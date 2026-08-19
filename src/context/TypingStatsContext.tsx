@@ -7,6 +7,7 @@ import {
   loadUnlockedAchievements,
 } from '../utils/storage';
 import { useAuth } from './AuthContext';
+import { auth, saveTypingScoreToFirestore } from '../services/firebase';
 import { soundSynthesizer } from '../utils/audio';
 
 interface TypingStatsContextType {
@@ -45,6 +46,19 @@ export const TypingStatsProvider: React.FC<{ children: React.ReactNode }> = ({ c
     setLastResult(result);
     updateUserProfileState(updatedProfile);
     refreshStats();
+
+    if (auth && auth.currentUser) {
+      saveTypingScoreToFirestore({
+        userId: auth.currentUser.uid,
+        userName: auth.currentUser.displayName || updatedProfile.displayName || 'Typing Master',
+        userEmail: auth.currentUser.email || updatedProfile.email || '',
+        wpm: result.netWpm,
+        rawWpm: result.grossWpm,
+        accuracy: result.accuracy,
+        timeTaken: result.durationSeconds,
+        mode: result.mode,
+      }).catch((err) => console.warn('Could not sync score to Firestore:', err));
+    }
 
     if (newAchievements.length > 0) {
       setRecentNewAchievements(prev => [...prev, ...newAchievements]);

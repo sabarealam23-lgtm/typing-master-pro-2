@@ -259,6 +259,86 @@ export const PARAGRAPHS_LIST: ParagraphItem[] = [
     difficulty: 'medium',
     text: "The art of typography balances letterforms, kerning, leading, and negative space to make written language both legible and visually harmonious. A well-chosen typeface establishes an immediate atmosphere, subtly guiding the reader's eye across the printed or digital page.",
     wordCount: 41
+  },
+  {
+    id: 'p-21',
+    title: 'Acoustic Resonance & Music',
+    category: 'Music',
+    difficulty: 'medium',
+    text: 'Acoustic instruments produce sound through the sympathetic vibration of wood, strings, and air columns. Handcrafted violins and concert grand pianos resonate with rich harmonic overtones that can captivate an audience in a quiet auditorium, turning mechanical vibrations into emotional resonance.',
+    wordCount: 43
+  },
+  {
+    id: 'p-22',
+    title: 'Glacial Geomorphology',
+    category: 'Science',
+    difficulty: 'hard',
+    text: 'Massive continental glaciers slowly carve deep U-shaped valleys and deposit vast moraines over millions of years. As ancient ice sheets advance and retreat, they sculpt rugged mountain landscapes, polish granite bedrock, and leave behind pristine crystalline fjord networks.',
+    wordCount: 39
+  },
+  {
+    id: 'p-23',
+    title: 'The Philosophy of Stoicism',
+    category: 'Philosophy',
+    difficulty: 'medium',
+    text: 'Ancient Stoic philosophers taught that while we cannot always control external circumstances, we maintain absolute sovereignty over our internal judgments and emotional reactions. By cultivating resilience, reason, and moral clarity, one can maintain equilibrium amidst life unpredictable changes.',
+    wordCount: 40
+  },
+  {
+    id: 'p-24',
+    title: 'Solar Energy & Photovoltaics',
+    category: 'Technology',
+    difficulty: 'medium',
+    text: 'Modern photovoltaic arrays capture sunlight and convert photonic energy directly into clean electricity through silicon semiconductor layers. Continued advancements in storage batteries and high-voltage transmission lines allow communities to power infrastructure with sustainable renewable energy.',
+    wordCount: 38
+  },
+  {
+    id: 'p-25',
+    title: 'Botany & Plant Communication',
+    category: 'Biology',
+    difficulty: 'easy',
+    text: 'Plants communicate through airborne chemical signals and underground mycorrhizal networks, warning neighboring flora of insect herbivores. By exchanging essential carbon, phosphorus, and moisture, entire forest communities demonstrate cooperative symbiotic intelligence.',
+    wordCount: 34
+  },
+  {
+    id: 'p-26',
+    title: 'Bridges & Structural Physics',
+    category: 'Engineering',
+    difficulty: 'medium',
+    text: 'Suspension bridges gracefully balance tensile and compressive forces across towering steel pylons and parabolic cables. Engineers calculate wind aeroelasticity and thermal expansion to ensure these monumental structures withstand fierce storms and carry millions of vehicles safely each year.',
+    wordCount: 41
+  },
+  {
+    id: 'p-27',
+    title: 'The Joy of Culinary Arts',
+    category: 'Lifestyle',
+    difficulty: 'easy',
+    text: 'Culinary mastery blends aromatic spices, temperature precision, and textural harmony to transform humble raw ingredients into memorable feasts. Sharing a freshly prepared meal around a welcoming table fosters heartfelt conversation, community bonds, and cherished memories.',
+    wordCount: 38
+  },
+  {
+    id: 'p-28',
+    title: 'Cartography & Ancient Maps',
+    category: 'History',
+    difficulty: 'medium',
+    text: 'Early cartographers charted unknown coastlines using bronze astrolabes, compass bearings, and celestial navigation. Their hand-drawn parchment maps merged mathematical precision with whimsical illustrations of sea serpents, inspiring generations of maritime explorers.',
+    wordCount: 36
+  },
+  {
+    id: 'p-29',
+    title: 'Deep Ocean Bioluminescence',
+    category: 'Science',
+    difficulty: 'hard',
+    text: 'In the pitch-black abyss of the bathypelagic zone, over ninety percent of marine organisms produce their own bioluminescent glow. Luciferin chemical reactions emit striking sapphire flashes used to attract mates, camouflage against predators, and illuminate dark waters.',
+    wordCount: 40
+  },
+  {
+    id: 'p-30',
+    title: 'Sustainable Architecture',
+    category: 'Architecture',
+    difficulty: 'medium',
+    text: 'Modern eco-friendly architecture incorporates natural passive ventilation, living green roofs, and recycled timber frames. By optimizing sun exposure and rainwater harvesting systems, these sustainable buildings drastically lower carbon footprints while creating restorative indoor spaces.',
+    wordCount: 37
   }
 ];
 
@@ -290,18 +370,20 @@ export function generateTimedWords(wordCount: number = 100): string {
 }
 
 export function generateDurationPassage(durationSeconds: number): { text: string; paragraphCount: number; usedIndices: number[] } {
-  let neededParagraphs = 2;
+  let neededParagraphs = 3;
 
   if (durationSeconds <= 30) {
-    neededParagraphs = 2;
+    neededParagraphs = 3; // ~130 words
   } else if (durationSeconds <= 60) {
-    neededParagraphs = 4;
+    neededParagraphs = 6; // ~260 words
   } else if (durationSeconds <= 120) {
-    neededParagraphs = 8;
+    neededParagraphs = 12; // ~520 words
   } else if (durationSeconds <= 300) {
-    neededParagraphs = 18;
+    // 5-minute test: Significantly longer content (~1,600 - 1,800 words)
+    neededParagraphs = 40;
   } else {
-    neededParagraphs = 36;
+    // 10-minute test: Maximum length content (~3,200 - 3,600 words)
+    neededParagraphs = 80;
   }
 
   const pool = NATURAL_PARAGRAPH_POOL;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { PageRoute, LeaderboardEntry, UserProfile, CursorStyle, SoundType, FontSize, ThemeMode } from '../../types';
 import { useAuth } from '../../context/AuthContext';
 import { useSettings } from '../../context/SettingsContext';
@@ -6,6 +6,11 @@ import { useTypingStats } from '../../context/TypingStatsContext';
 import { getLeaderboard, saveUserProfile, loadUserProfile } from '../../utils/storage';
 import { calculateLevelInfo, formatTotalTime } from '../../utils/typingCalculations';
 import { soundSynthesizer } from '../../utils/audio';
+import { 
+  getGlobalLeaderboardFromFirestore, 
+  FirestoreTypingScore, 
+  isFirebaseConfigured 
+} from '../../services/firebase';
 import { 
   Trophy, 
   User, 
@@ -25,7 +30,11 @@ import {
   Moon, 
   Sun, 
   Sparkles,
-  Award
+  Award,
+  RotateCcw,
+  Loader2,
+  Calendar,
+  Clock
 } from 'lucide-react';
 
 interface UserPageProps {
@@ -35,10 +44,67 @@ interface UserPageProps {
 // ==================== LEADERBOARD PAGE ====================
 export const LeaderboardPage: React.FC<UserPageProps> = ({ onNavigate }) => {
   const { user } = useAuth();
-  const [timeframe, setTimeframe] = useState<'daily' | 'weekly' | 'monthly' | 'all_time'>('all_time');
-  const [sortBy, setSortBy] = useState<'netWpm' | 'accuracy' | 'xp'>('netWpm');
+  const [firestoreScores, setFirestoreScores] = useState<FirestoreTypingScore[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
 
-  const leaderboardEntries = getLeaderboard(timeframe, sortBy);
+  const loadLeaderboardData = useCallback(async () => {
+    setIsRefreshing(true);
+    try {
+      const liveScores = await getGlobalLeaderboardFromFirestore(20);
+      setFirestoreScores(liveScores);
+    } catch (err) {
+      console.warn('Could not load Firestore leaderboard:', err);
+    } finally {
+      setIsLoading(false);
+      setIsRefreshing(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadLeaderboardData();
+  }, [loadLeaderboardData]);
+
+  // If no Firestore scores yet (e.g. fresh database), fallback to local leaderboard demo entries
+  const localEntries = getLeaderboard('all_time', 'netWpm');
+
+  const displayRows = firestoreScores.length > 0
+    ? firestoreScores.map((score, index) => ({
+        id: score.id || `fs_${index}`,
+        rank: index + 1,
+        userId: score.userId,
+        userName: score.userName || score.userEmail?.split('@')[0] || 'Anonymous Typist',
+        userEmail: score.userEmail || '',
+        wpm: score.wpm,
+        rawWpm: score.rawWpm || score.wpm,
+        accuracy: score.accuracy,
+        timeTaken: score.timeTaken || 60,
+        date: score.completedAtIso 
+          ? new Date(score.completedAtIso).toLocaleDateString(undefined, { 
+              month: 'short', 
+              day: 'numeric', 
+              year: 'numeric' 
+            })
+          : 'Recent',
+        isCurrentUser: score.userId === user.uid || (user.email && score.userEmail === user.email),
+      }))
+    : localEntries.map((entry) => ({
+        id: entry.id,
+        rank: entry.rank,
+        userId: entry.userId,
+        userName: entry.displayName,
+        userEmail: '',
+        wpm: entry.netWpm,
+        rawWpm: entry.netWpm,
+        accuracy: entry.accuracy,
+        timeTaken: 60,
+        date: new Date(entry.timestamp).toLocaleDateString(undefined, { 
+          month: 'short', 
+          day: 'numeric', 
+          year: 'numeric' 
+        }),
+        isCurrentUser: entry.userId === user.uid || entry.displayName.includes('(You)'),
+      }));
 
   return (
     <div id="leaderboard-page" className="w-full max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-8">
@@ -51,115 +117,142 @@ export const LeaderboardPage: React.FC<UserPageProps> = ({ onNavigate }) => {
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-100">
             Global Typist Leaderboard
           </h1>
+          <p className="text-xs sm:text-sm text-slate-400 mt-1">
+            Top scores synced in real time to the cloud from all certified typing sessions.
+          </p>
         </div>
 
-        {/* Timeframe selector */}
-        <div className="flex items-center gap-1 p-1 rounded-xl bg-slate-900 border border-slate-800 text-xs">
-          {(['daily', 'weekly', 'monthly', 'all_time'] as const).map((tf) => (
-            <button
-              key={tf}
-              onClick={() => setTimeframe(tf)}
-              className={`px-3 py-1.5 rounded-lg capitalize transition-colors font-medium ${
-                timeframe === tf
-                  ? 'bg-amber-500 text-slate-950 font-bold shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              {tf.replace('_', ' ')}
-            </button>
-          ))}
-        </div>
-      </div>
+        {/* Refresh button & Live indicator */}
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-300">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="font-mono text-[11px] text-slate-400">
+              {firestoreScores.length > 0 ? 'Live Cloud Sync' : 'Local / Ready'}
+            </span>
+          </div>
 
-      {/* Sort metric toggle */}
-      <div className="flex items-center gap-2 text-xs">
-        <span className="text-slate-400 uppercase font-semibold text-[10px]">Rank By:</span>
-        {(['netWpm', 'accuracy', 'xp'] as const).map((m) => (
           <button
-            key={m}
-            onClick={() => setSortBy(m)}
-            className={`px-3 py-1.5 rounded-lg border transition-colors ${
-              sortBy === m
-                ? 'bg-slate-800 text-emerald-400 border-emerald-500/40 font-bold'
-                : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-slate-200'
-            }`}
+            id="leaderboard-refresh-btn"
+            onClick={loadLeaderboardData}
+            disabled={isRefreshing}
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-200 border border-slate-700 text-xs font-medium transition-colors disabled:opacity-60"
+            title="Refresh Leaderboard"
           >
-            {m === 'netWpm' ? 'Net Speed (WPM)' : m === 'accuracy' ? 'Accuracy (%)' : 'XP Points'}
+            <RotateCcw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-emerald-400' : ''}`} />
+            <span>Refresh</span>
           </button>
-        ))}
+        </div>
       </div>
 
-      {/* Leaderboard Table */}
+      {/* Leaderboard Table Container */}
       <div className="bg-slate-900/80 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs text-slate-300">
-            <thead>
-              <tr className="border-b border-slate-800 bg-slate-950/60 text-slate-400 uppercase font-semibold text-[11px]">
-                <th className="py-3.5 px-4 w-16 text-center">Rank</th>
-                <th className="py-3.5 px-4">Typist</th>
-                <th className="py-3.5 px-4">Level</th>
-                <th className="py-3.5 px-4">Net Speed</th>
-                <th className="py-3.5 px-4">Accuracy</th>
-                <th className="py-3.5 px-4">XP</th>
-                <th className="py-3.5 px-4 text-right">Tests</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-800/60 font-mono">
-              {leaderboardEntries.map((entry) => {
-                const isCurrentUser = entry.userId === user.uid || entry.displayName.includes('(You)');
-                const isTop3 = entry.rank <= 3;
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center py-16 space-y-3">
+            <Loader2 className="w-7 h-7 text-emerald-400 animate-spin" />
+            <p className="text-xs text-slate-400 font-mono">Fetching global scores from Firestore...</p>
+          </div>
+        ) : displayRows.length === 0 ? (
+          <div className="text-center py-16 text-slate-400 text-xs space-y-3">
+            <p>No leaderboard scores recorded yet. Be the first to claim #1!</p>
+            <button
+              onClick={() => onNavigate('typing-test')}
+              className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs shadow-sm transition-all"
+            >
+              Take a Typing Test
+            </button>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs text-slate-300">
+              <thead>
+                <tr className="border-b border-slate-800 bg-slate-950/60 text-slate-400 uppercase font-semibold text-[11px]">
+                  <th className="py-3.5 px-4 w-16 text-center">Rank</th>
+                  <th className="py-3.5 px-4">User Name</th>
+                  <th className="py-3.5 px-4">WPM</th>
+                  <th className="py-3.5 px-4">Accuracy</th>
+                  <th className="py-3.5 px-4">Duration</th>
+                  <th className="py-3.5 px-4 text-right">Date</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-800/60 font-mono">
+                {displayRows.map((entry) => {
+                  const isTop1 = entry.rank === 1;
+                  const isTop2 = entry.rank === 2;
+                  const isTop3 = entry.rank === 3;
 
-                return (
-                  <tr
-                    key={entry.id}
-                    className={`transition-colors ${
-                      isCurrentUser
-                        ? 'bg-emerald-500/10 border-l-4 border-l-emerald-500 font-semibold'
-                        : 'hover:bg-slate-850'
-                    }`}
-                  >
-                    <td className="py-3.5 px-4 text-center">
-                      {entry.rank === 1 ? (
-                        <Crown className="w-5 h-5 text-amber-400 mx-auto" />
-                      ) : entry.rank === 2 ? (
-                        <Crown className="w-5 h-5 text-slate-300 mx-auto" />
-                      ) : entry.rank === 3 ? (
-                        <Crown className="w-5 h-5 text-amber-600 mx-auto" />
-                      ) : (
-                        <span className="text-slate-400 font-bold">#{entry.rank}</span>
-                      )}
-                    </td>
-                    <td className="py-3.5 px-4 font-sans font-medium text-slate-100 flex items-center gap-2.5">
-                      <div className="w-7 h-7 rounded-full bg-slate-800 text-slate-300 flex items-center justify-center font-bold text-xs">
-                        {entry.displayName.charAt(0).toUpperCase()}
-                      </div>
-                      <span className={isCurrentUser ? 'text-emerald-400 font-bold' : ''}>
-                        {entry.displayName}
-                      </span>
-                    </td>
-                    <td className="py-3.5 px-4 text-slate-300">
-                      <span className="px-2 py-0.5 rounded bg-slate-950 border border-slate-800 text-slate-300 text-[10px]">
-                        Lv.{entry.level}
-                      </span>
-                    </td>
-                    <td className="py-3.5 px-4 font-bold text-emerald-400 text-sm">
-                      {entry.netWpm} <span className="text-xs text-slate-400 font-normal">WPM</span>
-                    </td>
-                    <td className="py-3.5 px-4 text-cyan-400 font-bold">
-                      {entry.accuracy}%
-                    </td>
-                    <td className="py-3.5 px-4 text-amber-400">
-                      {entry.xp.toLocaleString()}
-                    </td>
-                    <td className="py-3.5 px-4 text-right text-slate-400">
-                      {entry.testsCount}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+                  return (
+                    <tr
+                      key={entry.id}
+                      className={`transition-colors ${
+                        entry.isCurrentUser
+                          ? 'bg-emerald-500/10 border-l-4 border-l-emerald-500 font-semibold'
+                          : 'hover:bg-slate-850'
+                      }`}
+                    >
+                      {/* Rank */}
+                      <td className="py-3.5 px-4 text-center">
+                        {isTop1 ? (
+                          <div className="flex items-center justify-center">
+                            <Crown className="w-5 h-5 text-amber-400" />
+                          </div>
+                        ) : isTop2 ? (
+                          <div className="flex items-center justify-center">
+                            <Crown className="w-5 h-5 text-slate-300" />
+                          </div>
+                        ) : isTop3 ? (
+                          <div className="flex items-center justify-center">
+                            <Crown className="w-5 h-5 text-amber-600" />
+                          </div>
+                        ) : (
+                          <span className="text-slate-400 font-bold text-xs">#{entry.rank}</span>
+                        )}
+                      </td>
+
+                      {/* User Name */}
+                      <td className="py-3.5 px-4 font-sans font-medium text-slate-100">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-7 h-7 rounded-full bg-slate-800 text-slate-300 flex items-center justify-center font-bold text-xs shrink-0">
+                            {entry.userName.charAt(0).toUpperCase()}
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <span className={entry.isCurrentUser ? 'text-emerald-400 font-bold' : ''}>
+                              {entry.userName}
+                            </span>
+                            {entry.isCurrentUser && (
+                              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-semibold border border-emerald-500/30">
+                                You
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* WPM */}
+                      <td className="py-3.5 px-4 font-bold text-emerald-400 text-sm">
+                        {entry.wpm} <span className="text-xs text-slate-400 font-normal">WPM</span>
+                      </td>
+
+                      {/* Accuracy */}
+                      <td className="py-3.5 px-4 font-bold text-cyan-400">
+                        {entry.accuracy}%
+                      </td>
+
+                      {/* Duration / Time Taken */}
+                      <td className="py-3.5 px-4 text-slate-400">
+                        {entry.timeTaken}s
+                      </td>
+
+                      {/* Date */}
+                      <td className="py-3.5 px-4 text-right text-slate-400 font-sans text-xs">
+                        {entry.date}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );

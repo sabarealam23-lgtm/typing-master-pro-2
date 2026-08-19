@@ -15,6 +15,7 @@ import {
 import { getAdditionalNaturalParagraphs } from '../../data/practiceTexts';
 import { useSettings } from '../../context/SettingsContext';
 import { useAuth } from '../../context/AuthContext';
+import { auth, saveTypingScoreToFirestore } from '../../services/firebase';
 import { soundSynthesizer } from '../../utils/audio';
 import { VirtualKeyboard } from './VirtualKeyboard';
 import { 
@@ -181,8 +182,24 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
       calculationVersion: CALCULATION_VERSION,
     };
 
+    // Save to Firestore typing_scores collection if user is logged in (auth.currentUser)
+    if (auth && auth.currentUser) {
+      saveTypingScoreToFirestore({
+        userId: auth.currentUser.uid,
+        userName: auth.currentUser.displayName || user.displayName || 'Typing Master',
+        userEmail: auth.currentUser.email || user.email || '',
+        wpm: netWPM,
+        rawWpm: grossWPM,
+        accuracy: accuracy,
+        timeTaken: finalElapsedSeconds,
+        mode: mode,
+      }).catch((err) => {
+        console.warn('Could not save score to Firestore:', err);
+      });
+    }
+
     onComplete(result);
-  }, [isFinished, isTimedMode, targetDurationSeconds, lesson, user.uid, mode, onComplete]);
+  }, [isFinished, isTimedMode, targetDurationSeconds, lesson, user.uid, user.displayName, user.email, mode, onComplete]);
 
   const finishTestRef = useRef(finishTest);
   finishTestRef.current = finishTest;

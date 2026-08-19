@@ -1,10 +1,14 @@
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { PageRoute, Lesson } from '../../types';
 import { useAuth } from '../../context/AuthContext';
 import { useTypingStats } from '../../context/TypingStatsContext';
 import { calculateLevelInfo, formatTotalTime } from '../../utils/typingCalculations';
 import { LESSONS_DATA } from '../../data/lessons';
 import { ProgressCharts } from '../../components/charts/ProgressCharts';
+import { 
+  getUserHistoryFromFirestore, 
+  FirestoreTypingScore 
+} from '../../services/firebase';
 import { 
   Zap, 
   Target, 
@@ -18,7 +22,8 @@ import {
   CheckCircle2, 
   Calendar,
   Sparkles,
-  RotateCcw
+  RotateCcw,
+  Loader2
 } from 'lucide-react';
 
 interface DashboardPageProps {
@@ -28,13 +33,81 @@ interface DashboardPageProps {
 export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
   const { user } = useAuth();
   const { stats, lessonProgress, unlockedAchievementIds } = useTypingStats();
+  const [cloudScores, setCloudScores] = useState<FirestoreTypingScore[]>([]);
+  const [isLoadingHistory, setIsLoadingHistory] = useState<boolean>(false);
 
   const levelInfo = calculateLevelInfo(user.xp || 0);
+
+  // Fetch logged-in user's past typing attempts from Firestore typing_scores
+  const loadUserCloudHistory = useCallback(async () => {
+    if (!user.uid || user.isGuest) return;
+    setIsLoadingHistory(true);
+    try {
+      const scores = await getUserHistoryFromFirestore(user.uid, 50);
+      setCloudScores(scores);
+    } catch (err) {
+      console.warn('Could not fetch cloud scores for dashboard:', err);
+    } finally {
+      setIsLoadingHistory(false);
+    }
+  }, [user.uid, user.isGuest]);
+
+  useEffect(() => {
+    loadUserCloudHistory();
+  }, [loadUserCloudHistory]);
+
+  // Derived KPI Metrics (combining Firestore cloud data & local stats)
+  const cloudBestWpm = cloudScores.length > 0
+    ? Math.max(...cloudScores.map(s => s.wpm || 0))
+    : 0;
+  const bestWpm = Math.max(cloudBestWpm, stats.bestNetWpm || 0);
+
+  const cloudAvgAccuracy = cloudScores.length > 0
+    ? Math.round((cloudScores.reduce((acc, s) => acc + (s.accuracy || 0), 0) / cloudScores.length) * 10) / 10
+    : null;
+  const averageAccuracy = cloudAvgAccuracy !== null ? cloudAvgAccuracy : (stats.averageAccuracy || 100);
+
+  const totalTestsTaken = cloudScores.length > 0 
+    ? Math.max(cloudScores.length, stats.totalTestsCompleted)
+    : stats.totalTestsCompleted;
+
+  // Recent test attempts list for display
+  const displayRecentTests = cloudScores.length > 0
+    ? cloudScores.slice(0, 10).map((score, index) => ({
+        id: score.id || `cloud_${index}`,
+        title: score.mode ? score.mode.replace('_', ' ').toUpperCase() : 'TIMED TEST',
+        netWpm: score.wpm,
+        grossWpm: score.rawWpm || score.wpm,
+        accuracy: score.accuracy,
+        duration: score.timeTaken ? `${score.timeTaken}s` : '60s',
+        date: score.completedAtIso 
+          ? new Date(score.completedAtIso).toLocaleDateString(undefined, { 
+              month: 'short', 
+              day: 'numeric', 
+              hour: '2-digit', 
+              minute: '2-digit' 
+            })
+          : 'Recent',
+      }))
+    : stats.recentResults.slice(0, 10).map((r) => ({
+        id: r.id,
+        title: r.lessonTitle || r.mode.replace('_', ' ').toUpperCase(),
+        netWpm: r.netWpm,
+        grossWpm: r.grossWpm,
+        accuracy: r.accuracy,
+        duration: `${(r.elapsedMs / 1000).toFixed(0)}s`,
+        date: new Date(r.completedAt).toLocaleDateString(undefined, { 
+          month: 'short', 
+          day: 'numeric', 
+          hour: '2-digit', 
+          minute: '2-digit' 
+        }),
+      }));
 
   // Find next uncompleted lesson to recommend
   const nextLesson = LESSONS_DATA.find(l => !lessonProgress[l.id]?.completed) || LESSONS_DATA[0];
 
-  // Daily goal: e.g. 5 minutes practice or 3 tests
+  // Daily goal
   const todayMinutes = stats.dailyPracticeMinutes.find(d => d.date === new Date().toISOString().split('T')[0])?.minutes || 0;
   const dailyGoalMinutes = 10;
   const dailyGoalPercent = Math.min(100, Math.round((todayMinutes / dailyGoalMinutes) * 100));
@@ -56,6 +129,14 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
               <span className="text-xs text-slate-400 flex items-center gap-1">
                 <Calendar className="w-3.5 h-3.5" /> {new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}
               </span>
+              {cloudScores.length > 0 && (
+                <>
+                  <span className="text-slate-600">•</span>
+                  <span className="text-[11px] font-mono text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20">
+                    Cloud Synced
+                  </span>
+                </>
+              )}
             </div>
             <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-100">
               Welcome back, {user.displayName}
@@ -90,26 +171,39 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
         {/* Best WPM */}
         <div id="kpi-best-wpm" className="p-5 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-1">
           <div className="flex justify-between items-center">
-            <span className="text-xs text-slate-400 font-medium">Best Net Speed</span>
+            <span className="text-xs text-slate-400 font-medium">Best WPM</span>
             <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400"><Zap className="w-4 h-4" /></div>
           </div>
           <div className="flex items-baseline gap-1.5 pt-1">
-            <span className="text-3xl font-mono font-extrabold text-emerald-400">{stats.bestNetWpm || 0}</span>
+            <span className="text-3xl font-mono font-extrabold text-emerald-400">{bestWpm}</span>
             <span className="text-xs text-slate-400 font-mono">WPM</span>
           </div>
-          <p className="text-[11px] text-slate-400">Avg: {stats.averageNetWpm || 0} WPM</p>
+          <p className="text-[11px] text-slate-400">Peak net speed recorded</p>
         </div>
 
-        {/* Best Accuracy */}
+        {/* Average Accuracy */}
         <div id="kpi-best-accuracy" className="p-5 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-1">
           <div className="flex justify-between items-center">
-            <span className="text-xs text-slate-400 font-medium">Best Accuracy</span>
+            <span className="text-xs text-slate-400 font-medium">Average Accuracy</span>
             <div className="p-2 rounded-lg bg-cyan-500/10 text-cyan-400"><Target className="w-4 h-4" /></div>
           </div>
           <div className="flex items-baseline gap-1.5 pt-1">
-            <span className="text-3xl font-mono font-extrabold text-cyan-400">{stats.bestAccuracy || 100}%</span>
+            <span className="text-3xl font-mono font-extrabold text-cyan-400">{averageAccuracy}%</span>
           </div>
-          <p className="text-[11px] text-slate-400">Avg: {stats.averageAccuracy || 100}%</p>
+          <p className="text-[11px] text-slate-400">Precision consistency</p>
+        </div>
+
+        {/* Total Tests Taken */}
+        <div id="kpi-practice-time" className="p-5 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-1">
+          <div className="flex justify-between items-center">
+            <span className="text-xs text-slate-400 font-medium">Total Tests Taken</span>
+            <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-400"><Clock className="w-4 h-4" /></div>
+          </div>
+          <div className="flex items-baseline gap-1.5 pt-1">
+            <span className="text-3xl font-mono font-extrabold text-indigo-400">{totalTestsTaken}</span>
+            <span className="text-xs text-slate-400 font-mono">Tests</span>
+          </div>
+          <p className="text-[11px] text-slate-400">Time: {formatTotalTime(stats.totalPracticeTimeSeconds)}</p>
         </div>
 
         {/* Current Streak */}
@@ -123,19 +217,6 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
             <span className="text-xs text-slate-400 font-mono">Days</span>
           </div>
           <p className="text-[11px] text-slate-400">Longest: {user.longestStreak || 0} Days</p>
-        </div>
-
-        {/* Total Tests & Practice Time */}
-        <div id="kpi-practice-time" className="p-5 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-1">
-          <div className="flex justify-between items-center">
-            <span className="text-xs text-slate-400 font-medium">Practice Volume</span>
-            <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-400"><Clock className="w-4 h-4" /></div>
-          </div>
-          <div className="flex items-baseline gap-1.5 pt-1">
-            <span className="text-3xl font-mono font-extrabold text-indigo-400">{stats.totalTestsCompleted}</span>
-            <span className="text-xs text-slate-400 font-mono">Tests</span>
-          </div>
-          <p className="text-[11px] text-slate-400">Time: {formatTotalTime(stats.totalPracticeTimeSeconds)}</p>
         </div>
       </div>
 
@@ -223,28 +304,43 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
       {/* Progress Charts Component */}
       <ProgressCharts stats={stats} />
 
-      {/* Recent Tests Table */}
+      {/* Recent Tests Table (User History from Firestore & Local) */}
       <div id="dashboard-recent-results" className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-lg space-y-4">
         <div className="flex justify-between items-center">
-          <div>
-            <h3 className="text-base font-bold text-slate-100">Recent Test History</h3>
-            <p className="text-xs text-slate-400">Your latest official keystroke records</p>
+          <div className="flex items-center gap-3">
+            <div>
+              <h3 className="text-base font-bold text-slate-100">Recent Test History</h3>
+              <p className="text-xs text-slate-400">Your latest official keystroke records</p>
+            </div>
+            {isLoadingHistory && (
+              <Loader2 className="w-4 h-4 text-emerald-400 animate-spin" />
+            )}
           </div>
-          <button
-            onClick={() => onNavigate('progress')}
-            className="text-xs text-emerald-400 hover:underline flex items-center gap-1"
-          >
-            <span>View Full Analytics</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={loadUserCloudHistory}
+              className="text-xs text-slate-400 hover:text-slate-200 flex items-center gap-1 font-mono"
+              title="Sync Cloud Scores"
+            >
+              <RotateCcw className="w-3 h-3" />
+              <span>Sync</span>
+            </button>
+            <button
+              onClick={() => onNavigate('progress')}
+              className="text-xs text-emerald-400 hover:underline flex items-center gap-1"
+            >
+              <span>View Full Analytics</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
         </div>
 
-        {stats.recentResults.length === 0 ? (
+        {displayRecentTests.length === 0 ? (
           <div className="text-center py-8 text-slate-400 text-xs space-y-3">
             <p>No typing tests completed yet.</p>
             <button
               onClick={() => onNavigate('typing-test')}
-              className="px-4 py-2 bg-emerald-500 text-slate-950 font-bold rounded-lg"
+              className="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-lg text-xs transition-colors"
             >
               Take Your First Test
             </button>
@@ -254,34 +350,26 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
             <table className="w-full text-left text-xs text-slate-300">
               <thead>
                 <tr className="border-b border-slate-800 text-slate-400 uppercase font-semibold">
-                  <th className="pb-3">Mode / Title</th>
+                  <th className="pb-3">Session / Mode</th>
                   <th className="pb-3">Net WPM</th>
                   <th className="pb-3">Gross WPM</th>
                   <th className="pb-3">Accuracy</th>
-                  <th className="pb-3">Errors</th>
-                  <th className="pb-3">XP</th>
+                  <th className="pb-3">Duration</th>
                   <th className="pb-3 text-right">Date</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/60 font-mono">
-                {stats.recentResults.map((r) => (
+                {displayRecentTests.map((r) => (
                   <tr key={r.id} className="hover:bg-slate-850 transition-colors">
                     <td className="py-3 font-sans font-medium text-slate-200">
-                      {r.lessonTitle || r.mode.replace('_', ' ').toUpperCase()}
+                      {r.title}
                     </td>
                     <td className="py-3 font-bold text-emerald-400">{r.netWpm}</td>
                     <td className="py-3 text-slate-400">{r.grossWpm}</td>
                     <td className="py-3 text-cyan-400">{r.accuracy}%</td>
-                    <td className="py-3 text-slate-400">
-                      {r.uncorrectedErrors > 0 ? (
-                        <span className="text-rose-400">{r.uncorrectedErrors} err</span>
-                      ) : (
-                        <span className="text-emerald-400">0</span>
-                      )}
-                    </td>
-                    <td className="py-3 text-amber-400">+{r.xpEarned}</td>
+                    <td className="py-3 text-slate-400">{r.duration}</td>
                     <td className="py-3 text-right text-slate-400 font-sans text-[11px]">
-                      {new Date(r.completedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                      {r.date}
                     </td>
                   </tr>
                 ))}

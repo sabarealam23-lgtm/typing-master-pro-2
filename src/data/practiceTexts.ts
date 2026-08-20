@@ -96,10 +96,74 @@ export const PRACTICE_TEXTS: PracticeTextItem[] = [
     author: 'Web Development',
     text: 'async function fetchMetrics(endpoint: string, retries = 3): Promise<Record<string, number>> { const res = await fetch(endpoint); if (!res.ok) throw new Error("HTTP Error " + res.status); return res.json(); }',
     difficulty: 'hard',
+  },
+  {
+    id: 'pt-11',
+    category: 'literature',
+    title: 'Story Series: Going Solo',
+    author: 'Roald Dahl',
+    text: 'The engine roared to life as the Tiger Moth biplane began to taxi across the open grassy airfield. Ahead lay the boundless blue sky, shimmering in the golden morning sunlight. With a gentle pull on the control stick, the wheels lifted effortlessly from the ground into free flight.',
+    difficulty: 'medium',
+  },
+  {
+    id: 'pt-12',
+    category: 'literature',
+    title: 'Story Series: Ava & the Rabbit',
+    author: 'Children Story Series',
+    text: 'Ava sat beneath the ancient willow tree, watching a curious white rabbit nibble on sweet clover. The rabbit twitched its velvety pink nose and hopped softly toward the sunlit meadow, looking back as if inviting Ava to follow on an afternoon adventure.',
+    difficulty: 'easy',
+  },
+  {
+    id: 'pt-13',
+    category: 'literature',
+    title: 'Story Series: Space Explorer',
+    author: 'Cosmic Journeys',
+    text: 'Commander Leo watched the neon rings of Saturn rotate slowly outside the observatory deck. Millions of ice particles glittered like stardust in the quiet void of deep space, signaling the successful completion of their interstellar journey.',
+    difficulty: 'medium',
+  },
+  {
+    id: 'pt-14',
+    category: 'general',
+    title: 'Left & Right Hand Finger Coordination',
+    author: 'Hand Drill Series',
+    text: 'Left pinky taps a and q, left ring hits s and w, left middle guides d and e, left index handles f and r. Right index controls j and u, right middle manages k and i, right ring directs l and o, right pinky commands semicolon and p.',
+    difficulty: 'medium',
   }
 ];
 
 export const PARAGRAPHS_LIST: ParagraphItem[] = [
+  {
+    id: 'p-story-1',
+    title: 'Going Solo: The Biplane Flight',
+    category: 'Story Series',
+    difficulty: 'easy',
+    text: 'The engine roared to life as the Tiger Moth biplane began to taxi across the open grassy airfield. Ahead lay the boundless blue sky, shimmering in the golden morning sunlight. With a gentle pull on the control stick, the wheels lifted effortlessly from the ground into free flight.',
+    wordCount: 49
+  },
+  {
+    id: 'p-story-2',
+    title: 'Ava & the Rabbit: Meadow Secret',
+    category: 'Story Series',
+    difficulty: 'easy',
+    text: 'Ava sat beneath the ancient willow tree, watching a curious white rabbit nibble on sweet clover. The rabbit twitched its velvety pink nose and hopped softly toward the sunlit meadow, looking back as if inviting Ava to follow on an afternoon adventure.',
+    wordCount: 44
+  },
+  {
+    id: 'p-story-3',
+    title: 'Space Explorer: Rings of Saturn',
+    category: 'Story Series',
+    difficulty: 'medium',
+    text: 'Commander Leo watched the neon rings of Saturn rotate slowly outside the observatory deck. Millions of ice particles glittered like stardust in the quiet void of deep space, signaling the successful completion of their interstellar journey.',
+    wordCount: 38
+  },
+  {
+    id: 'p-drill-1',
+    title: 'Left & Right Hand Home Isolation',
+    category: 'Hand Drills',
+    difficulty: 'easy',
+    text: 'Left hand balances a s d f with steady rhythm while right hand mirrors j k l ; across the center row. Thumbs rest lightly upon the spacebar, prepared to punctuate each cadence without lifting palm heels.',
+    wordCount: 37
+  },
   {
     id: 'p-1',
     title: 'The Art of Touch Typing',

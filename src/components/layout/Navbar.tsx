@@ -56,7 +56,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
   return (
     <nav 
       id="main-navigation-bar"
-      className="sticky top-0 z-50 w-full bg-slate-950/90 dark:bg-slate-950/95 border-b border-slate-800/80 backdrop-blur-md"
+      className="sticky top-0 z-50 w-full bg-white/95 dark:bg-slate-950/95 border-b border-slate-200 dark:border-slate-800/80 backdrop-blur-md transition-colors shadow-xs"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
@@ -66,14 +66,14 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
             onClick={() => handleNav(isAuthenticated ? 'dashboard' : 'home')}
             className="flex items-center gap-3 cursor-pointer group"
           >
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-600 to-cyan-500 flex items-center justify-center text-slate-950 shadow-md shadow-emerald-500/20 group-hover:scale-105 transition-transform">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white shadow-md shadow-blue-500/20 group-hover:scale-105 transition-transform">
               <Keyboard className="w-5 h-5 text-white stroke-[2.5]" />
             </div>
             <div>
-              <span className="text-base sm:text-lg font-extrabold tracking-tight bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent">
+              <span className="text-base sm:text-lg font-extrabold tracking-tight text-slate-900 dark:text-white">
                 Typing Master
               </span>
-              <span className="text-xs font-bold uppercase tracking-widest text-slate-400 ml-1.5 px-1.5 py-0.5 rounded bg-slate-800/90 border border-slate-700">
+              <span className="text-xs font-bold uppercase tracking-widest text-slate-600 dark:text-slate-400 ml-1.5 px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700">
                 PRO
               </span>
             </div>
@@ -91,8 +91,8 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
                   className={`
                     flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-medium transition-all
                     ${active 
-                      ? 'bg-slate-800 text-emerald-400 font-semibold border border-slate-700/60 shadow-inner' 
-                      : 'text-slate-300 hover:text-white hover:bg-slate-900'}
+                      ? 'bg-blue-50 dark:bg-slate-850 text-blue-600 dark:text-blue-400 font-bold border border-blue-200 dark:border-slate-700/60 shadow-xs' 
+                      : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-900'}
                   `}
                 >
                   {link.icon}
@@ -108,9 +108,9 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
             <div 
               id="streak-indicator-badge"
               title={`${user.currentStreak || 0} Day Practice Streak`}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-xs font-bold"
             >
-              <Flame className="w-4 h-4 fill-amber-400/30 text-amber-400" />
+              <Flame className="w-4 h-4 fill-amber-400/30 text-amber-500 dark:text-amber-400" />
               <span>{user.currentStreak || 0}</span>
             </div>
 
@@ -118,15 +118,15 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
             <div 
               id="level-indicator-badge"
               title={`Level ${levelInfo.level} - ${levelInfo.currentLevelXp}/${levelInfo.nextLevelXpThreshold} XP to Level ${levelInfo.level + 1}`}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-xs text-slate-200"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 text-xs text-slate-800 dark:text-slate-200 shadow-xs"
             >
               <div className="flex items-center gap-1">
-                <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-                <span className="font-bold text-emerald-400">Lv.{levelInfo.level}</span>
+                <Sparkles className="w-3.5 h-3.5 text-blue-600 dark:text-emerald-400" />
+                <span className="font-bold text-blue-600 dark:text-emerald-400">Lv.{levelInfo.level}</span>
               </div>
-              <div className="w-12 h-1.5 bg-slate-800 rounded-full overflow-hidden">
+              <div className="w-12 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
                 <div 
-                  className="h-full bg-emerald-400 rounded-full transition-all duration-300"
+                  className="h-full bg-blue-500 dark:bg-emerald-400 rounded-full transition-all duration-300"
                   style={{ width: `${levelInfo.progressPercent}%` }}
                 />
               </div>
@@ -136,10 +136,10 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
             <button
               id="theme-toggle-btn"
               onClick={toggleTheme}
-              title="Toggle Theme"
-              className="p-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-colors"
+              title={settings.theme === 'dark' ? 'Switch to Day Mode (Light)' : 'Switch to Night Mode (Dark)'}
+              className="p-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shadow-xs"
             >
-              {settings.theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-cyan-400" />}
+              {settings.theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-blue-600" />}
             </button>
 
             {/* Profile Dropdown / Login */}
@@ -148,9 +148,9 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
                 <button
                   id="profile-dropdown-btn"
                   onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-850 border border-slate-800 text-xs font-semibold text-slate-200 transition-colors"
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-850 border border-slate-300 dark:border-slate-800 text-xs font-semibold text-slate-800 dark:text-slate-200 transition-colors shadow-xs"
                 >
-                  <div className="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold">
+                  <div className="w-6 h-6 rounded-full bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold">
                     {user.displayName.charAt(0).toUpperCase()}
                   </div>
                   <span className="max-w-[100px] truncate">{user.displayName}</span>
@@ -159,33 +159,33 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
                 {profileDropdownOpen && (
                   <div 
                     id="profile-dropdown-menu"
-                    className="absolute right-0 mt-2 w-48 bg-slate-900 border border-slate-800 rounded-xl shadow-xl py-1.5 z-50"
+                    className="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl py-1.5 z-50 text-slate-700 dark:text-slate-300"
                   >
                     <button
                       onClick={() => handleNav('profile')}
-                      className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white"
+                      className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white"
                     >
                       <User className="w-4 h-4 text-slate-400" />
                       <span>My Profile</span>
                     </button>
                     <button
                       onClick={() => handleNav('progress')}
-                      className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white"
+                      className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white"
                     >
                       <BarChart3 className="w-4 h-4 text-slate-400" />
                       <span>Detailed Progress</span>
                     </button>
                     <button
                       onClick={() => handleNav('settings')}
-                      className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white"
+                      className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white"
                     >
                       <SettingsIcon className="w-4 h-4 text-slate-400" />
                       <span>Preferences</span>
                     </button>
-                    <div className="h-px bg-slate-800 my-1" />
+                    <div className="h-px bg-slate-200 dark:bg-slate-800 my-1" />
                     <button
                       onClick={() => { logout(); handleNav('home'); }}
-                      className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-rose-400 hover:bg-rose-500/10"
+                      className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10"
                     >
                       <LogOut className="w-4 h-4" />
                       <span>Sign Out</span>
@@ -198,14 +198,14 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
                 <button
                   id="nav-login-btn"
                   onClick={() => handleNav('login')}
-                  className="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-900"
+                  className="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-900"
                 >
                   Log In
                 </button>
                 <button
                   id="nav-register-btn"
                   onClick={() => handleNav('register')}
-                  className="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500 hover:bg-emerald-400 text-slate-950 shadow-sm transition-colors"
+                  className="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 hover:bg-blue-500 text-white shadow-sm transition-colors"
                 >
                   Sign Up
                 </button>

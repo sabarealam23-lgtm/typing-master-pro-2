@@ -123,8 +123,8 @@ const AppContent: React.FC = () => {
   const isDark = settings.theme === 'dark' || (settings.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
 
   return (
-    <div className={`min-h-screen flex flex-col font-sans selection:bg-emerald-500/30 selection:text-emerald-200 ${
-      isDark ? 'bg-slate-950 text-slate-100' : 'bg-slate-900 text-slate-100'
+    <div className={`min-h-screen flex flex-col font-sans selection:bg-cyan-500/30 selection:text-cyan-900 dark:selection:text-cyan-200 transition-colors duration-200 ${
+      isDark ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'
     }`}>
       {/* Top Sticky Navigation Bar */}
       <Navbar currentPage={currentPage} onNavigate={handleNavigate} />

@@ -762,13 +762,16 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
           >
             {charDetails.map((detail, index) => {
               const isCurrent = index === cursorIndex;
-              let charStyle = 'text-slate-400 dark:text-slate-500';
+              // Untyped / Upcoming text: solid, clearly visible dark slate / light slate
+              let charStyle = 'text-slate-700 dark:text-slate-300';
 
               if (!blindModeActive) {
                 if (detail.state === 'correct' || detail.state === 'corrected') {
+                  // Correctly Typed: vibrant green
                   charStyle = 'text-emerald-600 dark:text-emerald-400 font-semibold';
                 } else if (detail.state === 'incorrect') {
-                  charStyle = 'text-rose-600 dark:text-rose-400 bg-rose-500/20 underline decoration-rose-500 rounded-xs font-semibold';
+                  // Incorrect / Error: bright red (keeping existing error handling untouched)
+                  charStyle = 'text-red-500 dark:text-red-400 bg-red-500/10 underline decoration-red-500 font-semibold';
                 }
               }
 
@@ -784,11 +787,11 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
                         !blindModeActive && (detail.state === 'correct' || detail.state === 'corrected')
                           ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-300 font-semibold'
                           : !blindModeActive && detail.state === 'incorrect'
-                          ? 'bg-rose-500/25 text-rose-600 dark:text-rose-300 font-semibold'
-                          : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-300 dark:border-slate-700'
-                      } ${isCurrent ? 'ring-2 ring-cyan-500 font-bold text-cyan-600 dark:text-cyan-400' : ''}`}
+                          ? 'bg-red-500/25 text-red-600 dark:text-red-300 font-semibold'
+                          : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700'
+                      } ${isCurrent ? 'ring-2 ring-blue-500 font-bold text-slate-900 dark:text-slate-100' : ''}`}
                     >
-                      <span className="font-bold text-cyan-500">↵</span>
+                      <span className="font-bold text-blue-500">↵</span>
                       <span>Next Paragraph (Enter / Space)</span>
                     </span>
                   </span>
@@ -799,10 +802,12 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
                 <span
                   key={index}
                   ref={isCurrent ? activeCharRef : null}
-                  className={`relative inline-block transition-colors duration-75 ${charStyle} ${
-                    isCurrent ? 'border-b-2 border-cyan-500 bg-cyan-500/20 dark:bg-cyan-500/30 text-cyan-600 dark:text-cyan-300 font-bold rounded-xs px-0.5' : ''
-                  }`}
+                  className={`relative inline-block transition-colors duration-75 ${charStyle}`}
                 >
+                  {/* Active Vertical Bar Cursor */}
+                  {isCurrent && (
+                    <span className="absolute -left-[1px] top-[2px] bottom-[2px] w-[2px] bg-blue-600 dark:bg-blue-400 animate-pulse pointer-events-none rounded-full" />
+                  )}
                   {detail.expected === ' ' ? (detail.state === 'incorrect' ? '␣' : '\u00A0') : detail.expected}
                 </span>
               );

@@ -17,7 +17,7 @@ import { useSettings } from '../../context/SettingsContext';
 import { useAuth } from '../../context/AuthContext';
 import { saveTypingScoreToFirestore } from '../../services/firebase';
 import { soundSynthesizer } from '../../utils/audio';
-import { VirtualKeyboard } from './VirtualKeyboard';
+import { VirtualKeyboard, getFingerGuide } from './VirtualKeyboard';
 import { 
   RotateCcw, 
   AlertTriangle, 
@@ -476,6 +476,7 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
   };
 
   const currentExpectedChar = charDetails[cursorIndex]?.expected || '';
+  const fingerGuide = React.useMemo(() => getFingerGuide(currentExpectedChar), [currentExpectedChar]);
   const progressPercent = Math.min(100, Math.round((cursorIndex / Math.max(1, charDetails.length)) * 100));
 
   const isDark = settings.theme === 'dark' || (settings.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
@@ -642,13 +643,39 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
         </div>
       )}
 
+      {/* Target Key Prompt / Finger Guideline (Positioned cleanly ABOVE the main typing text display card) */}
+      {(settings.showVirtualKeyboard || mode === 'lesson') && (
+        <div 
+          id="typing-target-key-guide"
+          className="flex flex-wrap items-center justify-between gap-2 px-3.5 sm:px-4 py-2 bg-slate-100/90 dark:bg-slate-900/90 border border-slate-300 dark:border-slate-800 rounded-xl shadow-xs text-xs sm:text-sm"
+        >
+          <div className="flex items-center gap-2 font-medium text-slate-700 dark:text-slate-200">
+            <span className="text-slate-500 dark:text-slate-400 font-semibold">Type:</span>
+            <span className="font-mono font-extrabold px-2.5 py-0.5 rounded-md bg-cyan-100 dark:bg-cyan-950/80 text-cyan-700 dark:text-cyan-300 border border-cyan-300 dark:border-cyan-700 text-sm shadow-2xs">
+              {fingerGuide.targetDisplay}
+            </span>
+            <span className="text-slate-300 dark:text-slate-700">|</span>
+            <span className="text-slate-500 dark:text-slate-400">Finger:</span>
+            <span className="font-semibold text-slate-900 dark:text-slate-100">
+              {fingerGuide.handName} • {fingerGuide.fingerName}
+            </span>
+          </div>
+
+          <div className="hidden sm:flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 font-mono">
+            <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 inline-block" />
+            <span className="hidden md:inline">Home Row:</span>
+            <span>ASDF JKL;</span>
+          </div>
+        </div>
+      )}
+
       {/* Main Interactive Typing Container */}
       <div
         id="typing-focus-container"
         ref={containerRef}
         onPaste={handlePaste}
         className={`
-          relative w-full min-h-[170px] max-h-[280px] overflow-y-auto 
+          relative w-full min-h-[140px] max-h-[220px] overflow-y-auto 
           bg-white dark:bg-slate-950/95 
           border-2 rounded-2xl p-4 sm:p-5 
           shadow-md dark:shadow-2xl transition-all duration-150
@@ -829,6 +856,7 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
         <VirtualKeyboard 
           currentExpectedChar={currentExpectedChar} 
           onKeyPress={(k) => processKeyInput(k)}
+          hideFingerBadge={true}
         />
       )}
     </div>

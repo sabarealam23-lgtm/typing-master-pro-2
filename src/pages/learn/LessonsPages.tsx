@@ -574,7 +574,7 @@ export const LessonViewPage: React.FC<LessonViewPageProps> = ({ lesson, onNaviga
   }
 
   return (
-    <div id="active-lesson-view" className="w-full max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-6">
+    <div id="active-lesson-view" className="w-full max-w-7xl mx-auto py-3 sm:py-5 px-4 sm:px-6 lg:px-8 space-y-3.5 sm:space-y-4">
       {/* Back button & Lesson header */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <button

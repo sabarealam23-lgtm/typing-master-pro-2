@@ -11,6 +11,7 @@ export interface KeyDef {
 interface VirtualKeyboardProps {
   currentExpectedChar: string;
   onKeyPress?: (key: string) => void;
+  hideFingerBadge?: boolean;
 }
 
 interface FingerGuide {
@@ -154,7 +155,8 @@ export function getFingerGuide(char: string): FingerGuide {
 
 export const VirtualKeyboard: React.FC<VirtualKeyboardProps> = ({ 
   currentExpectedChar, 
-  onKeyPress
+  onKeyPress,
+  hideFingerBadge = false
 }) => {
   const needsShift = React.useMemo(() => {
     if (!currentExpectedChar) return false;
@@ -191,31 +193,33 @@ export const VirtualKeyboard: React.FC<VirtualKeyboardProps> = ({
   return (
     <div 
       id="virtual-keyboard-root" 
-      className="w-full max-w-4xl mx-auto select-none space-y-2.5"
+      className="w-full max-w-4xl mx-auto select-none space-y-2"
     >
-      {/* Target Key & Finger Guide Badge */}
-      <div 
-        id="dynamic-finger-guide-badge"
-        className="flex items-center justify-between px-3 sm:px-4 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xs"
-      >
-        <div className="flex items-center gap-2 text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-200">
-          <span>Target:</span>
-          <span className="font-mono font-bold px-2 py-0.5 rounded bg-cyan-50 dark:bg-cyan-950/50 text-cyan-700 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-800">
-            {fingerGuide.targetDisplay}
-          </span>
-          <span className="text-slate-300 dark:text-slate-700">|</span>
-          <span className="text-slate-500 dark:text-slate-400">Use:</span>
-          <span className="font-semibold text-slate-900 dark:text-slate-100">
-            {fingerGuide.handName} • {fingerGuide.fingerName}
-          </span>
-        </div>
+      {/* Target Key & Finger Guide Badge (rendered only if not rendered above in parent) */}
+      {!hideFingerBadge && (
+        <div 
+          id="dynamic-finger-guide-badge"
+          className="flex items-center justify-between px-3 sm:px-4 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xs"
+        >
+          <div className="flex items-center gap-2 text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-200">
+            <span>Target:</span>
+            <span className="font-mono font-bold px-2 py-0.5 rounded bg-cyan-50 dark:bg-cyan-950/50 text-cyan-700 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-800">
+              {fingerGuide.targetDisplay}
+            </span>
+            <span className="text-slate-300 dark:text-slate-700">|</span>
+            <span className="text-slate-500 dark:text-slate-400">Use:</span>
+            <span className="font-semibold text-slate-900 dark:text-slate-100">
+              {fingerGuide.handName} • {fingerGuide.fingerName}
+            </span>
+          </div>
 
-        {/* Home Row Reminder Hint */}
-        <div className="hidden sm:flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
-          <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 inline-block" />
-          <span>Home Row: ASDF JKL;</span>
+          {/* Home Row Reminder Hint */}
+          <div className="hidden sm:flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
+            <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 inline-block" />
+            <span>Home Row: ASDF JKL;</span>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Clean Minimal Virtual Keyboard Matrix (No outer frame/border/background panel) */}
       <div 

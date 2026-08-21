@@ -240,7 +240,11 @@ export const LessonViewPage: React.FC<LessonViewPageProps> = ({ lesson, onNaviga
     }
   }, [isPassed, nextLesson, onNavigate]);
 
-  // Scoped Enter listener active only when modal is completed (isCompleted === true)
+  const handleRetryLesson = React.useCallback(() => {
+    setCompletedResult(null);
+  }, []);
+
+  // Scoped keydown listener active only when modal is completed (isCompleted === true)
   React.useEffect(() => {
     if (!isCompleted) return;
 
@@ -248,6 +252,9 @@ export const LessonViewPage: React.FC<LessonViewPageProps> = ({ lesson, onNaviga
       if (e.key === 'Enter') {
         e.preventDefault();
         handleNextLesson();
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        handleRetryLesson();
       }
     };
 
@@ -255,7 +262,7 @@ export const LessonViewPage: React.FC<LessonViewPageProps> = ({ lesson, onNaviga
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isCompleted, handleNextLesson]);
+  }, [isCompleted, handleNextLesson, handleRetryLesson]);
 
   return (
     <div id="active-lesson-view" className="w-full max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-6">

@@ -228,6 +228,35 @@ export const LessonViewPage: React.FC<LessonViewPageProps> = ({ lesson, onNaviga
     ? LESSONS_DATA[currentIndex + 1] 
     : null;
 
+  const isCompleted = completedResult !== null;
+
+  const handleNextLesson = React.useCallback(() => {
+    if (isPassed && nextLesson) {
+      setCompletedResult(null);
+      onNavigate('lesson-view', nextLesson);
+    } else {
+      // If not passed or no next lesson, retry
+      setCompletedResult(null);
+    }
+  }, [isPassed, nextLesson, onNavigate]);
+
+  // Scoped Enter listener active only when modal is completed (isCompleted === true)
+  React.useEffect(() => {
+    if (!isCompleted) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        handleNextLesson();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isCompleted, handleNextLesson]);
+
   return (
     <div id="active-lesson-view" className="w-full max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-6">
       {/* Back button & Lesson header */}

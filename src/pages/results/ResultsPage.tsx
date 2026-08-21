@@ -81,6 +81,33 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ result, onNavigate }) 
     ? LESSONS_DATA.find(l => l.order === associatedLesson.order + 1)
     : undefined;
 
+  const handleNext = React.useCallback(() => {
+    if (nextLesson) {
+      onNavigate('lesson-view', nextLesson);
+    } else if (activeResult?.mode === 'lesson' && associatedLesson) {
+      onNavigate('lesson-view', associatedLesson);
+    } else {
+      onNavigate('typing-test');
+    }
+  }, [nextLesson, activeResult, associatedLesson, onNavigate]);
+
+  // Scoped Enter keydown listener on results screen
+  React.useEffect(() => {
+    if (!activeResult) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        handleNext();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [activeResult, handleNext]);
+
   return (
     <div id="test-results-view" className="w-full max-w-4xl mx-auto py-10 px-4 sm:px-6 space-y-8 animate-fade-in">
       {/* Header Banner */}

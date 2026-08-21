@@ -677,7 +677,7 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
               if (isNewline) {
                 return (
                   <div key={index} className="w-full my-1.5 border-t border-dashed border-slate-300 dark:border-slate-800 flex items-center pt-1">
-                    <span className="text-[9px] font-mono font-bold text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">
+                    <span className="text-[9px] font-mono font-bold text-slate-300 bg-slate-800/60 border border-white/10 px-2 py-0.5 rounded">
                       ↵ New Paragraph
                     </span>
                   </div>
@@ -701,7 +701,7 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
                           ? 'bg-rose-50 dark:bg-rose-950/40 border border-rose-400 dark:border-rose-600 text-rose-600 dark:text-rose-400'
                           : isCurrent
                           ? 'bg-cyan-50 dark:bg-cyan-950/40 border-2 border-cyan-500 text-cyan-600 dark:text-cyan-300 ring-2 ring-cyan-400/40 scale-105 shadow-2xs'
-                          : 'bg-slate-50 dark:bg-slate-900/70 border border-dashed border-slate-300 dark:border-slate-700 text-slate-400'
+                          : 'bg-slate-800/60 border border-dashed border-white/10 text-slate-300'
                       }
                     `}
                   >
@@ -735,7 +735,7 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
                         ? 'bg-rose-50 dark:bg-rose-950/40 border border-rose-400 dark:border-rose-600 text-rose-600 dark:text-rose-400'
                         : isCurrent
                         ? 'bg-cyan-50 dark:bg-cyan-950/40 border-2 border-cyan-500 text-cyan-600 dark:text-cyan-300 ring-2 ring-cyan-400/40 scale-105 shadow-2xs'
-                        : 'bg-white dark:bg-slate-850 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200'
+                        : 'bg-slate-800/60 border border-white/10 text-slate-100'
                     }
                   `}
                 >

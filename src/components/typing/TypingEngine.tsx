@@ -824,7 +824,7 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
         </div>
       </div>
 
-      {/* Clean Modular Virtual Keyboard with Transparent Hands Overlay */}
+      {/* Clean Modular Virtual Keyboard */}
       {settings.showVirtualKeyboard && (
         <VirtualKeyboard 
           currentExpectedChar={currentExpectedChar} 

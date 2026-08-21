@@ -217,61 +217,59 @@ export const VirtualKeyboard: React.FC<VirtualKeyboardProps> = ({
         </div>
       </div>
 
-      {/* Clean Virtual Keyboard Matrix */}
+      {/* Clean Minimal Virtual Keyboard Matrix (No outer frame/border/background panel) */}
       <div 
         id="virtual-keyboard-matrix"
-        className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-2xl p-2.5 sm:p-3.5 shadow-md dark:shadow-xl transition-colors"
+        className="w-full flex flex-col gap-1 sm:gap-1.5 items-center overflow-x-auto select-none py-1"
       >
-        <div className="flex flex-col gap-1 sm:gap-1.5 items-center w-full overflow-x-auto py-0.5">
-          {KEYBOARD_ROWS.map((row, rIdx) => (
-            <div key={rIdx} className="flex gap-1 sm:gap-1.5 justify-center w-full">
-              {row.map((k) => {
-                const active = isKeyActive(k);
-                const isHomeAnchor = k.key === 'f' || k.key === 'j';
-                const widthClass = k.width || 'w-6 sm:w-9 md:w-10';
+        {KEYBOARD_ROWS.map((row, rIdx) => (
+          <div key={rIdx} className="flex gap-1 sm:gap-1.5 justify-center w-full">
+            {row.map((k) => {
+              const active = isKeyActive(k);
+              const isHomeAnchor = k.key === 'f' || k.key === 'j';
+              const widthClass = k.width || 'w-6 sm:w-9 md:w-10';
 
-                return (
-                  <div
-                    key={k.key}
-                    id={`key-${k.key}`}
-                    onClick={() => handleKeyClick(k.display)}
-                    className={`
-                      ${widthClass} h-8 sm:h-9 md:h-10
-                      flex flex-col items-center justify-center
-                      rounded-lg transition-all duration-100 relative cursor-pointer select-none border shadow-2xs
-                      ${
-                        active
-                          ? 'bg-cyan-500 dark:bg-cyan-500 text-white shadow-lg shadow-cyan-500/50 scale-105 font-bold z-10 ring-2 ring-cyan-300 dark:ring-cyan-400 border-cyan-400'
-                          : 'bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-750 text-slate-800 dark:text-slate-200 border-slate-200 dark:border-slate-700/80'
-                      }
-                    `}
-                  >
-                    {/* Shift Symbol */}
-                    {k.shiftDisplay ? (
-                      <div className="flex flex-col items-center leading-none">
-                        <span className={`text-[8px] sm:text-[9px] font-mono leading-none ${active ? 'text-cyan-100' : 'text-slate-400 dark:text-slate-500'}`}>
-                          {k.shiftDisplay}
-                        </span>
-                        <span className="font-mono text-[10px] sm:text-xs font-semibold leading-tight mt-0.5">
-                          {k.display}
-                        </span>
-                      </div>
-                    ) : (
-                      <span className="font-mono text-[11px] sm:text-xs font-semibold leading-none">
+              return (
+                <div
+                  key={k.key}
+                  id={`key-${k.key}`}
+                  onClick={() => handleKeyClick(k.display)}
+                  className={`
+                    ${widthClass} h-8 sm:h-9 md:h-10
+                    flex flex-col items-center justify-center
+                    rounded-md sm:rounded-lg transition-all duration-100 relative cursor-pointer select-none border shadow-xs
+                    ${
+                      active
+                        ? 'bg-cyan-500 dark:bg-cyan-500 text-white shadow-md shadow-cyan-500/40 scale-105 font-bold z-10 ring-2 ring-cyan-300 dark:ring-cyan-400 border-cyan-400'
+                        : 'bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-750 text-slate-800 dark:text-slate-200 border-slate-200 dark:border-slate-700/80'
+                    }
+                  `}
+                >
+                  {/* Shift Symbol */}
+                  {k.shiftDisplay ? (
+                    <div className="flex flex-col items-center leading-none">
+                      <span className={`text-[8px] sm:text-[9px] font-mono leading-none ${active ? 'text-cyan-100' : 'text-slate-400 dark:text-slate-500'}`}>
+                        {k.shiftDisplay}
+                      </span>
+                      <span className="font-mono text-[10px] sm:text-xs font-semibold leading-tight mt-0.5">
                         {k.display}
                       </span>
-                    )}
+                    </div>
+                  ) : (
+                    <span className="font-mono text-[11px] sm:text-xs font-semibold leading-none">
+                      {k.display}
+                    </span>
+                  )}
 
-                    {/* Subtle tactile bump indicator on F and J */}
-                    {isHomeAnchor && !active && (
-                      <span className="absolute bottom-1 w-2.5 h-0.5 bg-cyan-500/80 rounded-full" />
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          ))}
-        </div>
+                  {/* Subtle tactile bump indicator on F and J */}
+                  {isHomeAnchor && !active && (
+                    <span className="absolute bottom-1 w-2.5 h-0.5 bg-cyan-500/80 rounded-full" />
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        ))}
       </div>
     </div>
   );

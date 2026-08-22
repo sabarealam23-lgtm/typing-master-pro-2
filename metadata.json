@@ -1,5 +1,5 @@
 {
-  "name": "Typing Master Pro",
+  "name": "SmartTypingPro",
   "description": "Professional browser-based typing learning and practice web platform with structured courses, accurate WPM/Accuracy typing engine, visual keyboard, detailed analytics, achievements, and leaderboards.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]

@@ -28,9 +28,9 @@ export const AboutPage: React.FC<InfoPageProps> = ({ onNavigate }) => {
           <Sparkles className="w-3.5 h-3.5" />
           <span>Science & Methodology</span>
         </div>
-        <h1 className="text-3xl sm:text-5xl font-extrabold text-slate-100">About Typing Master Pro</h1>
+        <h1 className="text-3xl sm:text-5xl font-extrabold text-slate-100">About SmartTypingPro</h1>
         <p className="text-sm sm:text-base text-slate-400 max-w-2xl mx-auto leading-relaxed">
-          Typing Master Pro was designed from the ground up to cultivate effortless motor memory through cognitive neuroscience principles and real-time biomechanical feedback.
+          SmartTypingPro was designed from the ground up to cultivate effortless motor memory through cognitive neuroscience principles and real-time biomechanical feedback.
         </p>
       </div>
 
@@ -203,7 +203,7 @@ export const PrivacyPolicyPage: React.FC<InfoPageProps> = () => {
         <section className="space-y-2">
           <h2 className="text-base font-bold text-slate-100">1. Information We Collect</h2>
           <p>
-            Typing Master Pro collects keystroke timing, WPM calculations, accuracy scores, lesson completion markers, and optional account credentials (such as email address and display name). We do not record or transmit arbitrary user input outside of explicit typing exercises.
+            SmartTypingPro collects keystroke timing, WPM calculations, accuracy scores, lesson completion markers, and optional account credentials (such as email address and display name). We do not record or transmit arbitrary user input outside of explicit typing exercises.
           </p>
         </section>
 
@@ -241,7 +241,7 @@ export const TermsPage: React.FC<InfoPageProps> = () => {
         <section className="space-y-2">
           <h2 className="text-base font-bold text-slate-100">1. Acceptance of Terms</h2>
           <p>
-            By accessing and practicing on Typing Master Pro, you agree to comply with these terms. The platform is provided for educational and skill improvement purposes.
+            By accessing and practicing on SmartTypingPro, you agree to comply with these terms. The platform is provided for educational and skill improvement purposes.
           </p>
         </section>
 
@@ -255,7 +255,7 @@ export const TermsPage: React.FC<InfoPageProps> = () => {
         <section className="space-y-2">
           <h2 className="text-base font-bold text-slate-100">3. Intellectual Property</h2>
           <p>
-            All custom learning paths, original UI design, branding, and algorithms are proprietary to Typing Master Pro.
+            All custom learning paths, original UI design, branding, and algorithms are proprietary to SmartTypingPro.
           </p>
         </section>
       </div>

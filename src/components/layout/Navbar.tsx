@@ -71,7 +71,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
             </div>
             <div>
               <span className="text-base sm:text-lg font-extrabold tracking-tight text-slate-900 dark:text-white">
-                Typing Master
+                SmartTyping
               </span>
               <span className="text-xs font-bold uppercase tracking-widest text-slate-600 dark:text-slate-400 ml-1.5 px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700">
                 PRO

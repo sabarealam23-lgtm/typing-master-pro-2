@@ -1,5 +1,5 @@
 /**
- * Typing Master Pro - Centralized Typing Calculation Utilities
+ * SmartTypingPro - Centralized Typing Calculation Utilities
  * 
  * Standard convention:
  * 1 Word = 5 keystrokes/characters (including spaces, numbers, punctuation)

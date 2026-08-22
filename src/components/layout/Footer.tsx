@@ -20,7 +20,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
               <div className="w-7 h-7 rounded-lg bg-emerald-500 flex items-center justify-center text-slate-950 shadow-sm">
                 <Keyboard className="w-4 h-4 text-slate-950 stroke-[2.5]" />
               </div>
-              <span className="text-sm font-extrabold text-slate-100">Typing Master Pro</span>
+              <span className="text-sm font-extrabold text-slate-100">SmartTypingPro</span>
             </div>
             <p className="text-slate-400 text-xs leading-relaxed">
               An original, high-performance touch-typing platform crafted for students, professionals, and developers seeking precision speed and effortless cognitive flow.
@@ -97,7 +97,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
 
         <div className="pt-6 border-t border-slate-900 flex flex-col sm:flex-row justify-between items-center gap-4 text-[11px] text-slate-500">
           <div>
-            © {new Date().getFullYear()} Typing Master Pro. All rights reserved. Web Application.
+            © {new Date().getFullYear()} SmartTypingPro. All rights reserved. Web Application.
           </div>
           <div className="flex gap-4">
             <button onClick={() => onNavigate('privacy')} className="hover:text-slate-400">Privacy</button>

@@ -195,7 +195,7 @@ export const RegisterPage: React.FC<AuthPageProps> = ({ onNavigate }) => {
             <Keyboard className="w-6 h-6 text-slate-950 stroke-[2.5]" />
           </div>
           <h1 className="text-2xl font-bold text-slate-100">Create Account</h1>
-          <p className="text-xs text-slate-400 mt-1">Join Typing Master Pro and start your progression</p>
+          <p className="text-xs text-slate-400 mt-1">Join SmartTypingPro and start your progression</p>
         </div>
 
         {error && (

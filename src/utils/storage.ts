@@ -97,7 +97,7 @@ export function createInitialUserProfile(uid?: string, email?: string, displayNa
   const generatedId = uid || `guest_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
   return {
     uid: generatedId,
-    email: email || 'guest@typingmasterpro.local',
+    email: email || 'guest@smarttypingpro.local',
     displayName: displayName || 'Typing Cadet',
     level: 1,
     xp: 0,
@@ -105,7 +105,7 @@ export function createInitialUserProfile(uid?: string, email?: string, displayNa
     longestStreak: 0,
     lastPracticeDate: null,
     createdAt: new Date().toISOString(),
-    bio: 'Touch typing enthusiast honing accuracy and rhythm on Typing Master Pro.',
+    bio: 'Touch typing enthusiast honing accuracy and rhythm on SmartTypingPro.',
     isGuest,
   };
 }

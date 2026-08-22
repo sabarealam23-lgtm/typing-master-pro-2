@@ -67,7 +67,7 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ result, onNavigate }) 
   const isPersonalBest = activeResult.netWpm >= (stats.bestNetWpm || 0);
 
   const handleCopySummary = () => {
-    const text = `🏆 Typing Master Pro Score:\n⚡ Net Speed: ${activeResult.netWpm} WPM (Gross: ${activeResult.grossWpm} WPM)\n🎯 Accuracy: ${activeResult.accuracy}%\n⏱️ Time: ${formatDuration(activeResult.durationSeconds)}\n✨ XP: +${activeResult.xpEarned}\nPractice free at Typing Master Pro!`;
+    const text = `🏆 SmartTypingPro Score:\n⚡ Net Speed: ${activeResult.netWpm} WPM (Gross: ${activeResult.grossWpm} WPM)\n🎯 Accuracy: ${activeResult.accuracy}%\n⏱️ Time: ${formatDuration(activeResult.durationSeconds)}\n✨ XP: +${activeResult.xpEarned}\nPractice free at SmartTypingPro!`;
     navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);

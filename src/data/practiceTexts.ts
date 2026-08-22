@@ -45,7 +45,7 @@ export const PRACTICE_TEXTS: PracticeTextItem[] = [
     id: 'pt-4',
     category: 'general',
     title: 'The Art of Touch Typing',
-    author: 'Typing Master Pro',
+    author: 'SmartTypingPro',
     text: 'Touch typing is the ability to use muscle memory to find keys fast without using the sense of sight. It eliminates the cognitive tax of searching for individual letters on the keyboard and allows your conscious mind to focus purely on composition, creativity, and flow.',
     difficulty: 'easy',
   },

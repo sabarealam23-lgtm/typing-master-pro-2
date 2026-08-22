@@ -28,7 +28,7 @@ export const DEFAULT_SETTINGS: UserSettings = {
   showVirtualKeyboard: true,
   keyboardLayout: 'qwerty',
   fontSize: 'md',
-  cursorStyle: 'line',
+  cursorStyle: 'underline',
   smoothCaret: true,
   blindMode: false,
   highlightMode: 'character',
@@ -58,7 +58,12 @@ export function loadSettings(): UserSettings {
     const soundType = validSoundTypes.includes(parsed?.soundType) ? parsed.soundType : 'click';
     const validThemes = ['dark', 'light', 'system'];
     const theme = validThemes.includes(parsed?.theme) ? parsed.theme : 'dark';
-    return { ...DEFAULT_SETTINGS, ...parsed, soundType, theme };
+    const validFontSizes = ['sm', 'md', 'lg', 'xl'];
+    const fontSize = validFontSizes.includes(parsed?.fontSize) ? parsed.fontSize : 'md';
+    const validCursorStyles = ['line', 'block', 'underline'];
+    const cursorStyle = validCursorStyles.includes(parsed?.cursorStyle) ? parsed.cursorStyle : 'underline';
+    const showVirtualKeyboard = typeof parsed?.showVirtualKeyboard === 'boolean' ? parsed.showVirtualKeyboard : true;
+    return { ...DEFAULT_SETTINGS, ...parsed, soundType, theme, fontSize, cursorStyle, showVirtualKeyboard };
   } catch {
     return DEFAULT_SETTINGS;
   }
@@ -70,6 +75,20 @@ export function saveSettings(settings: UserSettings): void {
     localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settings));
   } catch (err) {
     console.error('Failed to save settings to localStorage:', err);
+  }
+}
+
+export function resetAllDataToFactoryDefaults(): void {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.removeItem(STORAGE_KEYS.TEST_RESULTS);
+    localStorage.removeItem(STORAGE_KEYS.LESSON_PROGRESS);
+    localStorage.removeItem(STORAGE_KEYS.UNLOCKED_ACHIEVEMENTS);
+    localStorage.removeItem(STORAGE_KEYS.USER_PROFILE);
+    localStorage.removeItem(STORAGE_KEYS.GUEST_ID);
+    localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(DEFAULT_SETTINGS));
+  } catch (err) {
+    console.error('Failed to reset data to factory defaults:', err);
   }
 }
 

@@ -485,6 +485,110 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
     setTheme(isDark ? 'light' : 'dark');
   };
 
+  // Dynamic Typography Mapping for Typing Area
+  const continuousFontSizeClass = {
+    sm: 'text-lg md:text-xl leading-relaxed',
+    md: 'text-2xl md:text-2xl leading-relaxed',
+    lg: 'text-3xl md:text-3xl leading-relaxed',
+    xl: 'text-4xl md:text-4xl leading-relaxed',
+  }[settings.fontSize || 'md'] || 'text-2xl md:text-2xl leading-relaxed';
+
+  const cardSizes = {
+    sm: {
+      charText: 'text-xs sm:text-sm',
+      spaceText: 'text-[9px]',
+      charBox: 'min-w-[24px] sm:min-w-[28px] px-1 h-7 sm:h-8',
+      spaceBox: 'min-w-[38px] sm:min-w-[44px] px-1.5 h-7 sm:h-8'
+    },
+    md: {
+      charText: 'text-sm sm:text-base',
+      spaceText: 'text-[10px]',
+      charBox: 'min-w-[28px] sm:min-w-[34px] px-1.5 h-8 sm:h-9',
+      spaceBox: 'min-w-[44px] sm:min-w-[52px] px-2 h-8 sm:h-9'
+    },
+    lg: {
+      charText: 'text-base sm:text-lg',
+      spaceText: 'text-xs',
+      charBox: 'min-w-[32px] sm:min-w-[40px] px-2 h-9.5 sm:h-10.5',
+      spaceBox: 'min-w-[50px] sm:min-w-[60px] px-2.5 h-9.5 sm:h-10.5'
+    },
+    xl: {
+      charText: 'text-lg sm:text-xl',
+      spaceText: 'text-sm',
+      charBox: 'min-w-[38px] sm:min-w-[46px] px-2.5 h-11 sm:h-12',
+      spaceBox: 'min-w-[58px] sm:min-w-[70px] px-3 h-11 sm:h-12'
+    }
+  }[settings.fontSize || 'md'] || {
+    charText: 'text-sm sm:text-base',
+    spaceText: 'text-[10px]',
+    charBox: 'min-w-[28px] sm:min-w-[34px] px-1.5 h-8 sm:h-9',
+    spaceBox: 'min-w-[44px] sm:min-w-[52px] px-2 h-8 sm:h-9'
+  };
+
+  // Caret / Cursor Renderer for Continuous Flow Mode
+  const renderContinuousCaret = (isCurrent: boolean) => {
+    if (!isCurrent) return null;
+    const style = settings.cursorStyle || 'underline';
+
+    if (style === 'block') {
+      return (
+        <span 
+          id="typing-caret-block"
+          className="absolute inset-0 bg-blue-500/30 dark:bg-blue-400/40 border-2 border-blue-600 dark:border-blue-400 rounded-xs animate-pulse pointer-events-none z-10" 
+        />
+      );
+    }
+
+    if (style === 'line') {
+      return (
+        <span 
+          id="typing-caret-line"
+          className="absolute -left-[2px] top-[4%] bottom-[4%] w-[2.5px] bg-blue-600 dark:bg-blue-400 animate-pulse pointer-events-none rounded-full z-10" 
+        />
+      );
+    }
+
+    // Default: 'underline'
+    return (
+      <span 
+        id="typing-caret-underline"
+        className="absolute left-0 right-0 -bottom-0.5 h-[3px] bg-blue-600 dark:bg-blue-400 animate-pulse pointer-events-none rounded-full z-10" 
+      />
+    );
+  };
+
+  // Caret / Cursor Renderer for Character Boxes Mode
+  const renderCardCaret = (isCurrent: boolean) => {
+    if (!isCurrent) return null;
+    const style = settings.cursorStyle || 'underline';
+
+    if (style === 'line') {
+      return (
+        <span 
+          id="typing-card-caret-line"
+          className="absolute top-1 bottom-1 left-0.5 w-[2.5px] bg-cyan-500 rounded-full animate-pulse z-10" 
+        />
+      );
+    }
+
+    if (style === 'block') {
+      return (
+        <span 
+          id="typing-card-caret-block"
+          className="absolute inset-0 border-2 border-cyan-400 rounded-lg animate-pulse pointer-events-none z-10" 
+        />
+      );
+    }
+
+    // Default / 'underline'
+    return (
+      <span 
+        id="typing-card-caret-underline"
+        className="absolute bottom-0.5 left-1 right-1 h-[2.5px] bg-cyan-500 rounded-full animate-pulse z-10" 
+      />
+    );
+  };
+
   return (
     <div 
       id="typing-engine-wrapper" 
@@ -694,7 +798,7 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
         {displayStyle === 'cards' ? (
           <div 
             id="compact-character-boxes-grid"
-            className="flex flex-wrap items-center gap-1 sm:gap-1.5 py-1"
+            className="flex flex-wrap items-center gap-1.5 sm:gap-2 py-1"
           >
             {charDetails.map((detail, index) => {
               const isCurrent = index === cursorIndex;
@@ -719,7 +823,7 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
                     id={`letter-space-card-${index}`}
                     className={`
                       relative flex items-center justify-center
-                      min-w-[38px] sm:min-w-[44px] px-1.5 h-7.5 sm:h-8 rounded-lg text-[9px] uppercase font-mono font-bold
+                      ${cardSizes.spaceBox} rounded-lg ${cardSizes.spaceText} uppercase font-mono font-bold
                       transition-all duration-75 select-none
                       ${
                         detail.state === 'correct' || detail.state === 'corrected'
@@ -739,9 +843,7 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
                     {detail.state === 'incorrect' && !blindModeActive && (
                       <span className="text-[8px] font-extrabold text-rose-500 absolute top-0.5 right-0.5">✕</span>
                     )}
-                    {isCurrent && (
-                      <span className="absolute bottom-0.5 left-1.5 right-1.5 h-0.5 bg-cyan-500 rounded-full animate-pulse" />
-                    )}
+                    {renderCardCaret(isCurrent)}
                   </div>
                 );
               }
@@ -753,7 +855,7 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
                   id={`letter-card-${index}`}
                   className={`
                     relative flex items-center justify-center
-                    min-w-[24px] sm:min-w-[28px] px-1 h-7.5 sm:h-8 rounded-lg text-xs sm:text-sm font-mono font-bold
+                    ${cardSizes.charBox} rounded-lg ${cardSizes.charText} font-mono font-bold
                     transition-all duration-75 select-none shadow-2xs
                     ${
                       detail.state === 'correct' || detail.state === 'corrected'
@@ -773,9 +875,7 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
                   {detail.state === 'incorrect' && !blindModeActive && (
                     <span className="text-[8px] font-extrabold text-rose-500 absolute top-0.5 right-0.5">✕</span>
                   )}
-                  {isCurrent && (
-                    <span className="absolute bottom-0.5 left-1 right-1 h-0.5 bg-cyan-500 rounded-full animate-pulse" />
-                  )}
+                  {renderCardCaret(isCurrent)}
                 </div>
               );
             })}
@@ -784,7 +884,7 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
           /* 2. CONTINUOUS STREAMING MONOSPACE TEXT (Practice & Test view) */
           <div 
             id="typing-continuous-text-display"
-            className="font-mono text-left leading-relaxed text-base sm:text-lg tracking-normal whitespace-pre-wrap select-none outline-none py-1"
+            className={`font-mono text-left tracking-normal whitespace-pre-wrap select-none outline-none py-1.5 ${continuousFontSizeClass}`}
             style={{ wordBreak: 'normal', overflowWrap: 'break-word' }}
           >
             {charDetails.map((detail, index) => {
@@ -831,10 +931,8 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
                   ref={isCurrent ? activeCharRef : null}
                   className={`relative inline-block transition-colors duration-75 ${charStyle}`}
                 >
-                  {/* Active Vertical Bar Cursor */}
-                  {isCurrent && (
-                    <span className="absolute -left-[1px] top-[2px] bottom-[2px] w-[2px] bg-blue-600 dark:bg-blue-400 animate-pulse pointer-events-none rounded-full" />
-                  )}
+                  {/* Dynamic Active Caret Cursor */}
+                  {renderContinuousCaret(isCurrent)}
                   {detail.expected === ' ' ? (detail.state === 'incorrect' ? '␣' : '\u00A0') : detail.expected}
                 </span>
               );

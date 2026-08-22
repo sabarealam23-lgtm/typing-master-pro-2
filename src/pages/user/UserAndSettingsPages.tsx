@@ -3,7 +3,7 @@ import { PageRoute, LeaderboardEntry, UserProfile, CursorStyle, SoundType, FontS
 import { useAuth } from '../../context/AuthContext';
 import { useSettings } from '../../context/SettingsContext';
 import { useTypingStats } from '../../context/TypingStatsContext';
-import { getLeaderboard, saveUserProfile, loadUserProfile } from '../../utils/storage';
+import { getLeaderboard, saveUserProfile, loadUserProfile, resetAllDataToFactoryDefaults } from '../../utils/storage';
 import { calculateLevelInfo, formatTotalTime } from '../../utils/typingCalculations';
 import { soundSynthesizer, SOUND_OPTIONS } from '../../utils/audio';
 import { 
@@ -35,7 +35,9 @@ import {
   Loader2,
   Calendar,
   Clock,
-  Palette
+  Palette,
+  AlertTriangle,
+  X
 } from 'lucide-react';
 
 interface UserPageProps {
@@ -393,19 +395,29 @@ export const ProfilePage: React.FC<UserPageProps> = ({ onNavigate }) => {
 export const SettingsPage: React.FC<UserPageProps> = ({ onNavigate }) => {
   const { settings, updateSettings, setTheme, setSoundEnabled, setSoundType, setSoundVolume, setShowVirtualKeyboard, setFontSize, setCursorStyle, resetToDefaults } = useSettings();
   const [resetDone, setResetDone] = useState(false);
+  const [showResetModal, setShowResetModal] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
 
   const handleTestSound = (type: SoundType) => {
     soundSynthesizer.playKeySound(type, settings.soundVolume, false);
   };
 
-  const handleResetData = () => {
-    if (confirm('Are you sure you want to reset your local typing statistics and preferences?')) {
-      localStorage.clear();
-      resetToDefaults();
-      setResetDone(true);
-      setTimeout(() => setResetDone(false), 3000);
+  const handleOpenResetDialog = () => {
+    setShowResetModal(true);
+  };
+
+  const handleExecuteReset = () => {
+    setIsResetting(true);
+    resetAllDataToFactoryDefaults();
+    resetToDefaults();
+    setResetDone(true);
+    setShowResetModal(false);
+    setIsResetting(false);
+    
+    // Smoothly refresh/re-initialize application state
+    setTimeout(() => {
       window.location.reload();
-    }
+    }, 500);
   };
 
   return (
@@ -552,24 +564,34 @@ export const SettingsPage: React.FC<UserPageProps> = ({ onNavigate }) => {
         </div>
 
         {/* Typing Canvas Customization */}
-        <div className="p-6 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-4">
-          <h2 className="text-sm font-bold uppercase tracking-wider text-slate-200">Typing Area & Visuals</h2>
+        <div id="settings-typing-visuals-panel" className="p-6 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-5">
+          <div>
+            <h2 className="text-sm font-bold uppercase tracking-wider text-slate-200">Typing Area & Visuals</h2>
+            <p className="text-xs text-slate-400 mt-0.5">Customize font scaling, caret visual indicator, and guide visibility</p>
+          </div>
 
           {/* Font Size */}
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-2">Font Size</label>
-            <div className="grid grid-cols-4 gap-2 text-xs font-mono">
-              {(['sm', 'md', 'lg', 'xl'] as const).map((sz) => (
+            <label className="block text-xs font-semibold text-slate-300 mb-2">Font Size (Typing Arena & Tests)</label>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs font-mono">
+              {[
+                { id: 'sm', label: 'SM', desc: '1.125rem / 18px' },
+                { id: 'md', label: 'MD', desc: '1.5rem / 24px (Default)' },
+                { id: 'lg', label: 'LG', desc: '1.875rem / 30px' },
+                { id: 'xl', label: 'XL', desc: '2.25rem / 36px' },
+              ].map((sz) => (
                 <button
-                  key={sz}
-                  onClick={() => setFontSize(sz)}
-                  className={`py-2 rounded-xl border text-center font-bold capitalize transition-colors ${
-                    settings.fontSize === sz
-                      ? 'bg-emerald-500 text-slate-950 border-emerald-500'
-                      : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-slate-200'
+                  key={sz.id}
+                  id={`font-size-opt-${sz.id}`}
+                  onClick={() => setFontSize(sz.id as any)}
+                  className={`p-3 rounded-xl border text-left transition-all ${
+                    settings.fontSize === sz.id
+                      ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500 ring-2 ring-emerald-500/20'
+                      : 'bg-slate-950/80 border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700'
                   }`}
                 >
-                  {sz.toUpperCase()}
+                  <div className="font-extrabold text-sm">{sz.label}</div>
+                  <div className="text-[10px] text-slate-400 mt-0.5">{sz.desc}</div>
                 </button>
               ))}
             </div>
@@ -578,54 +600,145 @@ export const SettingsPage: React.FC<UserPageProps> = ({ onNavigate }) => {
           {/* Cursor Style */}
           <div>
             <label className="block text-xs font-semibold text-slate-300 mb-2">Cursor / Caret Style</label>
-            <div className="grid grid-cols-3 gap-2 text-xs font-mono">
-              {(['line', 'block', 'underline'] as const).map((cur) => (
+            <div className="grid grid-cols-3 gap-2.5 text-xs font-mono">
+              {[
+                { id: 'line', label: 'Line', symbol: '│', desc: 'Vertical blinking bar' },
+                { id: 'block', label: 'Block', symbol: '█', desc: 'Highlighted character box' },
+                { id: 'underline', label: 'Underline', symbol: ' ', desc: 'Bottom baseline bar' },
+              ].map((cur) => (
                 <button
-                  key={cur}
-                  onClick={() => setCursorStyle(cur)}
-                  className={`py-2 rounded-xl border text-center font-bold capitalize transition-colors ${
-                    settings.cursorStyle === cur
-                      ? 'bg-cyan-500 text-slate-950 border-cyan-500'
-                      : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-slate-200'
+                  key={cur.id}
+                  id={`cursor-style-opt-${cur.id}`}
+                  onClick={() => setCursorStyle(cur.id as any)}
+                  className={`p-3 rounded-xl border text-left transition-all ${
+                    settings.cursorStyle === cur.id
+                      ? 'bg-cyan-500/15 text-cyan-300 border-cyan-500 ring-2 ring-cyan-500/20'
+                      : 'bg-slate-950/80 border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700'
                   }`}
                 >
-                  {cur}
+                  <div className="flex items-center justify-between">
+                    <span className="font-extrabold text-sm capitalize">{cur.label}</span>
+                    <span className="text-base font-bold text-cyan-400">{cur.symbol}</span>
+                  </div>
+                  <div className="text-[10px] text-slate-400 mt-0.5">{cur.desc}</div>
                 </button>
               ))}
             </div>
           </div>
 
           {/* Virtual Keyboard Toggle */}
-          <div className="flex justify-between items-center pt-2">
-            <div>
+          <div 
+            id="toggle-virtual-keyboard-row"
+            onClick={() => setShowVirtualKeyboard(!settings.showVirtualKeyboard)}
+            className="flex items-center justify-between p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 hover:border-slate-700 cursor-pointer transition-colors"
+          >
+            <div className="space-y-0.5">
               <span className="text-xs font-semibold text-slate-200 block">On-Screen Visual Keyboard</span>
-              <span className="text-[11px] text-slate-400">Show interactive finger guide below typing area</span>
+              <span className="text-[11px] text-slate-400">Show interactive finger guide & keyboard below typing area</span>
             </div>
             <input
               type="checkbox"
+              id="settings-virtual-keyboard-checkbox"
               checked={settings.showVirtualKeyboard}
-              onChange={(e) => setShowVirtualKeyboard(e.target.checked)}
-              className="w-4 h-4 accent-emerald-500 rounded"
+              onChange={(e) => {
+                e.stopPropagation();
+                setShowVirtualKeyboard(e.target.checked);
+              }}
+              className="w-4 h-4 accent-emerald-500 rounded cursor-pointer"
             />
           </div>
         </div>
 
         {/* Reset & Storage Management */}
-        <div className="p-6 rounded-2xl bg-rose-500/10 border border-rose-500/20 space-y-3">
+        <div id="settings-reset-section" className="p-6 rounded-2xl bg-rose-500/10 border border-rose-500/20 space-y-3">
           <h2 className="text-sm font-bold text-rose-300 flex items-center gap-2">
             <Trash2 className="w-4 h-4" /> Reset Data & Factory Defaults
           </h2>
           <p className="text-xs text-rose-200/80">
-            Clear all locally cached keystroke records, test histories, streak counters, and reset preferences to default settings.
+            Clear all locally cached keystroke records, test histories, streak counters, and reset preferences to factory defaults (with default Underline caret).
           </p>
           <button
-            onClick={handleResetData}
-            className="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-bold transition-colors"
+            id="settings-wipe-data-btn"
+            onClick={handleOpenResetDialog}
+            className="px-4 py-2.5 bg-rose-600 hover:bg-rose-500 active:bg-rose-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm flex items-center gap-2"
           >
-            {resetDone ? 'Reset Completed!' : 'Wipe Local Records & Reset'}
+            <RotateCcw className="w-3.5 h-3.5" />
+            <span>{resetDone ? 'Reset Completed!' : 'Wipe Local Records & Reset'}</span>
           </button>
         </div>
       </div>
+
+      {/* Factory Reset Confirmation Dialog Modal */}
+      {showResetModal && (
+        <div 
+          id="factory-reset-modal-overlay"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-xs animate-in fade-in duration-150"
+        >
+          <div 
+            id="factory-reset-modal-card"
+            className="w-full max-w-md bg-slate-900 border border-rose-500/30 rounded-2xl p-6 shadow-2xl space-y-5 text-left relative"
+            role="dialog"
+            aria-modal="true"
+          >
+            <button
+              onClick={() => !isResetting && setShowResetModal(false)}
+              disabled={isResetting}
+              className="absolute top-4 right-4 p-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            <div className="flex items-start gap-3.5">
+              <div className="p-3 rounded-xl bg-rose-500/20 text-rose-400 border border-rose-500/30 shrink-0">
+                <AlertTriangle className="w-6 h-6" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-base font-bold text-slate-100">
+                  Reset Data & Factory Defaults
+                </h3>
+                <p className="text-xs font-semibold text-rose-300">
+                  Are you sure you want to reset all data, history, and settings to factory defaults?
+                </p>
+              </div>
+            </div>
+
+            <p className="text-xs text-slate-400 leading-relaxed bg-slate-950/60 p-3.5 rounded-xl border border-slate-800/80">
+              This action will permanently clear all cached test history, keystroke logs, and streak counters. All preferences will be restored to initial factory defaults (with default <span className="text-cyan-400 font-semibold">Underline</span> cursor). This cannot be undone.
+            </p>
+
+            <div className="flex items-center justify-end gap-3 pt-2">
+              <button
+                id="cancel-factory-reset-btn"
+                type="button"
+                onClick={() => setShowResetModal(false)}
+                disabled={isResetting}
+                className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-300 text-xs font-semibold border border-slate-700 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                id="confirm-factory-reset-btn"
+                type="button"
+                onClick={handleExecuteReset}
+                disabled={isResetting}
+                className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold transition-all shadow-md flex items-center gap-1.5"
+              >
+                {isResetting ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <span>Resetting...</span>
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Yes, Reset Everything</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

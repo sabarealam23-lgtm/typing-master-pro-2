@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { UserSettings, ThemeMode, SoundType, FontSize, CursorStyle } from '../types';
-import { loadSettings, saveSettings } from '../utils/storage';
+import { loadSettings, saveSettings, DEFAULT_SETTINGS } from '../utils/storage';
 
 interface SettingsContextType {
   settings: UserSettings;
@@ -57,21 +57,7 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const setShowVirtualKeyboard = (showVirtualKeyboard: boolean) => updateSettings({ showVirtualKeyboard });
 
   const resetToDefaults = () => {
-    const defaultVals: UserSettings = {
-      theme: 'dark',
-      soundEnabled: true,
-      soundType: 'click',
-      soundVolume: 0.5,
-      showVirtualKeyboard: true,
-      keyboardLayout: 'qwerty',
-      fontSize: 'lg',
-      cursorStyle: 'line',
-      smoothCaret: true,
-      blindMode: false,
-      highlightMode: 'character',
-      instantRestart: true,
-      autoSaveResults: true,
-    };
+    const defaultVals: UserSettings = { ...DEFAULT_SETTINGS };
     setSettingsState(defaultVals);
     saveSettings(defaultVals);
   };

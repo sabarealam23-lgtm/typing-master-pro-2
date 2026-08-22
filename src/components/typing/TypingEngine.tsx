@@ -112,28 +112,34 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
   const [liveNetWpm, setLiveNetWpm] = useState<number>(0);
   const [liveAccuracy, setLiveAccuracy] = useState<number>(100);
 
-  // Smooth auto-scroll for active typing position
+  // Smooth auto-scroll for active typing position / line centering
   useEffect(() => {
+    if (!containerRef.current) return;
+
     if (!isStarted || cursorIndex === 0) {
-      if (containerRef.current) {
-        containerRef.current.scrollTop = 0;
-      }
+      containerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
 
-    if (activeCharRef.current && containerRef.current) {
+    if (activeCharRef.current) {
       const container = containerRef.current;
       const charElem = activeCharRef.current;
-      const charTop = charElem.offsetTop - container.offsetTop;
-      
-      if (charTop > container.scrollTop + container.clientHeight - 70) {
+
+      const containerRect = container.getBoundingClientRect();
+      const charRect = charElem.getBoundingClientRect();
+
+      // Relative vertical offset from the top of the scrollable content
+      const relativeTop = charRect.top - containerRect.top + container.scrollTop;
+      const charHeight = charRect.height || 36;
+      const containerHeight = container.clientHeight;
+
+      // Keep active line centered in the container viewport so upcoming lines & paragraphs are always clearly visible
+      const targetScrollTop = Math.max(0, relativeTop - (containerHeight / 2) + (charHeight / 2));
+
+      // Scroll smoothly when advancing past 1st/2nd line or when deviating from center
+      if (Math.abs(container.scrollTop - targetScrollTop) > 14) {
         container.scrollTo({
-          top: charTop - 40,
-          behavior: 'smooth'
-        });
-      } else if (charTop < container.scrollTop + 15) {
-        container.scrollTo({
-          top: Math.max(0, charTop - 15),
+          top: targetScrollTop,
           behavior: 'smooth'
         });
       }
@@ -372,13 +378,23 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
       return;
     }
 
-    // Extend text if continuous test reaches end
-    if (currentIndex >= currentList.length) {
+    // Preemptively extend text buffer in timed/continuous tests so typing is never interrupted
+    if (isTimedMode && currentList.length - currentIndex < 140) {
+      const { text: extraText, newIndices } = getAdditionalNaturalParagraphs(3, usedParagraphIndicesRef.current);
+      usedParagraphIndicesRef.current.push(...newIndices);
+      const newChars: CharDetail[] = extraText.split('').map(char => ({ expected: char, state: 'untyped' }));
+      const extended = [...currentList, { expected: '\n', state: 'untyped' as const }, ...newChars];
+      currentList.length = 0;
+      currentList.push(...extended);
+      charDetailsRef.current = extended;
+      setCharDetails(extended);
+    } else if (currentIndex >= currentList.length) {
       if (isTimedMode) {
         const { text: extraText, newIndices } = getAdditionalNaturalParagraphs(3, usedParagraphIndicesRef.current);
         usedParagraphIndicesRef.current.push(...newIndices);
         const newChars: CharDetail[] = extraText.split('').map(char => ({ expected: char, state: 'untyped' }));
         const extended = [...currentList, { expected: '\n', state: 'untyped' as const }, ...newChars];
+        charDetailsRef.current = extended;
         setCharDetails(extended);
       } else {
         finishTest();
@@ -779,7 +795,7 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
         ref={containerRef}
         onPaste={handlePaste}
         className={`
-          relative w-full min-h-[140px] max-h-[220px] overflow-y-auto 
+          relative w-full min-h-[150px] max-h-[230px] overflow-y-auto scrollbar-clean scroll-smooth
           bg-white dark:bg-slate-950/95 
           border-2 rounded-2xl p-4 sm:p-5 
           shadow-md dark:shadow-2xl transition-all duration-150

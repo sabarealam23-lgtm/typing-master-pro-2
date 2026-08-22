@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { UserSettings, ThemeMode, SoundType, FontSize, CursorStyle } from '../types';
-import { loadSettings, saveSettings, DEFAULT_SETTINGS } from '../utils/storage';
+import { loadSettings, saveSettings } from '../utils/storage';
 
 interface SettingsContextType {
   settings: UserSettings;
@@ -9,9 +9,10 @@ interface SettingsContextType {
   setSoundEnabled: (enabled: boolean) => void;
   setSoundType: (type: SoundType) => void;
   setSoundVolume: (volume: number) => void;
-  setShowVirtualKeyboard: (show: boolean) => void;
   setFontSize: (size: FontSize) => void;
   setCursorStyle: (style: CursorStyle) => void;
+  toggleVirtualKeyboard: () => void;
+  setShowVirtualKeyboard: (show: boolean) => void;
   resetToDefaults: () => void;
 }
 
@@ -23,6 +24,9 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   useEffect(() => {
     // Apply theme class to document html element
     const root = document.documentElement;
+    root.classList.remove('light', 'dark', 'royal', 'nordic', 'espresso', 'theme-royal', 'theme-nordic', 'theme-espresso');
+    root.removeAttribute('data-theme');
+
     const isDark = settings.theme === 'dark' || 
       (settings.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
     
@@ -47,13 +51,29 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const setSoundEnabled = (soundEnabled: boolean) => updateSettings({ soundEnabled });
   const setSoundType = (soundType: SoundType) => updateSettings({ soundType });
   const setSoundVolume = (soundVolume: number) => updateSettings({ soundVolume });
-  const setShowVirtualKeyboard = (showVirtualKeyboard: boolean) => updateSettings({ showVirtualKeyboard });
   const setFontSize = (fontSize: FontSize) => updateSettings({ fontSize });
   const setCursorStyle = (cursorStyle: CursorStyle) => updateSettings({ cursorStyle });
+  const toggleVirtualKeyboard = () => updateSettings({ showVirtualKeyboard: !settings.showVirtualKeyboard });
+  const setShowVirtualKeyboard = (showVirtualKeyboard: boolean) => updateSettings({ showVirtualKeyboard });
 
   const resetToDefaults = () => {
-    setSettingsState(DEFAULT_SETTINGS);
-    saveSettings(DEFAULT_SETTINGS);
+    const defaultVals: UserSettings = {
+      theme: 'dark',
+      soundEnabled: true,
+      soundType: 'click',
+      soundVolume: 0.5,
+      showVirtualKeyboard: true,
+      keyboardLayout: 'qwerty',
+      fontSize: 'lg',
+      cursorStyle: 'line',
+      smoothCaret: true,
+      blindMode: false,
+      highlightMode: 'character',
+      instantRestart: true,
+      autoSaveResults: true,
+    };
+    setSettingsState(defaultVals);
+    saveSettings(defaultVals);
   };
 
   return (
@@ -65,9 +85,10 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         setSoundEnabled,
         setSoundType,
         setSoundVolume,
-        setShowVirtualKeyboard,
         setFontSize,
         setCursorStyle,
+        toggleVirtualKeyboard,
+        setShowVirtualKeyboard,
         resetToDefaults,
       }}
     >
@@ -76,10 +97,10 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   );
 };
 
-export function useSettings(): SettingsContextType {
+export const useSettings = (): SettingsContextType => {
   const context = useContext(SettingsContext);
   if (!context) {
     throw new Error('useSettings must be used within a SettingsProvider');
   }
   return context;
-}
+};

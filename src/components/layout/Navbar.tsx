@@ -50,7 +50,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
   };
 
   const toggleTheme = () => {
-    setTheme(settings.theme === 'dark' ? 'light' : 'dark');
+    setTheme(settings.theme === 'light' ? 'dark' : 'light');
   };
 
   return (
@@ -136,10 +136,10 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
             <button
               id="theme-toggle-btn"
               onClick={toggleTheme}
-              title={settings.theme === 'dark' ? 'Switch to Day Mode (Light)' : 'Switch to Night Mode (Dark)'}
+              title={settings.theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
               className="p-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shadow-xs"
             >
-              {settings.theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-blue-600" />}
+              {settings.theme === 'light' ? <Moon className="w-4 h-4 text-blue-600" /> : <Sun className="w-4 h-4 text-amber-400" />}
             </button>
 
             {/* Profile Dropdown / Login */}

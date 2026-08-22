@@ -56,7 +56,9 @@ export function loadSettings(): UserSettings {
     const parsed = JSON.parse(raw);
     const validSoundTypes = ['click', 'typewriter', 'soft', 'beep', 'off'];
     const soundType = validSoundTypes.includes(parsed?.soundType) ? parsed.soundType : 'click';
-    return { ...DEFAULT_SETTINGS, ...parsed, soundType };
+    const validThemes = ['dark', 'light', 'system'];
+    const theme = validThemes.includes(parsed?.theme) ? parsed.theme : 'dark';
+    return { ...DEFAULT_SETTINGS, ...parsed, soundType, theme };
   } catch {
     return DEFAULT_SETTINGS;
   }

@@ -1,11 +1,41 @@
+import { SoundType } from '../types';
+
+export interface SoundOption {
+  id: SoundType;
+  name: string;
+  description?: string;
+}
+
+export const SOUND_OPTIONS: SoundOption[] = [
+  { id: 'click', name: 'Standard Click', description: 'Crisp tactile switch click' },
+  { id: 'typewriter', name: 'Typewriter', description: 'Vintage mechanical typewriter hammer' },
+  { id: 'soft', name: 'Soft / Quiet', description: 'Gentle cushioned key pop' },
+  { id: 'beep', name: 'Beep', description: 'Subtle electronic tone' },
+];
+
 /**
  * Web Audio API synthesizer for keypress sound effects and milestone audio.
+ * Operates 100% in-memory with zero external dependencies.
  */
-
 class SoundSynthesizer {
   private ctx: AudioContext | null = null;
 
-  private getContext(): AudioContext | null {
+  constructor() {
+    if (typeof window !== 'undefined') {
+      // Warm up AudioContext on the earliest user interaction
+      const unlockAudio = () => {
+        this.getContext();
+        window.removeEventListener('pointerdown', unlockAudio);
+        window.removeEventListener('keydown', unlockAudio);
+        window.removeEventListener('touchstart', unlockAudio);
+      };
+      window.addEventListener('pointerdown', unlockAudio, { passive: true });
+      window.addEventListener('keydown', unlockAudio, { passive: true });
+      window.addEventListener('touchstart', unlockAudio, { passive: true });
+    }
+  }
+
+  public getContext(): AudioContext | null {
     if (typeof window === 'undefined') return null;
     if (!this.ctx) {
       const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
@@ -19,16 +49,21 @@ class SoundSynthesizer {
     return this.ctx;
   }
 
-  public playKeySound(type: 'click' | 'typewriter' | 'soft' | 'beep' | 'off', volume = 0.5, isError = false) {
+  public playKeySound(type: SoundType, volume = 0.5, isError = false) {
     if (type === 'off' || volume <= 0) return;
+
     const ctx = this.getContext();
     if (!ctx) return;
 
+    if (ctx.state === 'suspended') {
+      ctx.resume().catch(() => {});
+    }
+
     try {
       const now = ctx.currentTime;
-      const gainNode = ctx.createGain();
-      gainNode.gain.setValueAtTime(volume * 0.3, now);
-      gainNode.connect(ctx.destination);
+      const masterGain = ctx.createGain();
+      masterGain.gain.setValueAtTime(volume * 0.4, now);
+      masterGain.connect(ctx.destination);
 
       if (isError) {
         // Low error thud
@@ -36,9 +71,9 @@ class SoundSynthesizer {
         osc.type = 'sawtooth';
         osc.frequency.setValueAtTime(160, now);
         osc.frequency.exponentialRampToValueAtTime(80, now + 0.12);
-        osc.connect(gainNode);
-        gainNode.gain.setValueAtTime(volume * 0.4, now);
-        gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+        osc.connect(masterGain);
+        masterGain.gain.setValueAtTime(volume * 0.45, now);
+        masterGain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
         osc.start(now);
         osc.stop(now + 0.12);
         return;
@@ -51,8 +86,8 @@ class SoundSynthesizer {
           osc.type = 'triangle';
           osc.frequency.setValueAtTime(1200 + Math.random() * 200, now);
           osc.frequency.exponentialRampToValueAtTime(300, now + 0.04);
-          osc.connect(gainNode);
-          gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+          osc.connect(masterGain);
+          masterGain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
           osc.start(now);
           osc.stop(now + 0.05);
           break;
@@ -62,8 +97,8 @@ class SoundSynthesizer {
           const osc = ctx.createOscillator();
           osc.type = 'sine';
           osc.frequency.setValueAtTime(600, now);
-          osc.connect(gainNode);
-          gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.035);
+          osc.connect(masterGain);
+          masterGain.gain.exponentialRampToValueAtTime(0.001, now + 0.035);
           osc.start(now);
           osc.stop(now + 0.035);
           break;
@@ -74,8 +109,8 @@ class SoundSynthesizer {
           osc.type = 'sine';
           osc.frequency.setValueAtTime(320 + Math.random() * 40, now);
           osc.frequency.exponentialRampToValueAtTime(100, now + 0.03);
-          osc.connect(gainNode);
-          gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.03);
+          osc.connect(masterGain);
+          masterGain.gain.exponentialRampToValueAtTime(0.001, now + 0.03);
           osc.start(now);
           osc.stop(now + 0.03);
           break;
@@ -87,8 +122,8 @@ class SoundSynthesizer {
           osc.type = 'triangle';
           osc.frequency.setValueAtTime(800 + Math.random() * 150, now);
           osc.frequency.exponentialRampToValueAtTime(150, now + 0.03);
-          osc.connect(gainNode);
-          gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.03);
+          osc.connect(masterGain);
+          masterGain.gain.exponentialRampToValueAtTime(0.001, now + 0.03);
           osc.start(now);
           osc.stop(now + 0.03);
           break;
@@ -103,6 +138,10 @@ class SoundSynthesizer {
     if (volume <= 0) return;
     const ctx = this.getContext();
     if (!ctx) return;
+
+    if (ctx.state === 'suspended') {
+      ctx.resume().catch(() => {});
+    }
 
     try {
       const now = ctx.currentTime;

@@ -53,7 +53,10 @@ export function loadSettings(): UserSettings {
   try {
     const raw = localStorage.getItem(STORAGE_KEYS.SETTINGS);
     if (!raw) return DEFAULT_SETTINGS;
-    return { ...DEFAULT_SETTINGS, ...JSON.parse(raw) };
+    const parsed = JSON.parse(raw);
+    const validSoundTypes = ['click', 'typewriter', 'soft', 'beep', 'off'];
+    const soundType = validSoundTypes.includes(parsed?.soundType) ? parsed.soundType : 'click';
+    return { ...DEFAULT_SETTINGS, ...parsed, soundType };
   } catch {
     return DEFAULT_SETTINGS;
   }

@@ -114,7 +114,7 @@ export const LoginPage: React.FC<AuthPageProps> = ({ onNavigate }) => {
             id="login-submit-btn"
             type="submit"
             disabled={loading}
-            className="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm shadow-md transition-all flex items-center justify-center gap-2 mt-2"
+            className="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm shadow-md transition-all flex items-center justify-center gap-2 mt-2 cursor-pointer disabled:cursor-not-allowed"
           >
             {loading ? (
               <span className="inline-block w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
@@ -136,7 +136,7 @@ export const LoginPage: React.FC<AuthPageProps> = ({ onNavigate }) => {
           id="login-guest-btn"
           type="button"
           onClick={handleGuest}
-          className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-750 border border-slate-700 text-slate-200 font-medium text-xs transition-colors flex items-center justify-center gap-2"
+          className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-750 border border-slate-700 text-slate-200 font-medium text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
         >
           <Sparkles className="w-4 h-4 text-amber-400" />
           <span>Continue as Guest</span>
@@ -146,7 +146,7 @@ export const LoginPage: React.FC<AuthPageProps> = ({ onNavigate }) => {
           Don't have an account?{' '}
           <button
             onClick={() => onNavigate('register')}
-            className="text-emerald-400 font-semibold hover:underline ml-1"
+            className="text-emerald-400 font-semibold hover:underline ml-1 cursor-pointer"
           >
             Create one now
           </button>
@@ -258,7 +258,7 @@ export const RegisterPage: React.FC<AuthPageProps> = ({ onNavigate }) => {
             id="register-submit-btn"
             type="submit"
             disabled={loading}
-            className="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm shadow-md transition-all flex items-center justify-center gap-2 mt-2"
+            className="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm shadow-md transition-all flex items-center justify-center gap-2 mt-2 cursor-pointer disabled:cursor-not-allowed"
           >
             {loading ? (
               <span className="inline-block w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
@@ -275,7 +275,7 @@ export const RegisterPage: React.FC<AuthPageProps> = ({ onNavigate }) => {
           Already have an account?{' '}
           <button
             onClick={() => onNavigate('login')}
-            className="text-emerald-400 font-semibold hover:underline ml-1"
+            className="text-emerald-400 font-semibold hover:underline ml-1 cursor-pointer"
           >
             Log In
           </button>

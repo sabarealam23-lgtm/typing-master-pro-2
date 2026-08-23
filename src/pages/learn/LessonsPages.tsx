@@ -2,7 +2,10 @@ import React, { useState } from 'react';
 import { PageRoute, Lesson, DifficultyLevel, TypingResult } from '../../types';
 import { LESSONS_DATA } from '../../data/lessons';
 import { useTypingStats } from '../../context/TypingStatsContext';
+import { useSettings } from '../../context/SettingsContext';
+import { soundSynthesizer } from '../../utils/audio';
 import { TypingEngine } from '../../components/typing/TypingEngine';
+import { VirtualKeyboard, getFingerGuide } from '../../components/typing/VirtualKeyboard';
 import { LetterPopGame } from '../../components/learn/LetterPopGame';
 import { 
   BookOpen, 
@@ -420,7 +423,7 @@ export const LessonsPage: React.FC<LessonsPageProps> = ({ onNavigate }) => {
                   <h3 className="text-base font-bold text-slate-100">{lesson.title}</h3>
                   {lesson.steps && (
                     <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                      3 STEPS
+                      {lesson.steps.length} STEPS
                     </span>
                   )}
                   {isMilestone && (
@@ -477,6 +480,215 @@ export const LessonsPage: React.FC<LessonsPageProps> = ({ onNavigate }) => {
   );
 };
 
+// ==================== SINGLE-KEY DISCOVERY (STEP 1) ====================
+interface SingleKeyDiscoveryProps {
+  practiceText: string;
+  lesson: Lesson;
+  onComplete: () => void;
+}
+
+export const SingleKeyDiscovery: React.FC<SingleKeyDiscoveryProps> = ({
+  practiceText,
+  lesson,
+  onComplete,
+}) => {
+  const { settings } = useSettings();
+  const [currentCharIndex, setCurrentCharIndex] = useState<number>(0);
+  const [isCompleted, setIsCompleted] = useState<boolean>(false);
+  const [isErrorShake, setIsErrorShake] = useState<boolean>(false);
+
+  const currentChar = practiceText[currentCharIndex] || practiceText[0];
+  const fingerGuide = React.useMemo(() => getFingerGuide(currentChar), [currentChar]);
+
+  // Key press evaluation
+  const handleKeyEvaluation = React.useCallback((key: string) => {
+    if (isCompleted) return;
+
+    const expectedChar = practiceText[currentCharIndex];
+    if (!expectedChar) return;
+
+    const isMatch = (key.toLowerCase() === expectedChar.toLowerCase()) || (key === expectedChar);
+
+    if (isMatch) {
+      if (settings.soundEnabled) {
+        soundSynthesizer.playKeySound(settings.soundType, settings.soundVolume);
+      }
+      if (currentCharIndex + 1 < practiceText.length) {
+        setCurrentCharIndex(prev => prev + 1);
+      } else {
+        // Last intro key pressed!
+        if (settings.soundEnabled) {
+          soundSynthesizer.playSuccessChime(settings.soundVolume);
+        }
+        setIsCompleted(true);
+      }
+    } else {
+      if (settings.soundEnabled) {
+        soundSynthesizer.playKeySound(settings.soundType, settings.soundVolume, true);
+      }
+      setIsErrorShake(true);
+      setTimeout(() => setIsErrorShake(false), 350);
+    }
+  }, [isCompleted, practiceText, currentCharIndex, settings.soundEnabled, settings.soundType, settings.soundVolume]);
+
+  // Scoped keydown listener
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (isCompleted) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          onComplete();
+        }
+        return;
+      }
+
+      if (e.key === 'Shift' || e.key === 'Control' || e.key === 'Alt' || e.key === 'Meta' || e.key === 'Tab' || e.key === 'CapsLock') {
+        return;
+      }
+
+      e.preventDefault();
+      handleKeyEvaluation(e.key);
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isCompleted, handleKeyEvaluation, onComplete]);
+
+  return (
+    <div id="single-key-discovery-view" className="w-full max-w-4xl mx-auto space-y-6 animate-fade-in select-none">
+      {!isCompleted ? (
+        <div className="flex flex-col items-center justify-center p-6 sm:p-10 rounded-3xl bg-slate-900/90 border border-slate-800 shadow-2xl relative overflow-hidden text-center space-y-6">
+          {/* Top Instruction */}
+          <div className="space-y-1.5">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-mono font-bold">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Step 1: Key Discovery ({currentCharIndex + 1} of {practiceText.length})</span>
+            </div>
+            <h3 className="text-xl sm:text-2xl font-extrabold text-slate-100">
+              Press the highlighted key on your keyboard
+            </h3>
+            <p className="text-xs sm:text-sm text-slate-400 max-w-md mx-auto">
+              Place your hands on the home row and locate the tactile anchor position.
+            </p>
+          </div>
+
+          {/* Large Centered Active Keycap Tile */}
+          <div className="flex flex-col items-center justify-center py-2">
+            <div
+              className={`
+                w-28 h-28 sm:w-36 sm:h-36 rounded-3xl flex flex-col items-center justify-center
+                bg-gradient-to-b from-slate-800 to-slate-950 border-2 transition-all duration-200
+                shadow-2xl relative select-none
+                ${isErrorShake 
+                  ? 'border-rose-500 ring-4 ring-rose-500/30 scale-95' 
+                  : 'border-cyan-400 shadow-cyan-500/25 ring-4 ring-cyan-500/20 scale-105'}
+              `}
+            >
+              <span className="font-mono text-5xl sm:text-6xl font-black text-cyan-300 drop-shadow-md">
+                {currentChar === ' ' ? 'SPACE' : currentChar.toUpperCase()}
+              </span>
+              
+              {/* Tactile Ridge Indicator on F and J */}
+              {(currentChar.toLowerCase() === 'f' || currentChar.toLowerCase() === 'j') && (
+                <div className="absolute bottom-3.5 flex items-center gap-1">
+                  <span className="w-4 h-1 bg-cyan-400 rounded-full animate-pulse" />
+                </div>
+              )}
+            </div>
+
+            {/* Dynamic Finger Guide Banner */}
+            <div className="mt-5 flex flex-wrap items-center justify-center gap-2 px-4 py-2 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs sm:text-sm">
+              <span className="text-slate-400">Target:</span>
+              <span className="font-mono font-extrabold text-cyan-400 bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-800/60">
+                {fingerGuide.targetDisplay}
+              </span>
+              <span className="text-slate-600">|</span>
+              <span className="text-slate-400">Use:</span>
+              <span className="font-bold text-slate-100">
+                {fingerGuide.handName} • {fingerGuide.fingerName}
+              </span>
+            </div>
+
+            {/* Mini Progress Dots */}
+            <div className="flex items-center gap-2 mt-4">
+              {practiceText.split('').map((char, idx) => {
+                const isPassed = idx < currentCharIndex;
+                const isCurrent = idx === currentCharIndex;
+                return (
+                  <div
+                    key={idx}
+                    className={`w-7 h-7 rounded-lg flex items-center justify-center font-mono text-xs font-bold transition-all ${
+                      isPassed
+                        ? 'bg-emerald-500 text-slate-950 shadow-sm'
+                        : isCurrent
+                        ? 'bg-cyan-500 text-slate-950 ring-2 ring-cyan-300 scale-110'
+                        : 'bg-slate-800 text-slate-500 border border-slate-700'
+                    }`}
+                  >
+                    {isPassed ? <Check className="w-3.5 h-3.5 stroke-[3]" /> : (char === ' ' ? '␣' : char.toUpperCase())}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Interactive Virtual Keyboard Matrix */}
+          <div className="w-full pt-2 border-t border-slate-800/80">
+            <VirtualKeyboard
+              currentExpectedChar={currentChar}
+              onKeyPress={handleKeyEvaluation}
+              hideFingerBadge={true}
+            />
+          </div>
+        </div>
+      ) : (
+        /* Step 1 Completion Pause & 'Press Enter to Continue' Modal */
+        <div className="w-full max-w-xl mx-auto p-8 sm:p-10 rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl text-center space-y-6 animate-fade-in">
+          <div className="w-16 h-16 rounded-full mx-auto bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shadow-lg text-3xl">
+            🎉
+          </div>
+
+          <div className="space-y-2">
+            <div className="text-xs font-mono uppercase tracking-wider text-emerald-400 font-bold">
+              Step 1 of {lesson.steps?.length || 4} Completed
+            </div>
+            <h3 className="text-2xl font-extrabold text-slate-100">
+              Step Passed! 🎉
+            </h3>
+            <p className="text-xs sm:text-sm text-slate-400 max-w-md mx-auto">
+              You discovered all intro anchor keys for this lesson. Ready to build muscle memory in Step 2!
+            </p>
+          </div>
+
+          {/* Mastered Key Badges */}
+          <div className="flex flex-wrap items-center justify-center gap-2.5 py-2">
+            {practiceText.split('').map((k, idx) => (
+              <div
+                key={idx}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-950 border border-emerald-500/30 text-emerald-400 font-mono font-bold text-sm shadow-xs"
+              >
+                <Check className="w-3.5 h-3.5 stroke-[3]" />
+                <span>{k === ' ' ? 'SPACE' : k.toUpperCase()}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Continue CTA Button with Physical Enter Reminder */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+            <button
+              onClick={onComplete}
+              className="w-full sm:w-auto flex items-center justify-center gap-2.5 px-8 py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-sm shadow-xl shadow-emerald-500/25 transition-transform hover:scale-105 cursor-pointer"
+            >
+              <span>Continue [ ↵ Enter ]</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 // ==================== ACTIVE LESSON VIEW PAGE ====================
 interface LessonViewPageProps {
   lesson: Lesson;
@@ -492,7 +704,7 @@ interface StepVerdict {
 export const LessonViewPage: React.FC<LessonViewPageProps> = ({ lesson, onNavigate }) => {
   const { recordTestCompleted } = useTypingStats();
   
-  // 3-Step Sub-drill progression state
+  // 4-Step / Multi-Step Sub-drill progression state
   const lessonSteps = (lesson.steps && lesson.steps.length > 0) ? lesson.steps : [lesson.practiceText];
   const totalSteps = lessonSteps.length;
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
@@ -509,11 +721,20 @@ export const LessonViewPage: React.FC<LessonViewPageProps> = ({ lesson, onNaviga
   }, [lesson.id]);
 
   const getStepMetadata = (idx: number) => {
+    if (totalSteps === 4) {
+      if (idx === 0) return { name: 'Key Discovery', desc: 'Single-key intro & tactile anchors' };
+      if (idx === 1) return { name: 'Single Repetition', desc: '4x single-key bursts' };
+      if (idx === 2) return { name: 'Double Pairs', desc: '2x double pairs' };
+      if (idx === 3) return { name: 'Rhythm & Flow', desc: 'Alternates & rhythm patterns' };
+      return { name: `Sub-Drill ${idx + 1}`, desc: 'Progressive practice step' };
+    }
     if (idx === 0) return { name: 'Single Repetition', desc: '4x single-key bursts' };
     if (idx === 1) return { name: 'Double Pairs', desc: '2x double pairs' };
     if (idx === 2) return { name: 'Rhythm & Flow', desc: 'Alternates & rhythm patterns' };
     return { name: `Sub-Drill ${idx + 1}`, desc: 'Progressive practice step' };
   };
+
+  const isDiscoveryStep = currentStepIndex === 0 && (totalSteps === 4 || (lessonSteps[0].length <= 5 && !lessonSteps[0].includes(' ')));
 
   const handleSubStepComplete = (result: TypingResult) => {
     const isPassed = (result.netWpm >= lesson.requiredWpm && result.accuracy >= lesson.requiredAccuracy);
@@ -527,7 +748,7 @@ export const LessonViewPage: React.FC<LessonViewPageProps> = ({ lesson, onNaviga
           result,
         });
       } else {
-        // Final step passed (e.g. Step 3)! Complete overall lesson and grant XP
+        // Final step passed! Complete overall lesson and grant XP
         recordTestCompleted(result);
         setCompletedResult(result);
         setStepVerdict(null);
@@ -728,15 +949,24 @@ export const LessonViewPage: React.FC<LessonViewPageProps> = ({ lesson, onNaviga
         </div>
       )}
 
-      {/* View Branching: 1) Active Sub-Drill Typing, 2) Step Transition Verdict, 3) Final Lesson Completion */}
+      {/* View Branching: 1) Active Sub-Drill Typing or Discovery Mode, 2) Step Transition Verdict, 3) Final Lesson Completion */}
       {!completedResult && !stepVerdict && (
-        <TypingEngine
-          key={`${lesson.id}-step-${currentStepIndex}`}
-          practiceText={lessonSteps[currentStepIndex]}
-          mode="lesson"
-          lesson={lesson}
-          onComplete={handleSubStepComplete}
-        />
+        isDiscoveryStep ? (
+          <SingleKeyDiscovery
+            key={`${lesson.id}-step-0`}
+            practiceText={lessonSteps[0]}
+            lesson={lesson}
+            onComplete={handleAdvanceNextStep}
+          />
+        ) : (
+          <TypingEngine
+            key={`${lesson.id}-step-${currentStepIndex}`}
+            practiceText={lessonSteps[currentStepIndex]}
+            mode="lesson"
+            lesson={lesson}
+            onComplete={handleSubStepComplete}
+          />
+        )
       )}
 
       {/* Intermediate Sub-Step Verdict Screen */}

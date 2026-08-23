@@ -14,7 +14,7 @@ interface VirtualKeyboardProps {
   hideFingerBadge?: boolean;
 }
 
-interface FingerGuide {
+export interface FingerGuide {
   targetDisplay: string;
   handName: string;
   fingerName: string;

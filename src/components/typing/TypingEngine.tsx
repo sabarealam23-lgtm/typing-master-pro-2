@@ -92,6 +92,7 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
   const correctKeystrokesRef = useRef<number>(0);
   const incorrectKeystrokesRef = useRef<number>(0);
   const backspaceCountRef = useRef<number>(0);
+  const spacebarHitsRef = useRef<number>(0);
   const totalErrorsEncounteredRef = useRef<number>(0);
   const correctedErrorsRef = useRef<number>(0);
   const mistakePositionsRef = useRef<Set<number>>(new Set());
@@ -189,6 +190,58 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
     const netWPM = calculateNetWPM(correctChars, uncorrected, finalElapsedMs);
     const accuracy = calculateAccuracy(correctKeystrokesRef.current, totalKeystrokesRef.current);
 
+    // Compute Word Breakdown
+    const typedSlice = charDetailsRef.current.slice(0, cursorIndexRef.current);
+    const wordsList: typeof typedSlice[] = [];
+    let currentWord: typeof typedSlice = [];
+
+    typedSlice.forEach((c) => {
+      if (c.expected === ' ' || c.expected === '\n') {
+        if (currentWord.length > 0) {
+          wordsList.push(currentWord);
+          currentWord = [];
+        }
+      } else {
+        currentWord.push(c);
+      }
+    });
+    if (currentWord.length > 0) {
+      wordsList.push(currentWord);
+    }
+
+    let correctWordsCount = 0;
+    let incorrectWordsCount = 0;
+    wordsList.forEach((w) => {
+      const hasError = w.some((ch) => ch.state === 'incorrect');
+      if (hasError) {
+        incorrectWordsCount++;
+      } else {
+        correctWordsCount++;
+      }
+    });
+
+    // Time efficiency calculations
+    const allottedSeconds = isTimedMode && targetDurationSeconds
+      ? targetDurationSeconds
+      : (mode === 'paragraph' ? Math.max(30, Math.round((Math.max(1, wordsList.length) / 40) * 60)) : Math.round(finalElapsedSeconds));
+    const actualSeconds = Number((finalElapsedMs / 1000).toFixed(1));
+    const paceTimeSaved = Math.max(0, Number((allottedSeconds - actualSeconds).toFixed(1)));
+
+    // Certificate qualification & tier evaluation
+    const isTypingTestMode = mode.startsWith('timed_') || mode === 'paragraph';
+    const isCertificateQualified = isTypingTestMode && netWPM >= 30 && accuracy >= 95;
+    let certificateTier: 'silver' | 'gold' | 'platinum' | null = null;
+    if (isCertificateQualified) {
+      if (netWPM >= 70 && accuracy >= 98) {
+        certificateTier = 'platinum';
+      } else if (netWPM >= 50 && accuracy >= 97) {
+        certificateTier = 'gold';
+      } else {
+        certificateTier = 'silver';
+      }
+    }
+    const certificateCode = `ST-CERT-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+
     const isLessonPassed = lesson ? (netWPM >= lesson.requiredWpm && accuracy >= lesson.requiredAccuracy) : true;
     const xpEarned = calculateXpEarned(netWPM, accuracy, finalElapsedSeconds, Boolean(lesson), isLessonPassed);
 
@@ -215,6 +268,16 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
       xpEarned,
       completedAt: new Date().toISOString(),
       calculationVersion: CALCULATION_VERSION,
+      allottedDurationSeconds: allottedSeconds,
+      actualTimeTakenSeconds: actualSeconds,
+      paceTimeSavedSeconds: paceTimeSaved,
+      correctWordsCount,
+      incorrectWordsCount,
+      totalWordsCount: wordsList.length,
+      spacebarHits: spacebarHitsRef.current,
+      certificateCode,
+      isCertificateQualified,
+      certificateTier,
     };
 
     // Save score to Firestore if user is authenticated
@@ -242,6 +305,7 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
     correctKeystrokesRef.current = 0;
     incorrectKeystrokesRef.current = 0;
     backspaceCountRef.current = 0;
+    spacebarHitsRef.current = 0;
     totalErrorsEncounteredRef.current = 0;
     correctedErrorsRef.current = 0;
     mistakePositionsRef.current.clear();
@@ -282,6 +346,7 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
     correctKeystrokesRef.current = 0;
     incorrectKeystrokesRef.current = 0;
     backspaceCountRef.current = 0;
+    spacebarHitsRef.current = 0;
     totalErrorsEncounteredRef.current = 0;
     correctedErrorsRef.current = 0;
     mistakePositionsRef.current.clear();
@@ -423,6 +488,9 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
     if (!expectedChar) return;
 
     let inputChar = key;
+    if (key === ' ') {
+      spacebarHitsRef.current += 1;
+    }
     if (inputChar === 'Enter' && expectedChar === '\n') {
       inputChar = '\n';
     } else if (inputChar === ' ' && expectedChar === '\n') {

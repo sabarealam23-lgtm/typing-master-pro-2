@@ -23,7 +23,9 @@ import {
   Flame,
   ChevronDown,
   BookOpen,
-  Shuffle
+  Shuffle,
+  ShieldCheck,
+  Award
 } from 'lucide-react';
 
 interface PracticePageProps {
@@ -127,6 +129,25 @@ export const TypingTestPage: React.FC<PracticePageProps> = ({ onNavigate }) => {
           >
             Paragraph
           </button>
+        </div>
+      </div>
+
+      {/* Certification Qualification Information Bar */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-2xl bg-gradient-to-r from-amber-500/10 via-slate-900/90 to-emerald-500/10 border border-amber-500/20 text-xs">
+        <div className="flex items-center gap-2.5">
+          <div className="w-7 h-7 rounded-lg bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0">
+            <Award className="w-4 h-4" />
+          </div>
+          <div>
+            <span className="font-bold text-slate-200">Official Certification Criteria:</span>{' '}
+            <span className="text-slate-400">Score <strong className="text-emerald-400">≥30 Net WPM</strong> and <strong className="text-cyan-400">≥95% Accuracy</strong> to earn your Verified SmartTyping Pro Certificate.</span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 text-[11px] font-mono text-slate-400 self-end sm:self-auto shrink-0">
+          <span className="px-2 py-0.5 rounded bg-slate-800 text-slate-300">Silver: 30+ WPM</span>
+          <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300">Gold: 50+ WPM</span>
+          <span className="px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300">Platinum: 70+ WPM</span>
         </div>
       </div>
 

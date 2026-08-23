@@ -47,6 +47,8 @@ export interface KeystrokeEvent {
   wasMistakeCorrected?: boolean;
 }
 
+export type CertificateTier = 'silver' | 'gold' | 'platinum';
+
 export interface TypingResult {
   id: string;
   userId: string;
@@ -70,6 +72,17 @@ export interface TypingResult {
   xpEarned: number;
   completedAt: string; // ISO String
   calculationVersion: string; // e.g. "1.0.0"
+  // Certificate & Matrix Metrics
+  allottedDurationSeconds?: number;
+  actualTimeTakenSeconds?: number;
+  paceTimeSavedSeconds?: number;
+  correctWordsCount?: number;
+  incorrectWordsCount?: number;
+  totalWordsCount?: number;
+  spacebarHits?: number;
+  certificateCode?: string;
+  isCertificateQualified?: boolean;
+  certificateTier?: CertificateTier | null;
 }
 
 export interface Lesson {

@@ -343,6 +343,58 @@ export const ProfilePage: React.FC<UserPageProps> = ({ onNavigate }) => {
         </div>
       </div>
 
+      {/* Official Verified Certification Status */}
+      <div className="p-6 rounded-2xl bg-gradient-to-br from-slate-900 via-slate-900/90 to-slate-950 border border-slate-800 space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 border ${
+              stats.bestNetWpm >= 70 && stats.bestAccuracy >= 98
+                ? 'bg-cyan-500/15 border-cyan-400 text-cyan-300'
+                : stats.bestNetWpm >= 50 && stats.bestAccuracy >= 97
+                ? 'bg-amber-500/15 border-amber-400 text-amber-300'
+                : stats.bestNetWpm >= 30 && stats.bestAccuracy >= 95
+                ? 'bg-slate-700/50 border-slate-400 text-slate-200'
+                : 'bg-slate-800/40 border-slate-700 text-slate-500'
+            }`}>
+              <ShieldCheck className="w-6 h-6" />
+            </div>
+            <div className="space-y-0.5">
+              <div className="flex items-center gap-2">
+                <h3 className="text-sm font-bold text-slate-100">SmartTyping Pro Official Certification</h3>
+                <span className={`text-[10px] font-mono px-2 py-0.5 rounded font-bold uppercase ${
+                  stats.bestNetWpm >= 70 && stats.bestAccuracy >= 98
+                    ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
+                    : stats.bestNetWpm >= 50 && stats.bestAccuracy >= 97
+                    ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                    : stats.bestNetWpm >= 30 && stats.bestAccuracy >= 95
+                    ? 'bg-slate-700 text-slate-200 border border-slate-600'
+                    : 'bg-slate-800 text-slate-400 border border-slate-700'
+                }`}>
+                  {stats.bestNetWpm >= 70 && stats.bestAccuracy >= 98
+                    ? 'Platinum Tier Master'
+                    : stats.bestNetWpm >= 50 && stats.bestAccuracy >= 97
+                    ? 'Gold Tier Advanced'
+                    : stats.bestNetWpm >= 30 && stats.bestAccuracy >= 95
+                    ? 'Silver Tier Qualified'
+                    : 'Benchmark Pending'}
+                </span>
+              </div>
+              <p className="text-xs text-slate-400">
+                Official verified certificates with holographic seal, time matrix, and security hash are awarded on speed tests with ≥30 Net WPM & ≥95% Accuracy.
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={() => onNavigate('typing-test')}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs shadow-md transition-all self-start sm:self-auto shrink-0"
+          >
+            <Zap className="w-3.5 h-3.5" />
+            <span>Take Speed Test</span>
+          </button>
+        </div>
+      </div>
+
       {/* Profile Edit Form */}
       <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-lg space-y-4">
         <h2 className="text-base font-bold text-slate-100">Edit Profile Details</h2>

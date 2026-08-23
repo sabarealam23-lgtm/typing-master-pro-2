@@ -81,6 +81,7 @@ export interface Lesson {
   description: string;
   targetKeys: string[];
   practiceText: string;
+  steps?: string[];
   requiredWpm: number;
   requiredAccuracy: number;
   xpReward: number;

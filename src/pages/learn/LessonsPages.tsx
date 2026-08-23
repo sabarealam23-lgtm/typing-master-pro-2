@@ -18,7 +18,8 @@ import {
   Zap, 
   Target,
   Gamepad2,
-  Flame
+  Flame,
+  Check
 } from 'lucide-react';
 
 export interface LessonMilestone {
@@ -417,6 +418,11 @@ export const LessonsPage: React.FC<LessonsPageProps> = ({ onNavigate }) => {
 
                 <div className="flex items-center gap-2">
                   <h3 className="text-base font-bold text-slate-100">{lesson.title}</h3>
+                  {lesson.steps && (
+                    <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                      3 STEPS
+                    </span>
+                  )}
                   {isMilestone && (
                     <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-400 border border-amber-500/25">
                       🎮 MINI-GAME
@@ -477,17 +483,77 @@ interface LessonViewPageProps {
   onNavigate: (page: PageRoute, nextLesson?: Lesson) => void;
 }
 
+interface StepVerdict {
+  stepIndex: number;
+  passed: boolean;
+  result: TypingResult;
+}
+
 export const LessonViewPage: React.FC<LessonViewPageProps> = ({ lesson, onNavigate }) => {
   const { recordTestCompleted } = useTypingStats();
+  
+  // 3-Step Sub-drill progression state
+  const lessonSteps = (lesson.steps && lesson.steps.length > 0) ? lesson.steps : [lesson.practiceText];
+  const totalSteps = lessonSteps.length;
+  const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
+  const [stepVerdict, setStepVerdict] = useState<StepVerdict | null>(null);
   const [completedResult, setCompletedResult] = useState<TypingResult | null>(null);
   const [isMiniGameOpen, setIsMiniGameOpen] = useState<boolean>(false);
 
-  const handleTestComplete = (result: TypingResult) => {
-    recordTestCompleted(result);
-    setCompletedResult(result);
+  // Reset steps and results when active lesson switches
+  React.useEffect(() => {
+    setCurrentStepIndex(0);
+    setStepVerdict(null);
+    setCompletedResult(null);
+    setIsMiniGameOpen(false);
+  }, [lesson.id]);
+
+  const getStepMetadata = (idx: number) => {
+    if (idx === 0) return { name: 'Single Repetition', desc: '4x single-key bursts' };
+    if (idx === 1) return { name: 'Double Pairs', desc: '2x double pairs' };
+    if (idx === 2) return { name: 'Rhythm & Flow', desc: 'Alternates & rhythm patterns' };
+    return { name: `Sub-Drill ${idx + 1}`, desc: 'Progressive practice step' };
   };
 
-  const isPassed = completedResult 
+  const handleSubStepComplete = (result: TypingResult) => {
+    const isPassed = (result.netWpm >= lesson.requiredWpm && result.accuracy >= lesson.requiredAccuracy);
+
+    if (isPassed) {
+      if (currentStepIndex < totalSteps - 1) {
+        // Sub-drill passed! Show intermediate step transition
+        setStepVerdict({
+          stepIndex: currentStepIndex,
+          passed: true,
+          result,
+        });
+      } else {
+        // Final step passed (e.g. Step 3)! Complete overall lesson and grant XP
+        recordTestCompleted(result);
+        setCompletedResult(result);
+        setStepVerdict(null);
+      }
+    } else {
+      // Step failed targets, prompt retry for current step
+      setStepVerdict({
+        stepIndex: currentStepIndex,
+        passed: false,
+        result,
+      });
+    }
+  };
+
+  const handleAdvanceNextStep = React.useCallback(() => {
+    if (currentStepIndex < totalSteps - 1) {
+      setCurrentStepIndex(prev => prev + 1);
+      setStepVerdict(null);
+    }
+  }, [currentStepIndex, totalSteps]);
+
+  const handleRetryCurrentStep = React.useCallback(() => {
+    setStepVerdict(null);
+  }, []);
+
+  const isOverallPassed = completedResult 
     ? (completedResult.netWpm >= lesson.requiredWpm && completedResult.accuracy >= lesson.requiredAccuracy) 
     : false;
 
@@ -513,32 +579,52 @@ export const LessonViewPage: React.FC<LessonViewPageProps> = ({ lesson, onNaviga
   const isCompleted = completedResult !== null;
 
   const handleNextLesson = React.useCallback(() => {
-    if (isPassed && nextLesson) {
+    if (isOverallPassed && nextLesson) {
       setCompletedResult(null);
+      setStepVerdict(null);
+      setCurrentStepIndex(0);
       setIsMiniGameOpen(false);
       onNavigate('lesson-view', nextLesson);
     } else {
       setCompletedResult(null);
+      setStepVerdict(null);
+      setCurrentStepIndex(0);
       setIsMiniGameOpen(false);
     }
-  }, [isPassed, nextLesson, onNavigate]);
+  }, [isOverallPassed, nextLesson, onNavigate]);
 
   const handleRetryLesson = React.useCallback(() => {
     setCompletedResult(null);
+    setStepVerdict(null);
+    setCurrentStepIndex(0);
     setIsMiniGameOpen(false);
   }, []);
 
-  // Scoped keydown listener active only when modal is completed (isCompleted === true and not in mini-game)
+  // Scoped keydown listener active for modal steps & completion screen
   React.useEffect(() => {
-    if (!isCompleted || isMiniGameOpen) return;
+    if (isMiniGameOpen) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        handleNextLesson();
-      } else if (e.key === 'Escape') {
-        e.preventDefault();
-        handleRetryLesson();
+      if (completedResult) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          handleNextLesson();
+        } else if (e.key === 'Escape') {
+          e.preventDefault();
+          handleRetryLesson();
+        }
+      } else if (stepVerdict) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          if (stepVerdict.passed) {
+            handleAdvanceNextStep();
+          } else {
+            handleRetryCurrentStep();
+          }
+        } else if (e.key === 'Escape') {
+          e.preventDefault();
+          handleRetryCurrentStep();
+        }
       }
     };
 
@@ -546,7 +632,7 @@ export const LessonViewPage: React.FC<LessonViewPageProps> = ({ lesson, onNaviga
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isCompleted, isMiniGameOpen, handleNextLesson, handleRetryLesson]);
+  }, [completedResult, stepVerdict, isMiniGameOpen, handleNextLesson, handleRetryLesson, handleAdvanceNextStep, handleRetryCurrentStep]);
 
   // If user opened the milestone game from the completion modal
   if (isMiniGameOpen) {
@@ -566,6 +652,8 @@ export const LessonViewPage: React.FC<LessonViewPageProps> = ({ lesson, onNaviga
           onNavigateNextLesson={(nxt) => {
             setIsMiniGameOpen(false);
             setCompletedResult(null);
+            setStepVerdict(null);
+            setCurrentStepIndex(0);
             onNavigate('lesson-view', nxt);
           }}
         />
@@ -592,19 +680,150 @@ export const LessonViewPage: React.FC<LessonViewPageProps> = ({ lesson, onNaviga
         </div>
       </div>
 
-      {/* Embedded Typing Engine */}
-      {!completedResult ? (
+      {/* 3-Step Sub-Drill Progress Header (TypingClub Style) */}
+      {totalSteps > 1 && !completedResult && !stepVerdict && (
+        <div className="flex flex-wrap items-center justify-between gap-3 p-3 sm:p-4 rounded-2xl bg-slate-900/90 border border-slate-800 animate-fade-in">
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-lg bg-emerald-500/15 text-emerald-400 font-mono font-bold text-xs flex items-center justify-center border border-emerald-500/25">
+              {currentStepIndex + 1}/{totalSteps}
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h4 className="text-xs font-bold text-slate-100">
+                  Step {currentStepIndex + 1}: {getStepMetadata(currentStepIndex).name}
+                </h4>
+                <span className="text-[10px] text-slate-400 hidden sm:inline">
+                  ({getStepMetadata(currentStepIndex).desc})
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* 3 Progressive Step Pills */}
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            {lessonSteps.map((_, idx) => {
+              const isDone = idx < currentStepIndex;
+              const isCurrent = idx === currentStepIndex;
+              return (
+                <div
+                  key={idx}
+                  className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-mono font-semibold transition-all ${
+                    isDone
+                      ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                      : isCurrent
+                      ? 'bg-emerald-500 text-slate-950 font-bold shadow-sm shadow-emerald-500/20'
+                      : 'bg-slate-950 text-slate-500 border border-slate-800'
+                  }`}
+                >
+                  {isDone ? (
+                    <Check className="w-3 h-3 text-emerald-400 stroke-[3]" />
+                  ) : (
+                    <span>{idx + 1}</span>
+                  )}
+                  <span className="hidden md:inline">{getStepMetadata(idx).name}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* View Branching: 1) Active Sub-Drill Typing, 2) Step Transition Verdict, 3) Final Lesson Completion */}
+      {!completedResult && !stepVerdict && (
         <TypingEngine
-          practiceText={lesson.practiceText}
+          key={`${lesson.id}-step-${currentStepIndex}`}
+          practiceText={lessonSteps[currentStepIndex]}
           mode="lesson"
           lesson={lesson}
-          onComplete={handleTestComplete}
+          onComplete={handleSubStepComplete}
         />
-      ) : (
-        /* Completion Verdict Card */
+      )}
+
+      {/* Intermediate Sub-Step Verdict Screen */}
+      {stepVerdict && !completedResult && (
+        <div className="w-full max-w-xl mx-auto p-6 sm:p-8 rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl text-center space-y-5 animate-fade-in">
+          <div className="w-14 h-14 rounded-full mx-auto flex items-center justify-center text-2xl shadow-lg">
+            {stepVerdict.passed ? (
+              <div className="w-14 h-14 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30">
+                <Check className="w-7 h-7 stroke-[3]" />
+              </div>
+            ) : (
+              <div className="w-14 h-14 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center border border-amber-500/30">
+                <RotateCcw className="w-7 h-7" />
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-1">
+            <div className="text-[10px] font-mono uppercase tracking-wider text-slate-400 font-bold">
+              Step {stepVerdict.stepIndex + 1} of {totalSteps}: {getStepMetadata(stepVerdict.stepIndex).name}
+            </div>
+            <h3 className="text-xl font-extrabold text-slate-100">
+              {stepVerdict.passed ? `Step ${stepVerdict.stepIndex + 1} Cleared!` : `Try Step ${stepVerdict.stepIndex + 1} Again`}
+            </h3>
+            <p className="text-xs text-slate-400 max-w-md mx-auto">
+              {stepVerdict.passed
+                ? `Great rhythm! You achieved ${stepVerdict.result.netWpm} WPM and ${stepVerdict.result.accuracy}% accuracy.`
+                : `You scored ${stepVerdict.result.netWpm} WPM (${lesson.requiredWpm} required) and ${stepVerdict.result.accuracy}% accuracy (${lesson.requiredAccuracy}% required).`}
+            </p>
+          </div>
+
+          {/* Quick mini stats */}
+          <div className="grid grid-cols-2 gap-3 max-w-xs mx-auto">
+            <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
+              <span className="text-[10px] text-slate-400 uppercase font-semibold">Step Speed</span>
+              <p className="text-lg font-mono font-bold text-emerald-400">{stepVerdict.result.netWpm} WPM</p>
+            </div>
+            <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
+              <span className="text-[10px] text-slate-400 uppercase font-semibold">Step Accuracy</span>
+              <p className="text-lg font-mono font-bold text-cyan-400">{stepVerdict.result.accuracy}%</p>
+            </div>
+          </div>
+
+          {/* Action CTAs */}
+          <div className="flex flex-wrap justify-center items-center gap-3 pt-2">
+            {stepVerdict.passed ? (
+              <>
+                <button
+                  onClick={handleAdvanceNextStep}
+                  className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs shadow-md transition-transform hover:scale-105 cursor-pointer"
+                >
+                  <span>Advance to Step {stepVerdict.stepIndex + 2}</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={handleRetryCurrentStep}
+                  className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-300 text-xs font-medium border border-slate-700 cursor-pointer"
+                >
+                  Retry Step {stepVerdict.stepIndex + 1}
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={handleRetryCurrentStep}
+                  className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs shadow-md transition-transform hover:scale-105 cursor-pointer"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span>Retry Step {stepVerdict.stepIndex + 1}</span>
+                </button>
+                <button
+                  onClick={() => onNavigate('learn')}
+                  className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-300 text-xs font-medium border border-slate-700 cursor-pointer"
+                >
+                  Back to Catalog
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Overall Lesson Mastered Verdict Card (Shown after Passing Step 3) */}
+      {completedResult && (
         <div className="w-full max-w-2xl mx-auto p-8 rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl text-center space-y-6 animate-fade-in">
           <div className="w-16 h-16 rounded-full mx-auto flex items-center justify-center text-3xl shadow-lg">
-            {isPassed ? (
+            {isOverallPassed ? (
               <div className="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30">
                 <Trophy className="w-8 h-8" />
               </div>
@@ -617,11 +836,11 @@ export const LessonViewPage: React.FC<LessonViewPageProps> = ({ lesson, onNaviga
 
           <div className="space-y-1">
             <h2 className="text-2xl font-extrabold text-slate-100">
-              {isPassed ? 'Lesson Mastered!' : 'Keep Practicing'}
+              {isOverallPassed ? 'Lesson Mastered!' : 'Keep Practicing'}
             </h2>
             <p className="text-xs text-slate-400">
-              {isPassed 
-                ? `You reached ${completedResult.netWpm} WPM with ${completedResult.accuracy}% accuracy!` 
+              {isOverallPassed 
+                ? `All 3 sub-drills mastered! You scored ${completedResult.netWpm} WPM with ${completedResult.accuracy}% accuracy.` 
                 : `You scored ${completedResult.netWpm} WPM (${lesson.requiredWpm} required) and ${completedResult.accuracy}% accuracy (${lesson.requiredAccuracy}% required).`}
             </p>
           </div>
@@ -629,7 +848,7 @@ export const LessonViewPage: React.FC<LessonViewPageProps> = ({ lesson, onNaviga
           {/* Quick Stats Grid */}
           <div className="grid grid-cols-3 gap-3">
             <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
-              <span className="text-[10px] text-slate-400 uppercase font-semibold">Net Speed</span>
+              <span className="text-[10px] text-slate-400 uppercase font-semibold">Final Speed</span>
               <p className="text-xl font-mono font-bold text-emerald-400">{completedResult.netWpm} WPM</p>
             </div>
             <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
@@ -643,7 +862,7 @@ export const LessonViewPage: React.FC<LessonViewPageProps> = ({ lesson, onNaviga
           </div>
 
           {/* Highlighted Milestone Mini-Game Button (After Every 2 Completed Lessons) */}
-          {isPassed && isMilestone && (
+          {isOverallPassed && isMilestone && (
             <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 via-amber-500/15 to-orange-500/10 border border-amber-500/30 flex flex-col sm:flex-row items-center justify-between gap-3 text-left animate-pulse">
               <div className="space-y-0.5">
                 <div className="flex items-center gap-1.5 text-amber-400 text-xs font-extrabold font-mono">
@@ -668,19 +887,16 @@ export const LessonViewPage: React.FC<LessonViewPageProps> = ({ lesson, onNaviga
           {/* Action CTAs */}
           <div className="flex flex-wrap justify-center items-center gap-3 pt-2">
             <button
-              onClick={() => setCompletedResult(null)}
+              onClick={handleRetryLesson}
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-200 text-xs font-semibold border border-slate-700 cursor-pointer"
             >
               <RotateCcw className="w-3.5 h-3.5" />
-              <span>Retry Lesson</span>
+              <span>Retry Lesson (Step 1)</span>
             </button>
 
-            {isPassed && nextLesson && (
+            {isOverallPassed && nextLesson && (
               <button
-                onClick={() => {
-                  setCompletedResult(null);
-                  onNavigate('lesson-view', nextLesson);
-                }}
+                onClick={handleNextLesson}
                 className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs shadow-md cursor-pointer"
               >
                 <span>Next Lesson ({nextLesson.order})</span>

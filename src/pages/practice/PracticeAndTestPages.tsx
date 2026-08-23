@@ -156,8 +156,8 @@ export const TypingTestPage: React.FC<PracticePageProps> = ({ onNavigate }) => {
             </div>
           </div>
 
-          <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
-            <span className="text-[11px] font-mono text-slate-400 px-2 py-1 bg-slate-950 rounded-lg border border-slate-800">
+          <div className="flex items-center gap-3 self-end sm:self-auto shrink-0">
+            <span className="text-[11px] font-mono text-slate-400 px-2.5 py-1 bg-slate-950 rounded-lg border border-slate-800">
               {selectedParagraph.wordCount} words • {selectedParagraph.difficulty}
             </span>
             <button
@@ -199,6 +199,14 @@ export const PracticePage: React.FC<PracticePageProps> = ({ onNavigate }) => {
   const [customInputText, setCustomInputText] = useState<string>('');
   const [isCustomMode, setIsCustomMode] = useState<boolean>(false);
   const [activeText, setActiveText] = useState<string>(PRACTICE_TEXTS[0].text);
+
+  // Viewport auto-centering on mount
+  React.useEffect(() => {
+    const arena = document.getElementById('practice-sandbox-page');
+    if (arena) {
+      arena.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }, []);
 
   const filteredItems = activeCategory === 'all' 
     ? PRACTICE_TEXTS 

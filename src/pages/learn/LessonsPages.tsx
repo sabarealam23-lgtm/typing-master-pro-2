@@ -554,29 +554,37 @@ export const SingleKeyDiscovery: React.FC<SingleKeyDiscoveryProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isCompleted, handleKeyEvaluation, onComplete]);
 
+  // Auto-center discovery arena on mount
+  React.useEffect(() => {
+    const arena = document.getElementById('single-key-discovery-view');
+    if (arena) {
+      arena.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }, []);
+
   return (
-    <div id="single-key-discovery-view" className="w-full max-w-4xl mx-auto space-y-6 animate-fade-in select-none">
+    <div id="single-key-discovery-view" className="w-full max-w-4xl mx-auto space-y-3 sm:space-y-4 [@media(max-height:820px)]:space-y-2 animate-fade-in select-none">
       {!isCompleted ? (
-        <div className="flex flex-col items-center justify-center p-6 sm:p-10 rounded-3xl bg-slate-900/90 border border-slate-800 shadow-2xl relative overflow-hidden text-center space-y-6">
+        <div className="flex flex-col items-center justify-center p-4 sm:p-6 [@media(max-height:820px)]:p-3 rounded-2xl sm:rounded-3xl bg-slate-900/90 border border-slate-800 shadow-2xl relative overflow-hidden text-center space-y-3 sm:space-y-4 [@media(max-height:820px)]:space-y-2">
           {/* Top Instruction */}
-          <div className="space-y-1.5">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-mono font-bold">
-              <Sparkles className="w-3.5 h-3.5" />
+          <div className="space-y-1">
+            <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-mono font-bold">
+              <Sparkles className="w-3 h-3" />
               <span>Step 1: Key Discovery ({currentCharIndex + 1} of {practiceText.length})</span>
             </div>
-            <h3 className="text-xl sm:text-2xl font-extrabold text-slate-100">
+            <h3 className="text-base sm:text-xl md:text-2xl font-extrabold text-slate-100">
               Press the highlighted key on your keyboard
             </h3>
-            <p className="text-xs sm:text-sm text-slate-400 max-w-md mx-auto">
+            <p className="text-[11px] sm:text-xs text-slate-400 max-w-md mx-auto">
               Place your hands on the home row and locate the tactile anchor position.
             </p>
           </div>
 
           {/* Large Centered Active Keycap Tile */}
-          <div className="flex flex-col items-center justify-center py-2">
+          <div className="flex flex-col items-center justify-center py-1">
             <div
               className={`
-                w-28 h-28 sm:w-36 sm:h-36 rounded-3xl flex flex-col items-center justify-center
+                w-20 h-20 sm:w-26 sm:h-26 md:w-30 md:h-30 [@media(max-height:820px)]:w-18 [@media(max-height:820px)]:h-18 rounded-2xl sm:rounded-3xl flex flex-col items-center justify-center
                 bg-gradient-to-b from-slate-800 to-slate-950 border-2 transition-all duration-200
                 shadow-2xl relative select-none
                 ${isErrorShake 
@@ -584,22 +592,22 @@ export const SingleKeyDiscovery: React.FC<SingleKeyDiscoveryProps> = ({
                   : 'border-cyan-400 shadow-cyan-500/25 ring-4 ring-cyan-500/20 scale-105'}
               `}
             >
-              <span className="font-mono text-5xl sm:text-6xl font-black text-cyan-300 drop-shadow-md">
+              <span className="font-mono text-3xl sm:text-5xl font-black text-cyan-300 drop-shadow-md">
                 {currentChar === ' ' ? 'SPACE' : currentChar.toUpperCase()}
               </span>
               
               {/* Tactile Ridge Indicator on F and J */}
               {(currentChar.toLowerCase() === 'f' || currentChar.toLowerCase() === 'j') && (
-                <div className="absolute bottom-3.5 flex items-center gap-1">
-                  <span className="w-4 h-1 bg-cyan-400 rounded-full animate-pulse" />
+                <div className="absolute bottom-2.5 flex items-center gap-1">
+                  <span className="w-3.5 h-1 bg-cyan-400 rounded-full animate-pulse" />
                 </div>
               )}
             </div>
 
             {/* Dynamic Finger Guide Banner */}
-            <div className="mt-5 flex flex-wrap items-center justify-center gap-2 px-4 py-2 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs sm:text-sm">
+            <div className="mt-2.5 sm:mt-3 flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 rounded-xl bg-slate-950/80 border border-slate-800 text-xs">
               <span className="text-slate-400">Target:</span>
-              <span className="font-mono font-extrabold text-cyan-400 bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-800/60">
+              <span className="font-mono font-extrabold text-cyan-400 bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-800/60 text-xs">
                 {fingerGuide.targetDisplay}
               </span>
               <span className="text-slate-600">|</span>
@@ -610,14 +618,14 @@ export const SingleKeyDiscovery: React.FC<SingleKeyDiscoveryProps> = ({
             </div>
 
             {/* Mini Progress Dots */}
-            <div className="flex items-center gap-2 mt-4">
+            <div className="flex items-center gap-1.5 mt-2.5">
               {practiceText.split('').map((char, idx) => {
                 const isPassed = idx < currentCharIndex;
                 const isCurrent = idx === currentCharIndex;
                 return (
                   <div
                     key={idx}
-                    className={`w-7 h-7 rounded-lg flex items-center justify-center font-mono text-xs font-bold transition-all ${
+                    className={`w-6 h-6 sm:w-7 sm:h-7 rounded-lg flex items-center justify-center font-mono text-[11px] sm:text-xs font-bold transition-all ${
                       isPassed
                         ? 'bg-emerald-500 text-slate-950 shadow-sm'
                         : isCurrent
@@ -625,7 +633,7 @@ export const SingleKeyDiscovery: React.FC<SingleKeyDiscoveryProps> = ({
                         : 'bg-slate-800 text-slate-500 border border-slate-700'
                     }`}
                   >
-                    {isPassed ? <Check className="w-3.5 h-3.5 stroke-[3]" /> : (char === ' ' ? '␣' : char.toUpperCase())}
+                    {isPassed ? <Check className="w-3 h-3 stroke-[3]" /> : (char === ' ' ? '␣' : char.toUpperCase())}
                   </div>
                 );
               })}
@@ -633,11 +641,12 @@ export const SingleKeyDiscovery: React.FC<SingleKeyDiscoveryProps> = ({
           </div>
 
           {/* Interactive Virtual Keyboard Matrix */}
-          <div className="w-full pt-2 border-t border-slate-800/80">
+          <div className="w-full pt-1.5 border-t border-slate-800/80">
             <VirtualKeyboard
               currentExpectedChar={currentChar}
               onKeyPress={handleKeyEvaluation}
               hideFingerBadge={true}
+              compact={true}
             />
           </div>
         </div>
@@ -855,13 +864,21 @@ export const LessonViewPage: React.FC<LessonViewPageProps> = ({ lesson, onNaviga
     };
   }, [completedResult, stepVerdict, isMiniGameOpen, handleNextLesson, handleRetryLesson, handleAdvanceNextStep, handleRetryCurrentStep]);
 
+  // Viewport auto-centering on mount or step change
+  React.useEffect(() => {
+    const arena = document.getElementById('active-lesson-view');
+    if (arena) {
+      arena.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }, [lesson.id, currentStepIndex]);
+
   // If user opened the milestone game from the completion modal
   if (isMiniGameOpen) {
     const gameTitle = milestoneForLesson?.title || `Lesson ${lesson.order} Milestone Pop`;
     const targetKeysForGame = getLearnedKeysUpToLesson(lesson.order);
 
     return (
-      <div className="w-full max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-6">
+      <div className="w-full max-w-7xl mx-auto py-4 sm:py-6 px-3 sm:px-6 lg:px-8 space-y-4">
         <LetterPopGame
           milestoneTitle={gameTitle}
           allowedKeys={targetKeysForGame}
@@ -883,19 +900,19 @@ export const LessonViewPage: React.FC<LessonViewPageProps> = ({ lesson, onNaviga
   }
 
   return (
-    <div id="active-lesson-view" className="w-full max-w-7xl mx-auto py-3 sm:py-5 px-4 sm:px-6 lg:px-8 space-y-3.5 sm:space-y-4">
+    <div id="active-lesson-view" className="w-full max-w-7xl mx-auto py-2 sm:py-4 px-3 sm:px-6 lg:px-8 space-y-2 sm:space-y-3">
       {/* Back button & Lesson header */}
-      <div className="flex flex-wrap items-center justify-between gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-2.5">
         <button
           onClick={() => onNavigate('learn')}
-          className="flex items-center gap-2 text-xs font-semibold text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
+          className="flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="w-3.5 h-3.5" />
           <span>Back to All Lessons</span>
         </button>
 
-        <div className="flex items-center gap-3">
-          <span className="text-xs font-mono text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-md border border-emerald-500/20">
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-mono text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-md border border-emerald-500/20">
             Target: {lesson.requiredWpm} WPM • {lesson.requiredAccuracy}% Accuracy
           </span>
         </div>
@@ -903,9 +920,9 @@ export const LessonViewPage: React.FC<LessonViewPageProps> = ({ lesson, onNaviga
 
       {/* 3-Step Sub-Drill Progress Header (TypingClub Style) */}
       {totalSteps > 1 && !completedResult && !stepVerdict && (
-        <div className="flex flex-wrap items-center justify-between gap-3 p-3 sm:p-4 rounded-2xl bg-slate-900/90 border border-slate-800 animate-fade-in">
-          <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-lg bg-emerald-500/15 text-emerald-400 font-mono font-bold text-xs flex items-center justify-center border border-emerald-500/25">
+        <div className="flex flex-wrap items-center justify-between gap-2.5 p-2 sm:p-3 rounded-xl sm:rounded-2xl bg-slate-900/90 border border-slate-800 animate-fade-in">
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 rounded-lg bg-emerald-500/15 text-emerald-400 font-mono font-bold text-xs flex items-center justify-center border border-emerald-500/25">
               {currentStepIndex + 1}/{totalSteps}
             </div>
             <div>
@@ -921,14 +938,14 @@ export const LessonViewPage: React.FC<LessonViewPageProps> = ({ lesson, onNaviga
           </div>
 
           {/* 3 Progressive Step Pills */}
-          <div className="flex items-center gap-1.5 sm:gap-2">
+          <div className="flex items-center gap-1 sm:gap-1.5">
             {lessonSteps.map((_, idx) => {
               const isDone = idx < currentStepIndex;
               const isCurrent = idx === currentStepIndex;
               return (
                 <div
                   key={idx}
-                  className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-mono font-semibold transition-all ${
+                  className={`flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] sm:text-[11px] font-mono font-semibold transition-all ${
                     isDone
                       ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
                       : isCurrent
@@ -937,7 +954,7 @@ export const LessonViewPage: React.FC<LessonViewPageProps> = ({ lesson, onNaviga
                   }`}
                 >
                   {isDone ? (
-                    <Check className="w-3 h-3 text-emerald-400 stroke-[3]" />
+                    <Check className="w-2.5 h-2.5 text-emerald-400 stroke-[3]" />
                   ) : (
                     <span>{idx + 1}</span>
                   )}

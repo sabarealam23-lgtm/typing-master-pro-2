@@ -112,7 +112,24 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
   const [liveNetWpm, setLiveNetWpm] = useState<number>(0);
   const [liveAccuracy, setLiveAccuracy] = useState<number>(100);
 
-  // Smooth auto-scroll for active typing position / line centering
+  // Viewport Auto-Center & Auto-Focus on mount or mode change (isolated to lesson mode)
+  useEffect(() => {
+    containerRef.current?.focus();
+    if (mode === 'lesson') {
+      const timer = setTimeout(() => {
+        const arena = document.getElementById('typing-engine-wrapper');
+        if (arena) {
+          const rect = arena.getBoundingClientRect();
+          if (rect.top < 60 || rect.bottom > window.innerHeight) {
+            arena.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }
+        }
+      }, 50);
+      return () => clearTimeout(timer);
+    }
+  }, [practiceText, mode]);
+
+  // Smooth auto-scroll for active typing position / line centering inside the typing box
   useEffect(() => {
     if (!containerRef.current) return;
 
@@ -605,85 +622,95 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
     );
   };
 
+  const isLessonMode = mode === 'lesson';
+
   return (
     <div 
       id="typing-engine-wrapper" 
       onClick={() => containerRef.current?.focus()}
-      className="w-full max-w-5xl mx-auto space-y-3 select-none"
+      className={`w-full max-w-5xl mx-auto ${
+        isLessonMode 
+          ? 'space-y-2 sm:space-y-3 [@media(max-height:820px)]:space-y-1.5' 
+          : 'space-y-4 sm:space-y-5'
+      } select-none`}
     >
       {/* Top Controls & KPI Dashboard Bar */}
       <div 
         id="typing-stats-dashboard"
-        className="w-full bg-slate-100 dark:bg-slate-950/90 border border-slate-300 dark:border-slate-800 rounded-2xl p-3 sm:p-4 shadow-md dark:shadow-xl backdrop-blur-md flex flex-wrap items-center justify-between gap-3 transition-colors"
+        className={`w-full bg-slate-100 dark:bg-slate-950/90 border border-slate-300 dark:border-slate-800 rounded-xl sm:rounded-2xl ${
+          isLessonMode 
+            ? 'p-2.5 sm:p-3.5 [@media(max-height:820px)]:p-2' 
+            : 'p-3 sm:p-4'
+        } shadow-md dark:shadow-xl backdrop-blur-md flex flex-wrap items-center justify-between gap-2.5 sm:gap-3 transition-colors`}
       >
         {/* Left: Mode / Lesson Info */}
-        <div className="flex items-center gap-2.5">
-          <div className="p-2 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400">
-            <Flame className="w-4 h-4" />
+        <div className="flex items-center gap-2">
+          <div className="p-1.5 sm:p-2 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400">
+            <Flame className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </div>
           <div>
             <h2 className="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200">
               {lesson ? lesson.title : mode.replace('_', ' ').toUpperCase()}
             </h2>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+            <p className="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 font-medium">
               {lesson ? `Target: ${lesson.requiredWpm} WPM • ${lesson.requiredAccuracy}% Acc` : 'Type any key to begin'}
             </p>
           </div>
         </div>
 
         {/* Center: Live Stats Badges */}
-        <div className="flex items-center gap-3 sm:gap-5">
+        <div className="flex items-center gap-2.5 sm:gap-4">
           {/* Timer */}
-          <div className="flex items-center gap-1.5">
-            <TimerIcon className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+          <div className="flex items-center gap-1">
+            <TimerIcon className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
             <div className="text-right">
-              <span className="text-[9px] uppercase font-bold text-slate-500 dark:text-slate-400 block leading-none">Time</span>
-              <span className="text-base sm:text-lg font-mono font-bold text-slate-800 dark:text-slate-100">
+              <span className="text-[8px] sm:text-[9px] uppercase font-bold text-slate-500 dark:text-slate-400 block leading-none">Time</span>
+              <span className="text-sm sm:text-base font-mono font-bold text-slate-800 dark:text-slate-100">
                 {isTimedMode ? formatDuration(timeLeft) : formatDuration(elapsedSeconds)}
               </span>
             </div>
           </div>
 
-          <div className="h-7 w-px bg-slate-300 dark:bg-slate-800" />
+          <div className="h-6 w-px bg-slate-300 dark:bg-slate-800" />
 
           {/* Net WPM */}
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1">
             <div className="text-right">
-              <span className="text-[9px] uppercase font-bold text-slate-500 dark:text-slate-400 block leading-none">Net WPM</span>
-              <span className="text-base sm:text-xl font-mono font-bold text-emerald-600 dark:text-emerald-400">{Math.round(liveNetWpm)}</span>
+              <span className="text-[8px] sm:text-[9px] uppercase font-bold text-slate-500 dark:text-slate-400 block leading-none">Net WPM</span>
+              <span className="text-sm sm:text-lg font-mono font-bold text-emerald-600 dark:text-emerald-400">{Math.round(liveNetWpm)}</span>
             </div>
           </div>
 
-          <div className="h-7 w-px bg-slate-300 dark:bg-slate-800" />
+          <div className="h-6 w-px bg-slate-300 dark:bg-slate-800" />
 
           {/* Accuracy */}
-          <div className="flex items-center gap-1.5">
-            <Target className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400" />
+          <div className="flex items-center gap-1">
+            <Target className="w-3 h-3 text-cyan-600 dark:text-cyan-400" />
             <div className="text-right">
-              <span className="text-[9px] uppercase font-bold text-slate-500 dark:text-slate-400 block leading-none">Accuracy</span>
-              <span className="text-base sm:text-lg font-mono font-bold text-cyan-600 dark:text-cyan-400">{liveAccuracy}%</span>
+              <span className="text-[8px] sm:text-[9px] uppercase font-bold text-slate-500 dark:text-slate-400 block leading-none">Accuracy</span>
+              <span className="text-sm sm:text-base font-mono font-bold text-cyan-600 dark:text-cyan-400">{liveAccuracy}%</span>
             </div>
           </div>
 
-          <div className="h-7 w-px bg-slate-300 dark:bg-slate-800" />
+          <div className="h-6 w-px bg-slate-300 dark:bg-slate-800" />
 
           {/* Progress */}
           <div className="hidden sm:flex flex-col items-end">
-            <span className="text-[9px] uppercase font-bold text-slate-500 dark:text-slate-400 block leading-none">Progress</span>
-            <span className="text-xs font-mono font-semibold text-slate-700 dark:text-slate-300">{progressPercent}%</span>
+            <span className="text-[8px] sm:text-[9px] uppercase font-bold text-slate-500 dark:text-slate-400 block leading-none">Progress</span>
+            <span className="text-[11px] sm:text-xs font-mono font-semibold text-slate-700 dark:text-slate-300">{progressPercent}%</span>
           </div>
         </div>
 
         {/* Right: Controls & Toggles */}
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1">
           {/* Display Mode Toggle */}
           <button
             id="toggle-display-style-btn"
             onClick={(e) => { e.stopPropagation(); setDisplayStyle(prev => prev === 'cards' ? 'continuous' : 'cards'); }}
             title={displayStyle === 'cards' ? 'Switch to Continuous Text Flow' : 'Switch to Compact Character Boxes'}
-            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-750 transition-colors shadow-2xs"
+            className="flex items-center gap-1 px-2 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-750 transition-colors shadow-2xs"
           >
-            {displayStyle === 'cards' ? <LayoutGrid className="w-3.5 h-3.5 text-blue-500" /> : <AlignLeft className="w-3.5 h-3.5 text-emerald-500" />}
+            {displayStyle === 'cards' ? <LayoutGrid className="w-3 h-3 text-blue-500" /> : <AlignLeft className="w-3 h-3 text-emerald-500" />}
             <span className="hidden sm:inline">{displayStyle === 'cards' ? 'Boxes' : 'Flow'}</span>
           </button>
 
@@ -692,9 +719,9 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
             id="engine-theme-toggle-btn"
             onClick={(e) => { e.stopPropagation(); toggleTheme(); }}
             title={isDark ? 'Switch to Day Mode (Light)' : 'Switch to Night Mode (Dark)'}
-            className="p-1.5 sm:p-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-750 transition-colors shadow-2xs"
+            className="p-1 sm:p-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-750 transition-colors shadow-2xs"
           >
-            {isDark ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-blue-600" />}
+            {isDark ? <Sun className="w-3.5 h-3.5 text-amber-400" /> : <Moon className="w-3.5 h-3.5 text-blue-600" />}
           </button>
 
           {/* Sound Toggle */}
@@ -702,13 +729,13 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
             id="toggle-sound-btn"
             onClick={(e) => { e.stopPropagation(); setSoundEnabled(!settings.soundEnabled); }}
             title={settings.soundEnabled ? 'Mute Key Sound' : 'Enable Key Sound'}
-            className={`p-1.5 sm:p-2 rounded-lg border transition-colors shadow-2xs ${
+            className={`p-1 sm:p-1.5 rounded-lg border transition-colors shadow-2xs ${
               settings.soundEnabled 
                 ? 'bg-blue-50 dark:bg-blue-900/30 border-blue-300 dark:border-blue-700 text-blue-600 dark:text-blue-400' 
                 : 'bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-400'
             }`}
           >
-            {settings.soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+            {settings.soundEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
           </button>
 
           {/* Keyboard Toggle */}
@@ -716,13 +743,13 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
             id="toggle-keyboard-btn"
             onClick={(e) => { e.stopPropagation(); setShowVirtualKeyboard(!settings.showVirtualKeyboard); }}
             title={settings.showVirtualKeyboard ? 'Hide On-Screen Keyboard' : 'Show On-Screen Keyboard'}
-            className={`p-1.5 sm:p-2 rounded-lg border transition-colors shadow-2xs ${
+            className={`p-1 sm:p-1.5 rounded-lg border transition-colors shadow-2xs ${
               settings.showVirtualKeyboard 
                 ? 'bg-blue-50 dark:bg-blue-900/30 border-blue-300 dark:border-blue-700 text-blue-600 dark:text-blue-400' 
                 : 'bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-400'
             }`}
           >
-            <Keyboard className="w-4 h-4" />
+            <Keyboard className="w-3.5 h-3.5" />
           </button>
 
           {/* Blind Mode Toggle */}
@@ -730,13 +757,13 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
             id="toggle-blind-mode-btn"
             onClick={(e) => { e.stopPropagation(); setBlindModeActive(!blindModeActive); }}
             title={blindModeActive ? 'Disable Blind Mode' : 'Enable Blind Mode'}
-            className={`p-1.5 sm:p-2 rounded-lg border transition-colors shadow-2xs ${
+            className={`p-1 sm:p-1.5 rounded-lg border transition-colors shadow-2xs ${
               blindModeActive 
                 ? 'bg-amber-100 dark:bg-amber-500/20 border-amber-300 dark:border-amber-500/30 text-amber-700 dark:text-amber-300' 
                 : 'bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-400'
             }`}
           >
-            {blindModeActive ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            {blindModeActive ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
           </button>
 
           {/* Manual Restart */}
@@ -744,9 +771,9 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
             id="restart-test-btn"
             onClick={(e) => { e.stopPropagation(); handleManualRestart(); }}
             title="Restart Test (or press Tab / Esc)"
-            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-750 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 text-xs font-semibold transition-colors shadow-2xs"
+            className="flex items-center gap-1 px-2 py-1 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-750 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 text-xs font-semibold transition-colors shadow-2xs"
           >
-            <RotateCcw className="w-3.5 h-3.5" />
+            <RotateCcw className="w-3 h-3" />
             <span className="hidden sm:inline">Restart</span>
           </button>
         </div>
@@ -756,9 +783,9 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
       {pasteBlockedWarning && (
         <div 
           id="paste-warning-banner"
-          className="flex items-center gap-2.5 px-4 py-2 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-600 dark:text-rose-300 text-xs sm:text-sm font-medium animate-bounce shadow-md"
+          className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-600 dark:text-rose-300 text-xs font-medium animate-bounce shadow-md"
         >
-          <AlertTriangle className="w-4 h-4 text-rose-500 shrink-0" />
+          <AlertTriangle className="w-3.5 h-3.5 text-rose-500 shrink-0" />
           <span>Clipboard paste is disabled to ensure authentic keystroke tracking & accuracy metrics.</span>
         </div>
       )}
@@ -767,11 +794,11 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
       {(settings.showVirtualKeyboard || mode === 'lesson') && (
         <div 
           id="typing-target-key-guide"
-          className="flex flex-wrap items-center justify-between gap-2 px-3.5 sm:px-4 py-2 bg-slate-100/90 dark:bg-slate-900/90 border border-slate-300 dark:border-slate-800 rounded-xl shadow-xs text-xs sm:text-sm"
+          className="flex flex-wrap items-center justify-between gap-2 px-3 sm:px-4 py-1.5 bg-slate-100/90 dark:bg-slate-900/90 border border-slate-300 dark:border-slate-800 rounded-xl shadow-xs text-xs"
         >
           <div className="flex items-center gap-2 font-medium text-slate-700 dark:text-slate-200">
             <span className="text-slate-500 dark:text-slate-400 font-semibold">Type:</span>
-            <span className="font-mono font-extrabold px-2.5 py-0.5 rounded-md bg-cyan-100 dark:bg-cyan-950/80 text-cyan-700 dark:text-cyan-300 border border-cyan-300 dark:border-cyan-700 text-sm shadow-2xs">
+            <span className="font-mono font-extrabold px-2 py-0.5 rounded-md bg-cyan-100 dark:bg-cyan-950/80 text-cyan-700 dark:text-cyan-300 border border-cyan-300 dark:border-cyan-700 text-xs sm:text-sm shadow-2xs">
               {fingerGuide.targetDisplay}
             </span>
             <span className="text-slate-300 dark:text-slate-700">|</span>
@@ -795,9 +822,14 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
         ref={containerRef}
         onPaste={handlePaste}
         className={`
-          relative w-full min-h-[150px] max-h-[230px] overflow-y-auto scrollbar-clean scroll-smooth
+          relative w-full ${
+            isLessonMode 
+              ? 'min-h-[90px] max-h-[140px] sm:max-h-[175px] lg:max-h-[200px] [@media(max-height:820px)]:max-h-[120px] [@media(max-height:740px)]:max-h-[95px] p-3 sm:p-4 [@media(max-height:820px)]:p-2.5' 
+              : 'min-h-[150px] max-h-[240px] sm:max-h-[280px] p-4 sm:p-6'
+          }
+          overflow-y-auto scrollbar-clean scroll-smooth
           bg-white dark:bg-slate-950/95 
-          border-2 rounded-2xl p-4 sm:p-5 
+          border-2 rounded-xl sm:rounded-2xl
           shadow-md dark:shadow-2xl transition-all duration-150
           select-none outline-none cursor-text
           ${isStarted && !isFinished ? 'border-blue-500 ring-2 ring-blue-500/20' : 'border-slate-300 dark:border-slate-800'}
@@ -971,6 +1003,7 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
           currentExpectedChar={currentExpectedChar} 
           onKeyPress={(k) => processKeyInput(k)}
           hideFingerBadge={true}
+          compact={isLessonMode}
         />
       )}
     </div>

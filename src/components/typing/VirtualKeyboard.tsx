@@ -12,6 +12,7 @@ interface VirtualKeyboardProps {
   currentExpectedChar: string;
   onKeyPress?: (key: string) => void;
   hideFingerBadge?: boolean;
+  compact?: boolean;
 }
 
 export interface FingerGuide {
@@ -153,10 +154,11 @@ export function getFingerGuide(char: string): FingerGuide {
   return { targetDisplay, handName: 'Right Hand', fingerName: 'Pinky Finger' };
 }
 
-export const VirtualKeyboard: React.FC<VirtualKeyboardProps> = ({ 
-  currentExpectedChar, 
+export const VirtualKeyboard: React.FC<VirtualKeyboardProps> = ({
+  currentExpectedChar,
   onKeyPress,
-  hideFingerBadge = false
+  hideFingerBadge = false,
+  compact = false,
 }) => {
   const needsShift = React.useMemo(() => {
     if (!currentExpectedChar) return false;
@@ -193,13 +195,17 @@ export const VirtualKeyboard: React.FC<VirtualKeyboardProps> = ({
   return (
     <div 
       id="virtual-keyboard-root" 
-      className="w-full max-w-4xl mx-auto select-none space-y-2"
+      className={`w-full max-w-4xl mx-auto select-none ${
+        compact 
+          ? 'space-y-1.5 sm:space-y-2 [@media(max-height:820px)]:space-y-1' 
+          : 'space-y-2'
+      }`}
     >
       {/* Target Key & Finger Guide Badge (rendered only if not rendered above in parent) */}
       {!hideFingerBadge && (
         <div 
           id="dynamic-finger-guide-badge"
-          className="flex items-center justify-between px-3 sm:px-4 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xs"
+          className="flex items-center justify-between px-3 sm:px-4 py-1.5 sm:py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xs"
         >
           <div className="flex items-center gap-2 text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-200">
             <span>Target:</span>
@@ -224,14 +230,29 @@ export const VirtualKeyboard: React.FC<VirtualKeyboardProps> = ({
       {/* Clean Minimal Virtual Keyboard Matrix (No outer frame/border/background panel) */}
       <div 
         id="virtual-keyboard-matrix"
-        className="w-full flex flex-col gap-1 sm:gap-1.5 items-center overflow-x-auto select-none py-1"
+        className={`w-full flex flex-col items-center overflow-x-auto select-none py-0.5 ${
+          compact 
+            ? 'gap-0.5 sm:gap-1.5 [@media(max-height:820px)]:gap-0.5' 
+            : 'gap-1 sm:gap-1.5'
+        }`}
       >
         {KEYBOARD_ROWS.map((row, rIdx) => (
-          <div key={rIdx} className="flex gap-1 sm:gap-1.5 justify-center w-full">
+          <div 
+            key={rIdx} 
+            className={`flex justify-center w-full ${
+              compact 
+                ? 'gap-0.5 sm:gap-1.5 [@media(max-height:820px)]:gap-0.5' 
+                : 'gap-1 sm:gap-1.5'
+            }`}
+          >
             {row.map((k) => {
               const active = isKeyActive(k);
               const isHomeAnchor = k.key === 'f' || k.key === 'j';
               const widthClass = k.width || 'w-6 sm:w-9 md:w-10';
+
+              const heightClass = compact
+                ? 'h-7 sm:h-8.5 md:h-9.5 [@media(max-height:820px)]:h-7.5 [@media(max-height:740px)]:h-6.5'
+                : 'h-8 sm:h-9 md:h-10';
 
               return (
                 <div
@@ -239,7 +260,7 @@ export const VirtualKeyboard: React.FC<VirtualKeyboardProps> = ({
                   id={`key-${k.key}`}
                   onClick={() => handleKeyClick(k.display)}
                   className={`
-                    ${widthClass} h-8 sm:h-9 md:h-10
+                    ${widthClass} ${heightClass}
                     flex flex-col items-center justify-center
                     rounded-md sm:rounded-lg transition-all duration-100 relative cursor-pointer select-none border shadow-xs
                     ${
@@ -252,15 +273,15 @@ export const VirtualKeyboard: React.FC<VirtualKeyboardProps> = ({
                   {/* Shift Symbol */}
                   {k.shiftDisplay ? (
                     <div className="flex flex-col items-center leading-none">
-                      <span className={`text-[8px] sm:text-[9px] font-mono leading-none ${active ? 'text-cyan-100' : 'text-slate-400 dark:text-slate-500'}`}>
+                      <span className={`text-[7px] sm:text-[9px] font-mono leading-none ${active ? 'text-cyan-100' : 'text-slate-400 dark:text-slate-500'}`}>
                         {k.shiftDisplay}
                       </span>
-                      <span className="font-mono text-[10px] sm:text-xs font-semibold leading-tight mt-0.5">
+                      <span className="font-mono text-[9px] sm:text-xs font-semibold leading-tight mt-0.5">
                         {k.display}
                       </span>
                     </div>
                   ) : (
-                    <span className="font-mono text-[11px] sm:text-xs font-semibold leading-none">
+                    <span className="font-mono text-[10px] sm:text-xs font-semibold leading-none">
                       {k.display}
                     </span>
                   )}

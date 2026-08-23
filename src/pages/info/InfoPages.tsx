@@ -128,13 +128,17 @@ export const AboutPage: React.FC<InfoPageProps> = ({ onNavigate }) => {
 // ==================== CONTACT PAGE ====================
 export const ContactPage: React.FC<InfoPageProps> = () => {
   const [copied, setCopied] = useState(false);
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [category, setCategory] = useState('Feedback & Suggestions');
-  const [message, setMessage] = useState('');
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    message: ''
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [sent, setSent] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const contactEmail = 'sabarealam23@gmail.com';
+  const formspreeEndpoint = 'https://formspree.io/f/xyegvrvz';
 
   const handleCopyEmail = () => {
     navigator.clipboard.writeText(contactEmail);
@@ -142,9 +146,39 @@ export const ContactPage: React.FC<InfoPageProps> = () => {
     setTimeout(() => setCopied(false), 2500);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSent(true);
+    setIsSubmitting(true);
+    setErrorMessage(null);
+
+    try {
+      const response = await fetch(formspreeEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          message: formData.message
+        })
+      });
+
+      if (response.ok) {
+        setSent(true);
+        setFormData({ name: '', email: '', message: '' });
+      } else {
+        const data = await response.json().catch(() => ({}));
+        setErrorMessage(
+          data?.errors?.[0]?.message || 'Unable to submit your feedback at this moment. Please try again or email us directly.'
+        );
+      }
+    } catch (err) {
+      setErrorMessage('Network error occurred. Please check your connection or send us an email directly.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -155,7 +189,7 @@ export const ContactPage: React.FC<InfoPageProps> = () => {
         </div>
         <h1 className="text-3xl font-extrabold text-slate-100">Support & Contact</h1>
         <p className="text-xs sm:text-sm text-slate-400 max-w-md mx-auto leading-relaxed">
-          For feature suggestions, bugs, or business inquiries, email us at <strong className="text-cyan-300">{contactEmail}</strong>. We typically respond within 24–48 hours.
+          You can also reach us directly at <strong className="text-cyan-300">{contactEmail}</strong> (Response within 24–48 hours).
         </p>
       </div>
 
@@ -193,76 +227,97 @@ export const ContactPage: React.FC<InfoPageProps> = () => {
       <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-xl">
         {sent ? (
           <div className="text-center space-y-4 py-8">
-            <CheckCircle2 className="w-12 h-12 text-emerald-400 mx-auto" />
-            <h3 className="text-lg font-bold text-slate-100">Message Received</h3>
+            <div className="w-12 h-12 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 mx-auto flex items-center justify-center">
+              <CheckCircle2 className="w-6 h-6" />
+            </div>
+            <h3 className="text-lg font-bold text-slate-100">Thank you! Your feedback has been received.</h3>
             <p className="text-xs text-slate-400 max-w-md mx-auto">
-              Thank you for contacting SmartTypingPro! We read every note and will get back to you at {email}.
+              Our team has received your message and will review it promptly. We appreciate you helping us enhance SmartTypingPro!
             </p>
             <button
-              onClick={() => { setSent(false); setMessage(''); }}
+              onClick={() => {
+                setSent(false);
+                setFormData({ name: '', email: '', message: '' });
+                setErrorMessage(null);
+              }}
               className="px-4 py-2 rounded-lg bg-slate-800 text-slate-200 text-xs font-semibold hover:bg-slate-700 transition-colors cursor-pointer"
             >
               Send Another Note
             </button>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4" method="POST" action={formspreeEndpoint}>
+            {errorMessage && (
+              <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2 animate-fade-in">
+                <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
+                <span>{errorMessage}</span>
+              </div>
+            )}
+
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">Your Name</label>
+              <label htmlFor="info-name-input" className="block text-xs font-semibold text-slate-300 mb-1.5">
+                Your Name <span className="text-rose-400">*</span>
+              </label>
               <input
+                id="info-name-input"
+                name="name"
                 type="text"
                 required
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="Alex Hunter"
-                className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-cyan-400 text-sm text-slate-100 focus:outline-none"
+                className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-cyan-400 text-sm text-slate-100 focus:outline-none transition-colors"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">Email Address</label>
+              <label htmlFor="info-email-input" className="block text-xs font-semibold text-slate-300 mb-1.5">
+                User Email <span className="text-rose-400">*</span>
+              </label>
               <input
+                id="info-email-input"
+                name="email"
                 type="email"
                 required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 placeholder="alex@example.com"
-                className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-cyan-400 text-sm text-slate-100 focus:outline-none"
+                className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-cyan-400 text-sm text-slate-100 focus:outline-none transition-colors"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">Topic</label>
-              <select
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-cyan-400 text-sm text-slate-100 focus:outline-none"
-              >
-                <option value="Feedback & Suggestions">Feedback & Suggestions</option>
-                <option value="Bug Report">Bug or Calibration Report</option>
-                <option value="Certificate Verification">Certificate Verification</option>
-                <option value="General Inquiry">General Inquiry</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">Message</label>
+              <label htmlFor="info-message-input" className="block text-xs font-semibold text-slate-300 mb-1.5">
+                Message <span className="text-rose-400">*</span>
+              </label>
               <textarea
+                id="info-message-input"
+                name="message"
                 required
                 rows={4}
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
+                value={formData.message}
+                onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                 placeholder="How can we help enhance your typing experience?"
-                className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-cyan-400 text-sm text-slate-100 focus:outline-none resize-none"
+                className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-cyan-400 text-sm text-slate-100 focus:outline-none resize-none transition-colors"
               />
             </div>
 
             <button
               type="submit"
-              className="w-full py-3 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-sm shadow-md transition-colors flex items-center justify-center gap-2 cursor-pointer"
+              disabled={isSubmitting}
+              className="w-full py-3 rounded-xl bg-cyan-500 hover:bg-cyan-400 disabled:opacity-50 text-slate-950 font-bold text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer disabled:cursor-not-allowed"
             >
-              <Send className="w-4 h-4" />
-              <span>Send Message</span>
+              {isSubmitting ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+                  <span>Sending Feedback...</span>
+                </>
+              ) : (
+                <>
+                  <Send className="w-4 h-4" />
+                  <span>Send Feedback</span>
+                </>
+              )}
             </button>
           </form>
         )}

@@ -289,19 +289,21 @@ const AboutModalContent: React.FC<{ onNavigate?: (page: any) => void; onClose: (
 };
 
 // =========================================================================
-// 2. SUPPORT & CONTACT CONTENT
+// 2. SUPPORT & CONTACT CONTENT (LIVE FORMSPREE INTEGRATION)
 // =========================================================================
 const ContactModalContent: React.FC = () => {
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    category: 'Feedback & Suggestions',
     message: ''
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const contactEmail = 'sabarealam23@gmail.com';
+  const formspreeEndpoint = 'https://formspree.io/f/xyegvrvz';
 
   const handleCopyEmail = () => {
     navigator.clipboard.writeText(contactEmail);
@@ -309,9 +311,39 @@ const ContactModalContent: React.FC = () => {
     setTimeout(() => setCopiedEmail(false), 2500);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    setIsSubmitting(true);
+    setErrorMessage(null);
+
+    try {
+      const response = await fetch(formspreeEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          message: formData.message
+        })
+      });
+
+      if (response.ok) {
+        setSubmitted(true);
+        setFormData({ name: '', email: '', message: '' });
+      } else {
+        const data = await response.json().catch(() => ({}));
+        setErrorMessage(
+          data?.errors?.[0]?.message || 'Unable to submit your feedback at this moment. Please try again or email us directly.'
+        );
+      }
+    } catch (err) {
+      setErrorMessage('Network error occurred. Please check your connection or send us an email directly.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -321,7 +353,7 @@ const ContactModalContent: React.FC = () => {
         <div className="flex items-center justify-between flex-wrap gap-2">
           <div className="flex items-center gap-2 text-cyan-400 text-xs font-bold uppercase font-mono">
             <Mail className="w-4 h-4" />
-            <span>Direct Developer Support Email</span>
+            <span>Direct Developer Support</span>
           </div>
           <span className="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">
             24–48h Response SLA
@@ -329,7 +361,7 @@ const ContactModalContent: React.FC = () => {
         </div>
 
         <p className="text-xs sm:text-sm text-slate-200 leading-relaxed">
-          For feature suggestions, bug reports, custom enterprise setups, or business inquiries, email us directly at <strong className="text-cyan-300">{contactEmail}</strong>. We typically respond within 24–48 hours.
+          You can also reach us directly at <strong className="text-cyan-300">{contactEmail}</strong> (Response within 24–48 hours).
         </p>
 
         {/* Copyable Email Box */}
@@ -365,89 +397,109 @@ const ContactModalContent: React.FC = () => {
 
       {/* Interactive Contact / Feedback Form */}
       <div className="p-5 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-4">
-        <h3 className="text-xs font-bold uppercase tracking-wider text-slate-200 flex items-center gap-2">
-          <Send className="w-4 h-4 text-emerald-400" />
-          Send a Quick Message
-        </h3>
+        <div className="flex items-center justify-between">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-200 flex items-center gap-2">
+            <Send className="w-4 h-4 text-emerald-400" />
+            Send Feedback or Support Request
+          </h3>
+          <span className="text-[10px] font-mono text-slate-400">Live Formspree Integration</span>
+        </div>
 
         {submitted ? (
           <div className="text-center py-6 space-y-3 animate-fade-in">
             <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 mx-auto flex items-center justify-center">
               <CheckCircle2 className="w-6 h-6" />
             </div>
-            <h4 className="text-sm font-bold text-slate-100">Message Dispatched!</h4>
+            <h4 className="text-sm font-bold text-slate-100">Thank you! Your feedback has been received.</h4>
             <p className="text-xs text-slate-400 max-w-sm mx-auto">
-              Thank you, {formData.name || 'Typist'}! We have queued your message and will review it promptly.
+              Our team has received your message and will review it promptly. We appreciate you helping us make SmartTypingPro better!
             </p>
             <button
               onClick={() => {
                 setSubmitted(false);
-                setFormData({ name: '', email: '', category: 'Feedback & Suggestions', message: '' });
+                setFormData({ name: '', email: '', message: '' });
+                setErrorMessage(null);
               }}
-              className="px-3.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition-colors"
+              className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition-colors cursor-pointer"
             >
               Send Another Note
             </button>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-3.5">
+          <form onSubmit={handleSubmit} className="space-y-3.5" method="POST" action={formspreeEndpoint}>
+            {errorMessage && (
+              <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2 animate-fade-in">
+                <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
+                <span>{errorMessage}</span>
+              </div>
+            )}
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block text-[11px] font-semibold text-slate-300 mb-1">Your Name</label>
+                <label htmlFor="contact-name-input" className="block text-[11px] font-semibold text-slate-300 mb-1">
+                  Your Name <span className="text-rose-400">*</span>
+                </label>
                 <input
+                  id="contact-name-input"
+                  name="name"
                   type="text"
                   required
                   placeholder="e.g. Alex Hunter"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-800 focus:border-cyan-400 text-xs text-slate-100 focus:outline-none"
+                  className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-800 focus:border-cyan-400 text-xs text-slate-100 focus:outline-none transition-colors"
                 />
               </div>
               <div>
-                <label className="block text-[11px] font-semibold text-slate-300 mb-1">Your Email</label>
+                <label htmlFor="contact-email-input" className="block text-[11px] font-semibold text-slate-300 mb-1">
+                  User Email <span className="text-rose-400">*</span>
+                </label>
                 <input
+                  id="contact-email-input"
+                  name="email"
                   type="email"
                   required
                   placeholder="alex@example.com"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-800 focus:border-cyan-400 text-xs text-slate-100 focus:outline-none"
+                  className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-800 focus:border-cyan-400 text-xs text-slate-100 focus:outline-none transition-colors"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-[11px] font-semibold text-slate-300 mb-1">Topic Category</label>
-              <select
-                value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-800 focus:border-cyan-400 text-xs text-slate-100 focus:outline-none"
-              >
-                <option value="Feedback & Suggestions">Feedback & Feature Suggestions</option>
-                <option value="Bug Report">Bug or Calibration Issue</option>
-                <option value="Certification Verification">Certificate Verification Inquiry</option>
-                <option value="General Support">General Support & Inquiry</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-[11px] font-semibold text-slate-300 mb-1">Message</label>
+              <label htmlFor="contact-message-input" className="block text-[11px] font-semibold text-slate-300 mb-1">
+                Message <span className="text-rose-400">*</span>
+              </label>
               <textarea
+                id="contact-message-input"
+                name="message"
                 required
                 rows={3}
-                placeholder="Describe your suggestion, issue, or question..."
+                placeholder="Share your feature suggestions, bug reports, or questions..."
                 value={formData.message}
                 onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-800 focus:border-cyan-400 text-xs text-slate-100 focus:outline-none resize-none"
+                className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-800 focus:border-cyan-400 text-xs text-slate-100 focus:outline-none resize-none transition-colors"
               />
             </div>
 
             <button
+              id="contact-form-submit-btn"
               type="submit"
-              className="w-full py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs shadow-md transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+              disabled={isSubmitting}
+              className="w-full py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 disabled:opacity-50 text-slate-950 font-bold text-xs shadow-md transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:cursor-not-allowed"
             >
-              <Send className="w-3.5 h-3.5" />
-              <span>Submit Message to Support</span>
+              {isSubmitting ? (
+                <>
+                  <div className="w-3.5 h-3.5 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+                  <span>Sending Feedback...</span>
+                </>
+              ) : (
+                <>
+                  <Send className="w-3.5 h-3.5" />
+                  <span>Send Feedback</span>
+                </>
+              )}
             </button>
           </form>
         )}

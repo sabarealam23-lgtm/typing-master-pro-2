@@ -131,6 +131,7 @@ export const ContactPage: React.FC<InfoPageProps> = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    category: 'Feedback & Feature Suggestions',
     message: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -161,13 +162,14 @@ export const ContactPage: React.FC<InfoPageProps> = () => {
         body: JSON.stringify({
           name: formData.name,
           email: formData.email,
+          category: formData.category,
           message: formData.message
         })
       });
 
       if (response.ok) {
         setSent(true);
-        setFormData({ name: '', email: '', message: '' });
+        setFormData({ name: '', email: '', category: 'Feedback & Feature Suggestions', message: '' });
       } else {
         const data = await response.json().catch(() => ({}));
         setErrorMessage(
@@ -284,6 +286,24 @@ export const ContactPage: React.FC<InfoPageProps> = () => {
                 placeholder="alex@example.com"
                 className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-cyan-400 text-sm text-slate-100 focus:outline-none transition-colors"
               />
+            </div>
+
+            <div>
+              <label htmlFor="info-category-select" className="block text-xs font-semibold text-slate-300 mb-1.5">
+                Topic Category
+              </label>
+              <select
+                id="info-category-select"
+                name="category"
+                value={formData.category}
+                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-cyan-400 text-sm text-slate-100 focus:outline-none transition-colors cursor-pointer"
+              >
+                <option value="Feedback & Feature Suggestions">Feedback & Feature Suggestions</option>
+                <option value="Bug Report / Technical Issue">Bug Report / Technical Issue</option>
+                <option value="Typing Certificate Query">Typing Certificate Query</option>
+                <option value="General Question & Support">General Question & Support</option>
+              </select>
             </div>
 
             <div>

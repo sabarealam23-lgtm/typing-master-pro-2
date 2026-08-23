@@ -296,6 +296,7 @@ const ContactModalContent: React.FC = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    category: 'Feedback & Feature Suggestions',
     message: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -326,13 +327,14 @@ const ContactModalContent: React.FC = () => {
         body: JSON.stringify({
           name: formData.name,
           email: formData.email,
+          category: formData.category,
           message: formData.message
         })
       });
 
       if (response.ok) {
         setSubmitted(true);
-        setFormData({ name: '', email: '', message: '' });
+        setFormData({ name: '', email: '', category: 'Feedback & Feature Suggestions', message: '' });
       } else {
         const data = await response.json().catch(() => ({}));
         setErrorMessage(
@@ -417,7 +419,7 @@ const ContactModalContent: React.FC = () => {
             <button
               onClick={() => {
                 setSubmitted(false);
-                setFormData({ name: '', email: '', message: '' });
+                setFormData({ name: '', email: '', category: 'Feedback & Feature Suggestions', message: '' });
                 setErrorMessage(null);
               }}
               className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition-colors cursor-pointer"
@@ -465,6 +467,24 @@ const ContactModalContent: React.FC = () => {
                   className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-800 focus:border-cyan-400 text-xs text-slate-100 focus:outline-none transition-colors"
                 />
               </div>
+            </div>
+
+            <div>
+              <label htmlFor="contact-category-select" className="block text-[11px] font-semibold text-slate-300 mb-1">
+                Topic Category
+              </label>
+              <select
+                id="contact-category-select"
+                name="category"
+                value={formData.category}
+                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-800 focus:border-cyan-400 text-xs text-slate-100 focus:outline-none transition-colors cursor-pointer"
+              >
+                <option value="Feedback & Feature Suggestions">Feedback & Feature Suggestions</option>
+                <option value="Bug Report / Technical Issue">Bug Report / Technical Issue</option>
+                <option value="Typing Certificate Query">Typing Certificate Query</option>
+                <option value="General Question & Support">General Question & Support</option>
+              </select>
             </div>
 
             <div>

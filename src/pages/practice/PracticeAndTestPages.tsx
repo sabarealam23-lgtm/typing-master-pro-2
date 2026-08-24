@@ -155,7 +155,7 @@ export const TypingTestPage: React.FC<PracticePageProps> = ({ onNavigate }) => {
               </div>
               <div>
                 <h3 className="text-lg font-bold text-slate-100">Candidate Exam Entry</h3>
-                <p className="text-xs text-slate-400">Sonma Typing Test & Verified Certification</p>
+                <p className="text-xs text-slate-400">Smart Typing Pro & Verified Certification</p>
               </div>
             </div>
 
@@ -213,7 +213,7 @@ export const TypingTestPage: React.FC<PracticePageProps> = ({ onNavigate }) => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-5">
         <div>
           <div className="inline-flex items-center gap-1.5 text-xs font-mono text-emerald-400 font-bold uppercase mb-1">
-            <ShieldCheck className="w-3.5 h-3.5" /> Authentic Sonma Typing Assessment
+            <ShieldCheck className="w-3.5 h-3.5" /> Smart Typing Pro - Official Speed Assessment
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-100">Official Typing Test</h1>
           <p className="text-xs text-slate-400 mt-1">
@@ -298,13 +298,13 @@ export const TypingTestPage: React.FC<PracticePageProps> = ({ onNavigate }) => {
               <Sliders className="w-3.5 h-3.5 text-cyan-400" /> Categories
             </h3>
             <div className="flex flex-wrap gap-1.5">
-              {['all', 'quote', 'literature', 'code', 'business', 'pangram'].map((cat) => (
+              {['all', 'quote', 'code', 'business', 'literature', 'pangram', 'general'].map((cat) => (
                 <button
                   key={cat}
                   onClick={() => { setActiveCategory(cat); }}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition-colors ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition-colors cursor-pointer ${
                     activeCategory === cat
-                      ? 'bg-cyan-500 text-slate-950'
+                      ? 'bg-cyan-500 text-slate-950 font-bold'
                       : 'bg-slate-950 text-slate-400 hover:text-slate-200 border border-slate-800'
                   }`}
                 >
@@ -447,13 +447,13 @@ export const PracticePage: React.FC<PracticePageProps> = ({ onNavigate }) => {
           <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-3">
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300">Drill Categories</h3>
             <div className="flex flex-wrap gap-1.5">
-              {['all', 'quote', 'literature', 'code', 'business', 'pangram'].map((cat) => (
+              {['all', 'quote', 'code', 'business', 'literature', 'pangram', 'general'].map((cat) => (
                 <button
                   key={cat}
                   onClick={() => { setActiveCategory(cat); setIsCustomMode(false); }}
                   className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition-colors cursor-pointer ${
                     !isCustomMode && activeCategory === cat
-                      ? 'bg-emerald-500 text-slate-950'
+                      ? 'bg-emerald-500 text-slate-950 font-bold'
                       : 'bg-slate-950 text-slate-400 hover:text-slate-200 border border-slate-800'
                   }`}
                 >

@@ -17,6 +17,7 @@ export interface ParagraphItem {
 }
 
 export const PRACTICE_TEXTS: PracticeTextItem[] = [
+  // ==================== PANGRAMS ====================
   {
     id: 'pt-1',
     category: 'pangram',
@@ -26,51 +27,37 @@ export const PRACTICE_TEXTS: PracticeTextItem[] = [
     difficulty: 'easy',
   },
   {
+    id: 'pt-pangram-2',
+    category: 'pangram',
+    title: 'Sphinx & Black Quartz',
+    author: 'Typing Drill',
+    text: 'Sphinx of black quartz, judge my vow! The five boxing wizards jump quickly. How razorback-jumping frogs can level six piqued gymnasts! Cozy sphinx waves back from jigsaw cliff.',
+    difficulty: 'easy',
+  },
+  {
+    id: 'pt-pangram-3',
+    category: 'pangram',
+    title: 'Jackdaws & Quartz Jewels',
+    author: 'Alphabet Master',
+    text: 'Jackdaws love my big sphinx of quartz. Six crazy kings vowed to quiz the lazy dwarf about prized jumping fox gems. Blowzy red night-frumps vexing quick pyx quaffers.',
+    difficulty: 'medium',
+  },
+  {
+    id: 'pt-pangram-4',
+    category: 'pangram',
+    title: 'Wizards & Quizzical Prizefights',
+    author: 'Keyboard Gymnast',
+    text: 'A quick movement of the enemy will jeopardize six gunboats. Crazy Frederick bought many very exquisite opal jewels. The job requires extra pluck and zeal from every young wage earner.',
+    difficulty: 'medium',
+  },
+
+  // ==================== QUOTES ====================
+  {
     id: 'pt-2',
     category: 'quote',
     title: 'Simplicity and Clarity',
     author: 'Steve Jobs',
     text: 'Simple can be harder than complex: You have to work hard to get your thinking clean to make it simple. But it is worth it in the end because once you get there, you can move mountains.',
-    difficulty: 'medium',
-  },
-  {
-    id: 'pt-3',
-    category: 'literature',
-    title: 'A Tale of Two Cities',
-    author: 'Charles Dickens',
-    text: 'It was the best of times, it was the worst of times, it was the age of wisdom, it was the age of foolishness, it was the epoch of belief, it was the epoch of incredulity, it was the season of light, it was the season of darkness.',
-    difficulty: 'medium',
-  },
-  {
-    id: 'pt-4',
-    category: 'general',
-    title: 'The Art of Touch Typing',
-    author: 'SmartTypingPro',
-    text: 'Touch typing is the ability to use muscle memory to find keys fast without using the sense of sight. It eliminates the cognitive tax of searching for individual letters on the keyboard and allows your conscious mind to focus purely on composition, creativity, and flow.',
-    difficulty: 'easy',
-  },
-  {
-    id: 'pt-5',
-    category: 'business',
-    title: 'Executive Communication',
-    author: 'Professional Management',
-    text: 'Effective leadership requires unambiguous correspondence, rapid decision turnaround, and coherent project documentation. Delivering concise feedback while respecting team velocity ensures sustained organizational momentum across global quarters.',
-    difficulty: 'medium',
-  },
-  {
-    id: 'pt-6',
-    category: 'code',
-    title: 'TypeScript Architecture Drill',
-    author: 'Software Engineering',
-    text: 'interface CacheStore<T> { get(key: string): Promise<T | null>; set(key: string, value: T, ttlMs?: number): Promise<void>; clear(): void; }',
-    difficulty: 'hard',
-  },
-  {
-    id: 'pt-7',
-    category: 'literature',
-    title: 'The Great Gatsby',
-    author: 'F. Scott Fitzgerald',
-    text: 'In my younger and more vulnerable years my father gave me some advice that I have been turning over in my mind ever since. Whenever you feel like criticizing anyone, just remember that all the people in this world have not had the advantages that you have had.',
     difficulty: 'medium',
   },
   {
@@ -82,43 +69,163 @@ export const PRACTICE_TEXTS: PracticeTextItem[] = [
     difficulty: 'easy',
   },
   {
-    id: 'pt-9',
-    category: 'general',
-    title: 'Digital Ergonomics & Focus',
-    author: 'Ergonomic Society',
-    text: 'Keep your elbows bent at ninety degrees, relax your shoulders, align your screen at eye level, and take periodic micro-breaks every twenty minutes. Good ergonomics prevent repetitive strain and protect cognitive endurance over hours of intense computing.',
+    id: 'pt-quote-3',
+    category: 'quote',
+    title: 'Imagination and Relativity',
+    author: 'Albert Einstein',
+    text: 'Imagination is more important than knowledge. For knowledge is limited to all we now know and understand, while imagination embraces the entire world, and all there ever will be to know and understand.',
     difficulty: 'medium',
+  },
+  {
+    id: 'pt-quote-4',
+    category: 'quote',
+    title: 'Courage and Daily Choice',
+    author: 'Eleanor Roosevelt',
+    text: 'You gain strength, courage, and confidence by every experience in which you really stop to look fear in the face. You must do the thing you think you cannot do.',
+    difficulty: 'easy',
+  },
+  {
+    id: 'pt-quote-5',
+    category: 'quote',
+    title: 'Inner Sovereignty & Equilibrium',
+    author: 'Marcus Aurelius',
+    text: 'You have power over your mind, not outside events. Realize this, and you will find strength. The happiness of your life depends upon the quality of your thoughts.',
+    difficulty: 'medium',
+  },
+
+  // ==================== LITERATURE ====================
+  {
+    id: 'pt-3',
+    category: 'literature',
+    title: 'A Tale of Two Cities',
+    author: 'Charles Dickens',
+    text: 'It was the best of times, it was the worst of times, it was the age of wisdom, it was the age of foolishness, it was the epoch of belief, it was the epoch of incredulity, it was the season of light, it was the season of darkness.',
+    difficulty: 'medium',
+  },
+  {
+    id: 'pt-7',
+    category: 'literature',
+    title: 'The Great Gatsby',
+    author: 'F. Scott Fitzgerald',
+    text: 'In my younger and more vulnerable years my father gave me some advice that I have been turning over in my mind ever since. Whenever you feel like criticizing anyone, just remember that all the people in this world have not had the advantages that you have had.',
+    difficulty: 'medium',
+  },
+  {
+    id: 'pt-lit-3',
+    category: 'literature',
+    title: 'Pride and Prejudice',
+    author: 'Jane Austen',
+    text: 'It is a truth universally acknowledged, that a single man in possession of a good fortune, must be in want of a wife. However little known the feelings or views of such a man may be on his first entering a neighbourhood.',
+    difficulty: 'medium',
+  },
+  {
+    id: 'pt-lit-4',
+    category: 'literature',
+    title: 'Moby Dick',
+    author: 'Herman Melville',
+    text: 'Call me Ishmael. Some years ago, never mind how long precisely, having little or no money in my purse, and nothing particular to interest me on shore, I thought I would sail about a little and see the watery part of the world.',
+    difficulty: 'medium',
+  },
+  {
+    id: 'pt-lit-5',
+    category: 'literature',
+    title: 'The Adventures of Tom Sawyer',
+    author: 'Mark Twain',
+    text: 'Saturday morning was come, and all the summer world was bright and fresh, and brimming with life. There was a song in every heart; and if the heart was young the music came at the lips. There was cheer in every face and a spring in every step.',
+    difficulty: 'easy',
+  },
+
+  // ==================== CODE ====================
+  {
+    id: 'pt-6',
+    category: 'code',
+    title: 'TypeScript CacheStore Interface',
+    author: 'Software Engineering',
+    text: 'interface CacheStore<T> { get(key: string): Promise<T | null>; set(key: string, value: T, ttlMs?: number): Promise<void>; clear(): void; }',
+    difficulty: 'hard',
   },
   {
     id: 'pt-10',
     category: 'code',
-    title: 'Async Functions & State',
+    title: 'Async Fetch with Retries',
     author: 'Web Development',
     text: 'async function fetchMetrics(endpoint: string, retries = 3): Promise<Record<string, number>> { const res = await fetch(endpoint); if (!res.ok) throw new Error("HTTP Error " + res.status); return res.json(); }',
     difficulty: 'hard',
   },
   {
-    id: 'pt-11',
-    category: 'literature',
-    title: 'Story Series: Going Solo',
-    author: 'Roald Dahl',
-    text: 'The engine roared to life as the Tiger Moth biplane began to taxi across the open grassy airfield. Ahead lay the boundless blue sky, shimmering in the golden morning sunlight. With a gentle pull on the control stick, the wheels lifted effortlessly from the ground into free flight.',
+    id: 'pt-code-3',
+    category: 'code',
+    title: 'Python Binary Search Implementation',
+    author: 'Algorithms',
+    text: 'def binary_search(arr: list[int], target: int) -> int: low, high = 0, len(arr) - 1\nwhile low <= high:\n    mid = (low + high) // 2\n    if arr[mid] == target: return mid\n    elif arr[mid] < target: low = mid + 1\n    else: high = mid - 1\nreturn -1',
+    difficulty: 'hard',
+  },
+  {
+    id: 'pt-code-4',
+    category: 'code',
+    title: 'SQL Aggregation and Partition Query',
+    author: 'Database Engineering',
+    text: 'SELECT department_id, employee_id, salary, AVG(salary) OVER (PARTITION BY department_id) as dept_avg_salary, RANK() OVER (PARTITION BY department_id ORDER BY salary DESC) as rank FROM corporate_payroll WHERE active = true;',
+    difficulty: 'hard',
+  },
+  {
+    id: 'pt-code-5',
+    category: 'code',
+    title: 'React Custom Keydown Hook',
+    author: 'Frontend Engineering',
+    text: 'export function useKeyCombo(targetKey: string, handler: () => void) { useEffect(() => { const onKeyDown = (e: KeyboardEvent) => { if (e.key === targetKey && !e.repeat) handler(); }; window.addEventListener("keydown", onKeyDown); return () => window.removeEventListener("keydown", onKeyDown); }, [targetKey, handler]); }',
+    difficulty: 'hard',
+  },
+
+  // ==================== BUSINESS ====================
+  {
+    id: 'pt-5',
+    category: 'business',
+    title: 'Executive Communication',
+    author: 'Professional Management',
+    text: 'Effective leadership requires unambiguous correspondence, rapid decision turnaround, and coherent project documentation. Delivering concise feedback while respecting team velocity ensures sustained organizational momentum across global quarters.',
     difficulty: 'medium',
   },
   {
-    id: 'pt-12',
-    category: 'literature',
-    title: 'Story Series: Ava & the Rabbit',
-    author: 'Children Story Series',
-    text: 'Ava sat beneath the ancient willow tree, watching a curious white rabbit nibble on sweet clover. The rabbit twitched its velvety pink nose and hopped softly toward the sunlit meadow, looking back as if inviting Ava to follow on an afternoon adventure.',
+    id: 'pt-biz-2',
+    category: 'business',
+    title: 'Quarterly Strategic Alignment',
+    author: 'Corporate Operations',
+    text: 'Our primary objective for the second quarter is expanding customer lifetime value while streamlining operational expenditures. Cross-functional alignment between product engineering and enterprise sales will accelerate our expansion into high-growth international markets.',
+    difficulty: 'medium',
+  },
+  {
+    id: 'pt-biz-3',
+    category: 'business',
+    title: 'Customer Success & Retention Metrics',
+    author: 'Enterprise Advisory',
+    text: 'Retaining high-value clients depends on proactive account reviews, clear service level agreements, and responsive technical support. Monitoring net revenue retention and customer health scores allows us to preempt renewal bottlenecks well in advance.',
+    difficulty: 'medium',
+  },
+  {
+    id: 'pt-biz-4',
+    category: 'business',
+    title: 'Data-Driven Risk Management',
+    author: 'Executive Finance',
+    text: 'Prudent fiscal management balances calculated market expansion with strict liquidity reserves and diversified portfolio allocations. Regular stress testing and scenario modeling safeguard operational capital against macro market volatility.',
+    difficulty: 'hard',
+  },
+
+  // ==================== GENERAL ====================
+  {
+    id: 'pt-4',
+    category: 'general',
+    title: 'The Art of Touch Typing',
+    author: 'SmartTypingPro',
+    text: 'Touch typing is the ability to use muscle memory to find keys fast without using the sense of sight. It eliminates the cognitive tax of searching for individual letters on the keyboard and allows your conscious mind to focus purely on composition, creativity, and flow.',
     difficulty: 'easy',
   },
   {
-    id: 'pt-13',
-    category: 'literature',
-    title: 'Story Series: Space Explorer',
-    author: 'Cosmic Journeys',
-    text: 'Commander Leo watched the neon rings of Saturn rotate slowly outside the observatory deck. Millions of ice particles glittered like stardust in the quiet void of deep space, signaling the successful completion of their interstellar journey.',
+    id: 'pt-9',
+    category: 'general',
+    title: 'Digital Ergonomics & Focus',
+    author: 'Ergonomic Society',
+    text: 'Keep your elbows bent at ninety degrees, relax your shoulders, align your screen at eye level, and take periodic micro-breaks every twenty minutes. Good ergonomics prevent repetitive strain and protect cognitive endurance over hours of intense computing.',
     difficulty: 'medium',
   },
   {
@@ -132,277 +239,280 @@ export const PRACTICE_TEXTS: PracticeTextItem[] = [
 ];
 
 export const PARAGRAPHS_LIST: ParagraphItem[] = [
+  // ==================== QUOTE CATEGORY ====================
   {
-    id: 'p-story-1',
-    title: 'Going Solo: The Biplane Flight',
-    category: 'Story Series',
-    difficulty: 'easy',
-    text: 'The engine roared to life as the Tiger Moth biplane began to taxi across the open grassy airfield. Ahead lay the boundless blue sky, shimmering in the golden morning sunlight. With a gentle pull on the control stick, the wheels lifted effortlessly from the ground into free flight.',
-    wordCount: 49
-  },
-  {
-    id: 'p-story-2',
-    title: 'Ava & the Rabbit: Meadow Secret',
-    category: 'Story Series',
-    difficulty: 'easy',
-    text: 'Ava sat beneath the ancient willow tree, watching a curious white rabbit nibble on sweet clover. The rabbit twitched its velvety pink nose and hopped softly toward the sunlit meadow, looking back as if inviting Ava to follow on an afternoon adventure.',
-    wordCount: 44
-  },
-  {
-    id: 'p-story-3',
-    title: 'Space Explorer: Rings of Saturn',
-    category: 'Story Series',
+    id: 'p-quote-1',
+    title: 'Simplicity & Vision (Steve Jobs)',
+    category: 'Quote',
     difficulty: 'medium',
-    text: 'Commander Leo watched the neon rings of Saturn rotate slowly outside the observatory deck. Millions of ice particles glittered like stardust in the quiet void of deep space, signaling the successful completion of their interstellar journey.',
-    wordCount: 38
+    text: 'Simple can be harder than complex: You have to work hard to get your thinking clean to make it simple. But it is worth it in the end because once you get there, you can move mountains with clarity and focus.',
+    wordCount: 42
   },
   {
-    id: 'p-drill-1',
-    title: 'Left & Right Hand Home Isolation',
-    category: 'Hand Drills',
+    id: 'p-quote-2',
+    title: 'Mastery & Deliberate Practice (Bruce Lee)',
+    category: 'Quote',
     difficulty: 'easy',
-    text: 'Left hand balances a s d f with steady rhythm while right hand mirrors j k l ; across the center row. Thumbs rest lightly upon the spacebar, prepared to punctuate each cadence without lifting palm heels.',
+    text: 'I fear not the man who has practiced ten thousand kicks once, but I fear the man who has practiced one kick ten thousand times. Consistency, quiet rhythm, and deliberate focus surpass sporadic bursts of effort.',
     wordCount: 37
   },
   {
-    id: 'p-1',
+    id: 'p-quote-3',
+    title: 'Imagination & Cosmic Wonder (Albert Einstein)',
+    category: 'Quote',
+    difficulty: 'medium',
+    text: 'Imagination is more important than knowledge. For knowledge is limited to all we now know and understand, while imagination embraces the entire world, stimulating progress and giving birth to future evolution.',
+    wordCount: 32
+  },
+  {
+    id: 'p-quote-4',
+    title: 'Courage & Facing Fear (Eleanor Roosevelt)',
+    category: 'Quote',
+    difficulty: 'easy',
+    text: 'You gain strength, courage, and confidence by every experience in which you really stop to look fear in the face. You are able to say to yourself, I have lived through this horror; I can take the next thing that comes along.',
+    wordCount: 44
+  },
+  {
+    id: 'p-quote-5',
+    title: 'Inner Sovereignty & Judgment (Marcus Aurelius)',
+    category: 'Quote',
+    difficulty: 'medium',
+    text: 'You have power over your mind, not outside events. Realize this, and you will find strength. The happiness of your life depends upon the quality of your thoughts; therefore, guard accordingly.',
+    wordCount: 31
+  },
+
+  // ==================== CODE CATEGORY ====================
+  {
+    id: 'p-code-1',
+    title: 'TypeScript Interface & Generic Cache',
+    category: 'Code',
+    difficulty: 'hard',
+    text: 'export interface CacheManager<T> { get(key: string): Promise<T | null>; set(key: string, value: T, ttlMs?: number): Promise<void>; invalidate(pattern: string): Promise<number>; has(key: string): boolean; }',
+    wordCount: 29
+  },
+  {
+    id: 'p-code-2',
+    title: 'Async Retry & Error Handling Function',
+    category: 'Code',
+    difficulty: 'hard',
+    text: 'async function fetchMetrics(endpoint: string, retries = 3): Promise<Record<string, number>> { for (let i = 0; i < retries; i++) { try { const res = await fetch(endpoint); if (res.ok) return await res.json(); } catch (err) { if (i === retries - 1) throw err; } } throw new Error("Retry limit exceeded"); }',
+    wordCount: 52
+  },
+  {
+    id: 'p-code-3',
+    title: 'Python Binary Search Algorithm',
+    category: 'Code',
+    difficulty: 'hard',
+    text: 'def binary_search(nums: list[int], target: int) -> int: low, high = 0, len(nums) - 1\nwhile low <= high:\n    mid = (low + high) // 2\n    if nums[mid] == target: return mid\n    elif nums[mid] < target: low = mid + 1\n    else: high = mid - 1\nreturn -1',
+    wordCount: 42
+  },
+  {
+    id: 'p-code-4',
+    title: 'SQL Window Partition & Ranking Query',
+    category: 'Code',
+    difficulty: 'hard',
+    text: 'SELECT department_id, employee_id, salary, AVG(salary) OVER (PARTITION BY department_id) as dept_average, RANK() OVER (PARTITION BY department_id ORDER BY salary DESC) as salary_rank FROM corporate_roster WHERE status = "active";',
+    wordCount: 29
+  },
+  {
+    id: 'p-code-5',
+    title: 'React Custom Hook for Event Keybindings',
+    category: 'Code',
+    difficulty: 'hard',
+    text: 'export function useShortcut(key: string, callback: () => void) { useEffect(() => { const handleKeyDown = (e: KeyboardEvent) => { if (e.key === key && !e.repeat) callback(); }; window.addEventListener("keydown", handleKeyDown); return () => window.removeEventListener("keydown", handleKeyDown); }, [key, callback]); }',
+    wordCount: 40
+  },
+
+  // ==================== BUSINESS CATEGORY ====================
+  {
+    id: 'p-biz-1',
+    title: 'Executive Communication & Alignment',
+    category: 'Business',
+    difficulty: 'medium',
+    text: 'Effective leadership requires unambiguous correspondence, rapid decision turnaround, and coherent project documentation. Delivering concise feedback while respecting team velocity ensures sustained organizational momentum across global quarters.',
+    wordCount: 28
+  },
+  {
+    id: 'p-biz-2',
+    title: 'Quarterly Strategic Growth & KPIs',
+    category: 'Business',
+    difficulty: 'medium',
+    text: 'Our primary corporate objective for the upcoming fiscal quarter centers on accelerating net revenue retention while streamlining operational overhead. Close cross-functional alignment between engineering and enterprise accounts will ensure seamless customer onboarding.',
+    wordCount: 33
+  },
+  {
+    id: 'p-biz-3',
+    title: 'Enterprise Security & Compliance Memo',
+    category: 'Business',
+    difficulty: 'hard',
+    text: 'Maintaining stringent SOC 2 and ISO compliance requires rigorous access controls, multi-factor authentication enforcement, and periodic third-party penetration audits. Safeguarding customer data remains our highest fiduciary commitment.',
+    wordCount: 27
+  },
+  {
+    id: 'p-biz-4',
+    title: 'Customer Lifetime Value & Retention',
+    category: 'Business',
+    difficulty: 'medium',
+    text: 'Sustainable business expansion relies upon cultivating enduring client relationships. By proactively addressing support escalations and delivering regular value-added feature updates, we maximize retention while minimizing customer acquisition expenditures.',
+    wordCount: 30
+  },
+  {
+    id: 'p-biz-5',
+    title: 'Agile Velocity & Sprint Retrospective',
+    category: 'Business',
+    difficulty: 'easy',
+    text: 'During our sprint retrospective, the product team identified opportunities to reduce code review cycle times and improve automated test coverage. Fostering continuous feedback loops empowers distributed engineering teams to ship reliable software on schedule.',
+    wordCount: 34
+  },
+
+  // ==================== LITERATURE CATEGORY ====================
+  {
+    id: 'p-lit-1',
+    title: 'A Tale of Two Cities (Charles Dickens)',
+    category: 'Literature',
+    difficulty: 'medium',
+    text: 'It was the best of times, it was the worst of times, it was the age of wisdom, it was the age of foolishness, it was the epoch of belief, it was the epoch of incredulity, it was the season of light, it was the season of darkness.',
+    wordCount: 48
+  },
+  {
+    id: 'p-lit-2',
+    title: 'The Great Gatsby (F. Scott Fitzgerald)',
+    category: 'Literature',
+    difficulty: 'medium',
+    text: 'In my younger and more vulnerable years my father gave me some advice that I have been turning over in my mind ever since. Whenever you feel like criticizing anyone, just remember that all the people in this world have not had the advantages that you have had.',
+    wordCount: 49
+  },
+  {
+    id: 'p-lit-3',
+    title: 'Pride & Prejudice (Jane Austen)',
+    category: 'Literature',
+    difficulty: 'medium',
+    text: 'It is a truth universally acknowledged, that a single man in possession of a good fortune, must be in want of a wife. However little known the feelings or views of such a man may be on his first entering a neighbourhood, this truth is well fixed.',
+    wordCount: 47
+  },
+  {
+    id: 'p-lit-4',
+    title: 'Moby Dick (Herman Melville)',
+    category: 'Literature',
+    difficulty: 'medium',
+    text: 'Call me Ishmael. Some years ago, never mind how long precisely, having little or no money in my purse, and nothing particular to interest me on shore, I thought I would sail about a little and see the watery part of the world. It is a way I have of driving off the spleen.',
+    wordCount: 54
+  },
+  {
+    id: 'p-lit-5',
+    title: 'Tom Sawyer (Mark Twain)',
+    category: 'Literature',
+    difficulty: 'easy',
+    text: 'Saturday morning was come, and all the summer world was bright and fresh, and brimming with life. There was a song in every heart; and if the heart was young the music came at the lips. There was cheer in every face and a spring in every step.',
+    wordCount: 48
+  },
+
+  // ==================== PANGRAM CATEGORY ====================
+  {
+    id: 'p-pangram-1',
+    title: 'Classic Fox & Dog Pangram Suite',
+    category: 'Pangram',
+    difficulty: 'easy',
+    text: 'The quick brown fox jumps over the lazy dog. Pack my box with five dozen liquor jugs. How vexingly quick daft zebras jump! Sphinx of black quartz, judge my vow.',
+    wordCount: 31
+  },
+  {
+    id: 'p-pangram-2',
+    title: 'Sphinx, Wizards & Piqued Gymnasts',
+    category: 'Pangram',
+    difficulty: 'medium',
+    text: 'Sphinx of black quartz, judge my vow! The five boxing wizards jump quickly. How razorback-jumping frogs can level six piqued gymnasts! Cozy sphinx waves back from jigsaw cliff.',
+    wordCount: 29
+  },
+  {
+    id: 'p-pangram-3',
+    title: 'Jackdaws & Prized Opal Jewels',
+    category: 'Pangram',
+    difficulty: 'medium',
+    text: 'Jackdaws love my big sphinx of quartz. Six crazy kings vowed to quiz the lazy dwarf about prized jumping fox gems. Blowzy red night-frumps vexing quick pyx quaffers.',
+    wordCount: 30
+  },
+  {
+    id: 'p-pangram-4',
+    title: 'Quizzical Prizefighters & Gunboats',
+    category: 'Pangram',
+    difficulty: 'hard',
+    text: 'A quick movement of the enemy will jeopardize six gunboats. Crazy Frederick bought many very exquisite opal jewels. The job requires extra pluck and zeal from every young wage earner.',
+    wordCount: 31
+  },
+  {
+    id: 'p-pangram-5',
+    title: 'Brawny Fox & Zesty Jumping Jive',
+    category: 'Pangram',
+    difficulty: 'medium',
+    text: 'Brawny gods just flocked up to quiz and vex playful wimps. Watch "Jeopardy!", Alex Trebek\'s fun TV quiz game. Foxy parsons quiz and cajole the lovably dim, gawky wizard.',
+    wordCount: 30
+  },
+
+  // ==================== GENERAL CATEGORY ====================
+  {
+    id: 'p-gen-1',
     title: 'The Art of Touch Typing',
-    category: 'Skill & Mastery',
+    category: 'General',
     difficulty: 'easy',
     text: 'Touch typing transforms the physical keyboard from a mechanical barrier into a direct extension of your thoughts. By resting your index fingers on the tactile home bumps of the F and J keys, every character becomes reachable through subconscious reflex. Speed naturally emerges when smooth accuracy leads the way.',
     wordCount: 49
   },
   {
-    id: 'p-2',
+    id: 'p-gen-2',
     title: 'Deep Work & Cognitive Flow',
-    category: 'Productivity',
+    category: 'General',
     difficulty: 'medium',
     text: 'Cultivating deep focus requires carving out quiet sanctuaries within our noisy digital world. When you silence notifications and immerse yourself in a challenging task, your brain enters a state of cognitive flow. Distractions fragment attention, but sustained concentration yields work of enduring depth and craft.',
     wordCount: 47
   },
   {
-    id: 'p-3',
-    title: 'Modern Software Engineering',
-    category: 'Technology',
+    id: 'p-gen-3',
+    title: 'Digital Ergonomics & Physical Health',
+    category: 'General',
     difficulty: 'medium',
-    text: 'Modern software engineering relies on reliable abstractions, modular architectures, and disciplined testing paradigms. When systems scale across thousands of distributed servers, clarity of design becomes paramount. Clean code is not merely aesthetic; it reduces operational risk and enables collaborative teams to innovate with quiet confidence.',
-    wordCount: 47
+    text: 'Keep your elbows bent at ninety degrees, relax your shoulders, align your screen at eye level, and take periodic micro-breaks every twenty minutes. Good ergonomics prevent repetitive strain and protect cognitive endurance over hours of intense computing.',
+    wordCount: 37
   },
   {
-    id: 'p-4',
+    id: 'p-gen-4',
     title: 'Oceans & Marine Sanctuaries',
-    category: 'Nature & Science',
+    category: 'General',
     difficulty: 'easy',
     text: 'Beneath the sunlit surface of the open ocean lies an ecosystem of immense complexity and tranquil beauty. Coral reefs shimmer with vibrant marine life, while gentle deep-sea currents transport nutrients across vast aquatic trenches. Exploring these underwater realms reminds us of the delicate balance sustaining our planet.',
     wordCount: 49
   },
   {
-    id: 'p-5',
-    title: 'Astronomy & The Cosmos',
-    category: 'Science',
+    id: 'p-gen-5',
+    title: 'Astronomy & The Cosmic Frontier',
+    category: 'General',
     difficulty: 'medium',
     text: "On a crisp, cloudless night, looking up at the canopy of stars reveals the quiet grandeur of the cosmos. Distant galaxies emit light that traveled across billions of years to reach our eyes. Each telescope launched into orbit expands our understanding of cosmic origins and humanity's place in the universe.",
     wordCount: 50
   },
   {
-    id: 'p-6',
-    title: 'Urban Architecture & Cities',
-    category: 'Architecture',
-    difficulty: 'medium',
-    text: 'Great cities are living tapestries woven from centuries of history, architectural innovation, and communal energy. Narrow cobblestone alleys open into bustling marketplaces, while soaring glass towers reflect the sunset. The rhythm of footsteps, streetcars, and conversations creates an inspiring urban symphony.',
-    wordCount: 43
-  },
-  {
-    id: 'p-7',
-    title: 'Mountain Summits & Wilderness',
-    category: 'Adventure',
-    difficulty: 'easy',
-    text: 'Standing atop an alpine summit at dawn, the cool wind carries the scent of pine and fresh morning frost. Jagged granite peaks stretch across the horizon, bathed in amber sunlight. In such untamed wilderness, one discovers both physical resilience and a profound sense of inner stillness.',
-    wordCount: 46
-  },
-  {
-    id: 'p-8',
-    title: 'The Craft of Clear Writing',
-    category: 'Literature',
-    difficulty: 'medium',
-    text: 'Writing well is an act of empathy for the reader. Choosing the exact word, balancing sentence rhythm, and discarding superfluous adjectives requires patience and relentless revision. A thoughtful paragraph can clarify complex dilemmas and spark creative curiosity in unexpected ways.',
-    wordCount: 41
-  },
-  {
-    id: 'p-9',
-    title: 'Everyday Mindfulness',
-    category: 'Wellness',
-    difficulty: 'easy',
-    text: 'Taking a deliberate breath in the middle of a busy day grounds our wandering thoughts in the present moment. Notice the ambient sound of rain against the window, the warmth of a morning beverage, and the subtle sensation of relaxation spreading across your shoulders.',
-    wordCount: 44
-  },
-  {
-    id: 'p-10',
-    title: 'Lifelong Learning & Curiosity',
-    category: 'Education',
-    difficulty: 'medium',
-    text: 'Genuine education is not the passive accumulation of static facts, but the continuous refinement of critical thinking and intellectual curiosity. Asking thoughtful questions often illuminates more truth than memorizing easy answers. A lifelong learner approaches every challenge with humility and enthusiasm.',
-    wordCount: 43
-  },
-  {
-    id: 'p-11',
-    title: 'Engineering Innovation',
-    category: 'Technology',
-    difficulty: 'medium',
-    text: 'From renewable energy grids to lightweight aerospace materials, technological breakthroughs begin with small experimental prototypes. Iterative problem solving allows engineers to test hypotheses, analyze anomalies, and refine complex systems until theoretical ideas transform into reliable everyday infrastructure.',
-    wordCount: 41
-  },
-  {
-    id: 'p-12',
-    title: 'Ancient Temperate Forests',
-    category: 'Nature',
+    id: 'p-gen-6',
+    title: 'Ancient Temperate Rainforests',
+    category: 'General',
     difficulty: 'easy',
     text: 'Ancient temperate forests harbor intricate underground fungal networks that connect towering trees across miles of woodland. Sunlight filters through the lush canopy, casting dappled emerald shadows on mossy riverbanks. These woodland sanctuaries provide essential shelter for countless bird and mammal species.',
     wordCount: 43
   },
   {
-    id: 'p-13',
-    title: 'High-Performance Habits',
-    category: 'Productivity',
-    difficulty: 'easy',
-    text: 'Excellence is rarely an accident; it is the compound interest of daily habits practiced with steady discipline. Whether training as an athlete, practicing an instrument, or refining a vocational craft, small daily improvements inevitably culminate in remarkable long-term achievements.',
-    wordCount: 40
-  },
-  {
-    id: 'p-14',
-    title: 'The Ancient Silk Road',
-    category: 'History',
-    difficulty: 'medium',
-    text: 'Caravans along the ancient Silk Road transported silk, ceramics, and spices across treacherous mountain passes and sun-baked desert dunes. Beyond precious commodities, these travelers exchanged scientific treatises, philosophical ideas, and musical traditions that permanently reshaped human civilization.',
-    wordCount: 41
-  },
-  {
-    id: 'p-15',
-    title: 'Artificial Intelligence & Ethics',
-    category: 'Technology',
-    difficulty: 'hard',
-    text: 'As computational intelligence advances, the collaboration between human creativity and algorithmic precision opens unprecedented frontiers. Automated models can rapidly process immense datasets, yet the discernment of moral values, empathy, and artistic intent remains a uniquely human responsibility.',
-    wordCount: 39
-  },
-  {
-    id: 'p-16',
-    title: 'The Psychology of Optimal Flow',
-    category: 'Psychology',
-    difficulty: 'medium',
-    text: 'Psychologists describe flow as the optimal mental state where challenge and skill meet in perfect harmony. During flow, self-consciousness vanishes, time seems to stretch or contract, and every keystroke or brushstroke flows seamlessly into the next with effortless momentum.',
-    wordCount: 41
-  },
-  {
-    id: 'p-17',
-    title: 'Coastal Lighthouses & Sea',
-    category: 'Exploration',
-    difficulty: 'easy',
-    text: 'Perched upon windswept rocky cliffs, historic lighthouses have guided sailors safely through dense fog and turbulent coastal waters for generations. The steady rhythmic sweep of their beacons offers reassurance to weary navigators returning home after long journeys across the sea.',
-    wordCount: 42
-  },
-  {
-    id: 'p-18',
-    title: 'High-Trust Collaborative Teams',
-    category: 'Leadership',
-    difficulty: 'medium',
-    text: 'High-performing teams thrive on psychological safety, mutual respect, and transparent communication. When team members feel secure sharing unconventional ideas or highlighting potential flaws, the collective intelligence of the group far surpasses the insight of any single individual.',
-    wordCount: 39
-  },
-  {
-    id: 'p-19',
-    title: 'Precision Mechanical Horology',
-    category: 'Craftsmanship',
-    difficulty: 'hard',
-    text: 'Master watchmakers assemble intricate mechanical movements containing hundreds of microscopic gears, rubies, and hairsprings. Operating without electrical currents, these mechanical chronometers measure seconds with rhythmic escapement beats, celebrating centuries of horological precision.',
-    wordCount: 35
-  },
-  {
-    id: 'p-20',
-    title: 'The Balance of Typography',
-    category: 'Design',
+    id: 'p-gen-7',
+    title: 'The Balance of Typography & Space',
+    category: 'General',
     difficulty: 'medium',
     text: "The art of typography balances letterforms, kerning, leading, and negative space to make written language both legible and visually harmonious. A well-chosen typeface establishes an immediate atmosphere, subtly guiding the reader's eye across the printed or digital page.",
     wordCount: 41
   },
   {
-    id: 'p-21',
-    title: 'Acoustic Resonance & Music',
-    category: 'Music',
+    id: 'p-gen-8',
+    title: 'Acoustic Resonance & Classical Music',
+    category: 'General',
     difficulty: 'medium',
     text: 'Acoustic instruments produce sound through the sympathetic vibration of wood, strings, and air columns. Handcrafted violins and concert grand pianos resonate with rich harmonic overtones that can captivate an audience in a quiet auditorium, turning mechanical vibrations into emotional resonance.',
     wordCount: 43
-  },
-  {
-    id: 'p-22',
-    title: 'Glacial Geomorphology',
-    category: 'Science',
-    difficulty: 'hard',
-    text: 'Massive continental glaciers slowly carve deep U-shaped valleys and deposit vast moraines over millions of years. As ancient ice sheets advance and retreat, they sculpt rugged mountain landscapes, polish granite bedrock, and leave behind pristine crystalline fjord networks.',
-    wordCount: 39
-  },
-  {
-    id: 'p-23',
-    title: 'The Philosophy of Stoicism',
-    category: 'Philosophy',
-    difficulty: 'medium',
-    text: 'Ancient Stoic philosophers taught that while we cannot always control external circumstances, we maintain absolute sovereignty over our internal judgments and emotional reactions. By cultivating resilience, reason, and moral clarity, one can maintain equilibrium amidst life unpredictable changes.',
-    wordCount: 40
-  },
-  {
-    id: 'p-24',
-    title: 'Solar Energy & Photovoltaics',
-    category: 'Technology',
-    difficulty: 'medium',
-    text: 'Modern photovoltaic arrays capture sunlight and convert photonic energy directly into clean electricity through silicon semiconductor layers. Continued advancements in storage batteries and high-voltage transmission lines allow communities to power infrastructure with sustainable renewable energy.',
-    wordCount: 38
-  },
-  {
-    id: 'p-25',
-    title: 'Botany & Plant Communication',
-    category: 'Biology',
-    difficulty: 'easy',
-    text: 'Plants communicate through airborne chemical signals and underground mycorrhizal networks, warning neighboring flora of insect herbivores. By exchanging essential carbon, phosphorus, and moisture, entire forest communities demonstrate cooperative symbiotic intelligence.',
-    wordCount: 34
-  },
-  {
-    id: 'p-26',
-    title: 'Bridges & Structural Physics',
-    category: 'Engineering',
-    difficulty: 'medium',
-    text: 'Suspension bridges gracefully balance tensile and compressive forces across towering steel pylons and parabolic cables. Engineers calculate wind aeroelasticity and thermal expansion to ensure these monumental structures withstand fierce storms and carry millions of vehicles safely each year.',
-    wordCount: 41
-  },
-  {
-    id: 'p-27',
-    title: 'The Joy of Culinary Arts',
-    category: 'Lifestyle',
-    difficulty: 'easy',
-    text: 'Culinary mastery blends aromatic spices, temperature precision, and textural harmony to transform humble raw ingredients into memorable feasts. Sharing a freshly prepared meal around a welcoming table fosters heartfelt conversation, community bonds, and cherished memories.',
-    wordCount: 38
-  },
-  {
-    id: 'p-28',
-    title: 'Cartography & Ancient Maps',
-    category: 'History',
-    difficulty: 'medium',
-    text: 'Early cartographers charted unknown coastlines using bronze astrolabes, compass bearings, and celestial navigation. Their hand-drawn parchment maps merged mathematical precision with whimsical illustrations of sea serpents, inspiring generations of maritime explorers.',
-    wordCount: 36
-  },
-  {
-    id: 'p-29',
-    title: 'Deep Ocean Bioluminescence',
-    category: 'Science',
-    difficulty: 'hard',
-    text: 'In the pitch-black abyss of the bathypelagic zone, over ninety percent of marine organisms produce their own bioluminescent glow. Luciferin chemical reactions emit striking sapphire flashes used to attract mates, camouflage against predators, and illuminate dark waters.',
-    wordCount: 40
-  },
-  {
-    id: 'p-30',
-    title: 'Sustainable Architecture',
-    category: 'Architecture',
-    difficulty: 'medium',
-    text: 'Modern eco-friendly architecture incorporates natural passive ventilation, living green roofs, and recycled timber frames. By optimizing sun exposure and rainwater harvesting systems, these sustainable buildings drastically lower carbon footprints while creating restorative indoor spaces.',
-    wordCount: 37
   }
 ];
 

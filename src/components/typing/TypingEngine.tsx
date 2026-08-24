@@ -857,7 +857,7 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
         <div className="bg-[#1e40af] text-white px-4 py-2.5 flex items-center justify-between text-xs font-bold shadow-sm">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse" />
-            <span className="tracking-wide text-sm font-extrabold font-sans">Sonma Typing Expert - Official Speed Assessment</span>
+            <span className="tracking-wide text-sm font-extrabold font-sans">Smart Typing Pro - Official Speed Assessment</span>
           </div>
           <div className="font-mono text-xs text-blue-100 flex items-center gap-2">
             <span>Candidate:</span>
@@ -970,16 +970,8 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
                   <div className="whitespace-pre-wrap">
                     {charDetails.slice(0, Math.max(cursorIndex + 1, 1)).map((detail, index) => {
                       const isCurrent = index === cursorIndex;
-                      const isPassed = index < cursorIndex;
-
-                      let charStyle = 'text-[#111827]';
-                      if (isPassed) {
-                        if (detail.state === 'correct' || detail.state === 'corrected') {
-                          charStyle = 'text-[#111827]';
-                        } else if (detail.state === 'incorrect') {
-                          charStyle = 'text-[#dc2626] bg-[#fee2e2] underline font-medium';
-                        }
-                      }
+                      // Clean standard neutral body text color as typed, exactly like authentic Sonma Typing Expert (no live red highlights)
+                      const charStyle = 'text-[#111827]';
 
                       if (detail.expected === '\n') {
                         return (

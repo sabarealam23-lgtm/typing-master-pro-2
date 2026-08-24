@@ -120,11 +120,16 @@ const AppContent: React.FC = () => {
   };
 
   // Theme container classes
-  const isDark = settings.theme === 'dark' || (settings.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  const isIvorySapphire = settings.theme === 'ivory-sapphire';
+  const isDark = !isIvorySapphire && (settings.theme === 'dark' || (settings.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches));
 
   return (
-    <div className={`min-h-screen flex flex-col font-sans selection:bg-cyan-500/30 selection:text-cyan-900 dark:selection:text-cyan-200 transition-colors duration-200 ${
-      isDark ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'
+    <div className={`min-h-screen flex flex-col font-sans transition-colors duration-200 ${
+      isIvorySapphire
+        ? 'bg-[#fbf8f1] text-[#1e293b] selection:bg-[#1e3a8a]/20 selection:text-[#1e3a8a]'
+        : isDark 
+        ? 'bg-slate-950 text-slate-100 selection:bg-cyan-500/30 selection:text-cyan-200' 
+        : 'bg-slate-50 text-slate-900 selection:bg-cyan-500/30 selection:text-cyan-900'
     }`}>
       {/* Top Sticky Navigation Bar */}
       <Navbar currentPage={currentPage} onNavigate={handleNavigate} />

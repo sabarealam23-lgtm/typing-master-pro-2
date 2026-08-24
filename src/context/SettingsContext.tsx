@@ -24,18 +24,23 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   useEffect(() => {
     // Apply theme class to document html element
     const root = document.documentElement;
-    root.classList.remove('light', 'dark', 'royal', 'nordic', 'espresso', 'theme-royal', 'theme-nordic', 'theme-espresso');
+    root.classList.remove('light', 'dark', 'theme-ivory-sapphire', 'ivory-sapphire', 'royal', 'nordic', 'espresso', 'theme-royal', 'theme-nordic', 'theme-espresso');
     root.removeAttribute('data-theme');
 
-    const isDark = settings.theme === 'dark' || 
-      (settings.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-    
-    if (isDark) {
-      root.classList.add('dark');
-      root.classList.remove('light');
+    if (settings.theme === 'ivory-sapphire') {
+      root.classList.add('light', 'theme-ivory-sapphire');
+      root.setAttribute('data-theme', 'ivory-sapphire');
     } else {
-      root.classList.remove('dark');
-      root.classList.add('light');
+      const isDark = settings.theme === 'dark' || 
+        (settings.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      
+      if (isDark) {
+        root.classList.add('dark');
+        root.classList.remove('light');
+      } else {
+        root.classList.remove('dark');
+        root.classList.add('light');
+      }
     }
   }, [settings.theme]);
 

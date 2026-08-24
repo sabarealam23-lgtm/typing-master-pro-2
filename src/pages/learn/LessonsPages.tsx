@@ -258,19 +258,19 @@ export const LessonsPage: React.FC<LessonsPageProps> = ({ onNavigate }) => {
       </div>
 
       {/* Level Tabs */}
-      <div className="flex flex-wrap gap-3 border-b border-slate-800 pb-4">
+      <div className="flex flex-wrap gap-3 border-b border-slate-200 dark:border-slate-800 pb-4">
         <button
           id="tab-beginner-lessons"
           onClick={() => setSelectedLevel('beginner')}
           className={`flex items-center gap-3 px-5 py-3 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
             selectedLevel === 'beginner'
-              ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20'
-              : 'bg-slate-900 text-slate-300 hover:bg-slate-850 border border-slate-800'
+              ? 'bg-[#1e3a8a] text-white shadow-md'
+              : 'bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-850 border border-slate-300 dark:border-slate-800'
           }`}
         >
           <span>Beginner: Foundation</span>
           <span className={`px-2 py-0.5 rounded-md text-xs font-mono font-bold ${
-            selectedLevel === 'beginner' ? 'bg-slate-950 text-emerald-400' : 'bg-slate-800 text-slate-400'
+            selectedLevel === 'beginner' ? 'bg-white/20 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-400'
           }`}>
             {begProg.completedCount}/{begProg.total}
           </span>
@@ -281,13 +281,13 @@ export const LessonsPage: React.FC<LessonsPageProps> = ({ onNavigate }) => {
           onClick={() => setSelectedLevel('intermediate')}
           className={`flex items-center gap-3 px-5 py-3 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
             selectedLevel === 'intermediate'
-              ? 'bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/20'
-              : 'bg-slate-900 text-slate-300 hover:bg-slate-850 border border-slate-800'
+              ? 'bg-[#1e3a8a] text-white shadow-md'
+              : 'bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-850 border border-slate-300 dark:border-slate-800'
           }`}
         >
           <span>Intermediate: Precision</span>
           <span className={`px-2 py-0.5 rounded-md text-xs font-mono font-bold ${
-            selectedLevel === 'intermediate' ? 'bg-slate-950 text-cyan-400' : 'bg-slate-800 text-slate-400'
+            selectedLevel === 'intermediate' ? 'bg-white/20 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-400'
           }`}>
             {intProg.completedCount}/{intProg.total}
           </span>
@@ -298,13 +298,13 @@ export const LessonsPage: React.FC<LessonsPageProps> = ({ onNavigate }) => {
           onClick={() => setSelectedLevel('advanced')}
           className={`flex items-center gap-3 px-5 py-3 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
             selectedLevel === 'advanced'
-              ? 'bg-purple-500 text-slate-950 shadow-md shadow-purple-500/20'
-              : 'bg-slate-900 text-slate-300 hover:bg-slate-850 border border-slate-800'
+              ? 'bg-[#1e3a8a] text-white shadow-md'
+              : 'bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-850 border border-slate-300 dark:border-slate-800'
           }`}
         >
           <span>Advanced: Speed Mastery</span>
           <span className={`px-2 py-0.5 rounded-md text-xs font-mono font-bold ${
-            selectedLevel === 'advanced' ? 'bg-slate-950 text-purple-400' : 'bg-slate-800 text-slate-400'
+            selectedLevel === 'advanced' ? 'bg-white/20 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-400'
           }`}>
             {advProg.completedCount}/{advProg.total}
           </span>
@@ -313,20 +313,20 @@ export const LessonsPage: React.FC<LessonsPageProps> = ({ onNavigate }) => {
 
       {/* Milestone Mini-Games Highlight Section */}
       {filteredMilestones.length > 0 && (
-        <div className="p-6 rounded-3xl bg-gradient-to-r from-slate-900 via-slate-900/90 to-indigo-950/40 border border-slate-800/80 shadow-xl space-y-4">
+        <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-md space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2.5">
-              <div className="p-2 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400">
+              <div className="p-2 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400">
                 <Gamepad2 className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-sm font-extrabold text-slate-100 flex items-center gap-2">
+                <h3 className="text-sm font-extrabold text-slate-900 dark:text-slate-100 flex items-center gap-2">
                   <span>Milestone Bubble Pop Games</span>
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/30">
                     +XP REWARDS
                   </span>
                 </h3>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-slate-600 dark:text-slate-400">
                   Reinforce keys you've learned through fast-paced falling bubble drills!
                 </p>
               </div>
@@ -343,19 +343,19 @@ export const LessonsPage: React.FC<LessonsPageProps> = ({ onNavigate }) => {
                   key={m.id}
                   className={`p-4 rounded-2xl border transition-all flex items-center justify-between gap-4 ${
                     isUnlocked
-                      ? 'bg-slate-950/80 border-slate-800 hover:border-amber-500/40 shadow-sm'
-                      : 'bg-slate-950/40 border-slate-850 opacity-75'
+                      ? 'bg-slate-50 dark:bg-slate-950/80 border-slate-200 dark:border-slate-800 hover:border-amber-500/40 shadow-xs'
+                      : 'bg-slate-100/50 dark:bg-slate-950/40 border-slate-200 dark:border-slate-850 opacity-75'
                   }`}
                 >
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20">
                         After Lesson {m.afterLessonOrder}
                       </span>
-                      <span className="text-[11px] font-bold text-slate-300">{m.badge}</span>
+                      <span className="text-[11px] font-bold text-slate-800 dark:text-slate-300">{m.badge}</span>
                     </div>
-                    <h4 className="text-xs sm:text-sm font-bold text-slate-100">{m.title}</h4>
-                    <p className="text-[11px] text-slate-400 line-clamp-1">{m.description}</p>
+                    <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100">{m.title}</h4>
+                    <p className="text-[11px] text-slate-600 dark:text-slate-400 line-clamp-1">{m.description}</p>
                   </div>
 
                   <button
@@ -384,64 +384,64 @@ export const LessonsPage: React.FC<LessonsPageProps> = ({ onNavigate }) => {
             <div
               key={lesson.id}
               id={`lesson-card-${lesson.id}`}
-              className={`p-6 rounded-2xl bg-slate-900/80 border transition-all duration-200 flex flex-col justify-between space-y-4 ${
+              className={`p-6 rounded-2xl bg-white dark:bg-slate-900 border transition-all duration-200 flex flex-col justify-between space-y-4 shadow-sm ${
                 isCompleted 
-                  ? 'border-emerald-500/40 shadow-sm shadow-emerald-500/5' 
-                  : 'border-slate-800 hover:border-slate-700'
+                  ? 'border-emerald-500/40' 
+                  : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
               }`}
             >
               <div className="space-y-3">
                 <div className="flex justify-between items-start">
                   <div className="flex items-center gap-2">
-                    <span className="w-7 h-7 rounded-lg bg-slate-800 text-slate-300 font-mono font-bold text-xs flex items-center justify-center">
+                    <span className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-300 font-mono font-bold text-xs flex items-center justify-center border border-slate-200 dark:border-slate-700">
                       {lesson.order}
                     </span>
-                    <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">
+                    <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500 dark:text-slate-400">
                       {lesson.category}
                     </span>
                   </div>
 
                   {isCompleted ? (
-                    <div className="flex items-center gap-1 text-amber-400">
+                    <div className="flex items-center gap-1 text-amber-500">
                       {[1, 2, 3].map((starIdx) => (
                         <Star
                           key={starIdx}
                           className={`w-3.5 h-3.5 ${
-                            starIdx <= stars ? 'fill-amber-400 text-amber-400' : 'text-slate-700'
+                            starIdx <= stars ? 'fill-amber-400 text-amber-400' : 'text-slate-300 dark:text-slate-700'
                           }`}
                         />
                       ))}
                     </div>
                   ) : (
-                    <span className="text-[11px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                    <span className="text-[11px] font-mono text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 font-bold">
                       +{lesson.xpReward} XP
                     </span>
                   )}
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <h3 className="text-base font-bold text-slate-100">{lesson.title}</h3>
+                  <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">{lesson.title}</h3>
                   {lesson.steps && (
-                    <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
                       {lesson.steps.length} STEPS
                     </span>
                   )}
                   {isMilestone && (
-                    <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-400 border border-amber-500/25">
+                    <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/25">
                       🎮 MINI-GAME
                     </span>
                   )}
                 </div>
                 
-                <p className="text-xs text-slate-400 leading-relaxed">{lesson.description}</p>
+                <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">{lesson.description}</p>
 
                 {/* Target Keys Badges */}
                 <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                  <span className="text-[10px] text-slate-400 uppercase font-semibold">Keys:</span>
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-semibold">Keys:</span>
                   {lesson.targetKeys.map((k, kIdx) => (
                     <span
                       key={kIdx}
-                      className="px-2 py-0.5 rounded bg-slate-950 border border-slate-800 text-emerald-400 font-mono font-bold text-xs"
+                      className="px-2 py-0.5 rounded bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-[#1e3a8a] dark:text-emerald-400 font-mono font-bold text-xs shadow-2xs"
                     >
                       {k === ' ' ? 'SPACE' : k}
                     </span>
@@ -449,11 +449,11 @@ export const LessonsPage: React.FC<LessonsPageProps> = ({ onNavigate }) => {
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-slate-800/80 flex items-center justify-between">
-                <div className="text-[11px] font-mono text-slate-400">
+              <div className="pt-4 border-t border-slate-200 dark:border-slate-800/80 flex items-center justify-between">
+                <div className="text-[11px] font-mono text-slate-500 dark:text-slate-400">
                   <span>Req: {lesson.requiredWpm} WPM • {lesson.requiredAccuracy}% Acc</span>
                   {isCompleted && (
-                    <div className="text-emerald-400 text-[10px] font-sans font-semibold mt-0.5">
+                    <div className="text-emerald-600 dark:text-emerald-400 text-[10px] font-sans font-semibold mt-0.5">
                       Best: {prog.bestWpm} WPM ({prog.bestAccuracy}%)
                     </div>
                   )}
@@ -464,8 +464,8 @@ export const LessonsPage: React.FC<LessonsPageProps> = ({ onNavigate }) => {
                   onClick={() => onNavigate('lesson-view', lesson)}
                   className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-colors cursor-pointer ${
                     isCompleted
-                      ? 'bg-slate-800 hover:bg-slate-750 text-slate-200 border border-slate-700'
-                      : 'bg-emerald-500 hover:bg-emerald-400 text-slate-950 shadow-sm'
+                      ? 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-750 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700'
+                      : 'bg-[#1e3a8a] hover:bg-[#1e40af] text-white shadow-sm'
                   }`}
                 >
                   <Play className="w-3.5 h-3.5 fill-current" />

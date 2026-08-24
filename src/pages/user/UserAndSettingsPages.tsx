@@ -502,8 +502,14 @@ export const SettingsPage: React.FC<UserPageProps> = ({ onNavigate }) => {
             </span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {[
+              {
+                id: 'ivory-sapphire' as ThemeMode,
+                name: '📜 Warm Ivory & Sapphire',
+                description: 'Cream canvas, sapphire navy bars & gold amber trims',
+                icon: <Palette className="w-4 h-4 text-amber-500" />
+              },
               {
                 id: 'dark' as ThemeMode,
                 name: 'Dark Mode',
@@ -531,14 +537,14 @@ export const SettingsPage: React.FC<UserPageProps> = ({ onNavigate }) => {
                   onClick={() => setTheme(thm.id)}
                   className={`p-4 rounded-xl border flex items-center justify-between text-xs font-semibold capitalize transition-all ${
                     isSelected
-                      ? 'bg-slate-800 border-emerald-500 text-emerald-400 shadow-sm ring-1 ring-emerald-500/40'
-                      : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-900/70'
+                      ? 'bg-[#1e3a8a]/10 border-[#1e3a8a] text-[#1e3a8a] dark:bg-slate-800 dark:border-emerald-500 dark:text-emerald-400 shadow-sm ring-1 ring-[#1e3a8a]/40 dark:ring-emerald-500/40'
+                      : 'bg-slate-950/40 border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-900/70'
                   }`}
                 >
                   <div className="flex items-center gap-3">
                     <div className={`p-2 rounded-lg border ${
                       isSelected
-                        ? 'bg-slate-900 border-emerald-500/40 text-emerald-400'
+                        ? 'bg-white border-[#1e3a8a]/40 text-[#1e3a8a] dark:bg-slate-900 dark:border-emerald-500/40 dark:text-emerald-400'
                         : 'bg-slate-900 border-slate-800 text-slate-400'
                     }`}>
                       {thm.icon}
@@ -549,7 +555,7 @@ export const SettingsPage: React.FC<UserPageProps> = ({ onNavigate }) => {
                     </div>
                   </div>
                   {isSelected && (
-                    <div className="w-5 h-5 rounded-full bg-emerald-500 text-slate-950 flex items-center justify-center">
+                    <div className="w-5 h-5 rounded-full bg-[#1e3a8a] text-white dark:bg-emerald-500 dark:text-slate-950 flex items-center justify-center">
                       <Check className="w-3 h-3 stroke-[3]" />
                     </div>
                   )}

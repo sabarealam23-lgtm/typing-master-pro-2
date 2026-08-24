@@ -102,3 +102,68 @@
 .scrollbar-clean::-webkit-scrollbar-thumb:hover {
   background-color: rgba(148, 163, 184, 0.45);
 }
+
+/* =========================================================
+   WARM IVORY & SAPPHIRE THEME PRESET
+   - App Canvas: #fbf8f1 (Warm Cream)
+   - Containers/Cards/Modals: #fffdf5 (Warm Ivory) with #e2d9c8 borders
+   - Headers/Navigation/Bars: Sapphire Navy (#1e3a8a) & Amber (#d97706) trims
+   - Typing Test Arena: Strictly exempted from overrides
+   ========================================================= */
+[data-theme="ivory-sapphire"],
+.theme-ivory-sapphire {
+  --bg-app: #fbf8f1;
+  --bg-card: #fffdf5;
+  --border-card: #e2d9c8;
+  --text-main: #1e293b;
+  --text-muted: #64748b;
+  --accent-sapphire: #1e3a8a;
+  --accent-amber: #d97706;
+}
+
+[data-theme="ivory-sapphire"] body,
+.theme-ivory-sapphire body {
+  background-color: #fbf8f1 !important;
+  color: #1e293b !important;
+}
+
+/* General containers & cards in Ivory & Sapphire theme (Exempting Sonma Exam Arena) */
+[data-theme="ivory-sapphire"] div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).bg-slate-900,
+[data-theme="ivory-sapphire"] div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).bg-slate-900\/80,
+[data-theme="ivory-sapphire"] div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).bg-slate-900\/90,
+[data-theme="ivory-sapphire"] div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).bg-slate-950,
+[data-theme="ivory-sapphire"] div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).bg-slate-950\/80,
+[data-theme="ivory-sapphire"] div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).bg-slate-950\/90,
+[data-theme="ivory-sapphire"] div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).bg-slate-950\/40,
+.theme-ivory-sapphire div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).bg-slate-900,
+.theme-ivory-sapphire div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).bg-slate-900\/80,
+.theme-ivory-sapphire div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).bg-slate-900\/90,
+.theme-ivory-sapphire div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).bg-slate-950,
+.theme-ivory-sapphire div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).bg-slate-950\/80,
+.theme-ivory-sapphire div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).bg-slate-950\/90,
+.theme-ivory-sapphire div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).bg-slate-950\/40 {
+  background-color: #fffdf5;
+  border-color: #e2d9c8;
+}
+
+[data-theme="ivory-sapphire"] div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).border-slate-800,
+[data-theme="ivory-sapphire"] div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).border-slate-850,
+.theme-ivory-sapphire div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).border-slate-800,
+.theme-ivory-sapphire div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).border-slate-850 {
+  border-color: #e2d9c8;
+}
+
+[data-theme="ivory-sapphire"] .text-slate-100,
+[data-theme="ivory-sapphire"] .text-slate-200,
+.theme-ivory-sapphire .text-slate-100,
+.theme-ivory-sapphire .text-slate-200 {
+  color: #1e293b;
+}
+
+[data-theme="ivory-sapphire"] .text-slate-300,
+[data-theme="ivory-sapphire"] .text-slate-400,
+.theme-ivory-sapphire .text-slate-300,
+.theme-ivory-sapphire .text-slate-400 {
+  color: #475569;
+}
+

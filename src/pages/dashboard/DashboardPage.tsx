@@ -117,48 +117,48 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
       {/* Top Welcome & Level Hero Header */}
       <div 
         id="dashboard-welcome-banner"
-        className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-900 via-slate-900 to-slate-950 border border-slate-800 p-6 sm:p-8 shadow-xl"
+        className="relative overflow-hidden rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 sm:p-8 shadow-md"
       >
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-mono text-emerald-400 uppercase font-semibold tracking-wider">
+              <span className="text-xs font-mono text-emerald-600 dark:text-emerald-400 uppercase font-semibold tracking-wider">
                 {user.isGuest ? 'Guest Session' : 'Typing Member'}
               </span>
-              <span className="text-slate-600">•</span>
-              <span className="text-xs text-slate-400 flex items-center gap-1">
+              <span className="text-slate-300 dark:text-slate-600">•</span>
+              <span className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1">
                 <Calendar className="w-3.5 h-3.5" /> {new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}
               </span>
               {cloudScores.length > 0 && (
                 <>
-                  <span className="text-slate-600">•</span>
-                  <span className="text-[11px] font-mono text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20">
+                  <span className="text-slate-300 dark:text-slate-600">•</span>
+                  <span className="text-[11px] font-mono text-[#1e3a8a] dark:text-cyan-400 bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20">
                     Cloud Synced
                   </span>
                 </>
               )}
             </div>
-            <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-100">
+            <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-900 dark:text-slate-100">
               Welcome back, {user.displayName}
             </h1>
-            <p className="text-xs sm:text-sm text-slate-400 max-w-xl">
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 max-w-xl">
               Ready for your daily practice? Maintain your rhythm, elevate your Net WPM, and keep your streak alive.
             </p>
           </div>
 
           {/* Level Progress Capsule */}
-          <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 min-w-[260px] space-y-2">
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 min-w-[260px] space-y-2">
             <div className="flex justify-between items-center text-xs">
-              <span className="text-slate-400 font-medium">Level Status</span>
-              <span className="text-emerald-400 font-mono font-bold">Level {levelInfo.level}</span>
+              <span className="text-slate-600 dark:text-slate-400 font-medium">Level Status</span>
+              <span className="text-emerald-600 dark:text-emerald-400 font-mono font-bold">Level {levelInfo.level}</span>
             </div>
-            <div className="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden">
+            <div className="w-full h-2.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
               <div 
-                className="h-full bg-gradient-to-r from-emerald-500 to-cyan-400 transition-all duration-500"
+                className="h-full bg-gradient-to-r from-emerald-500 to-[#1e3a8a] dark:to-cyan-400 transition-all duration-500"
                 style={{ width: `${levelInfo.progressPercent}%` }}
               />
             </div>
-            <div className="flex justify-between items-center text-[11px] text-slate-400 font-mono">
+            <div className="flex justify-between items-center text-[11px] text-slate-500 dark:text-slate-400 font-mono">
               <span>{levelInfo.currentLevelXp} XP</span>
               <span>{levelInfo.nextLevelXpThreshold} XP for Lv.{levelInfo.level + 1}</span>
             </div>
@@ -169,76 +169,76 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
       {/* Primary KPI Metrics Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Best WPM */}
-        <div id="kpi-best-wpm" className="p-5 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-1">
+        <div id="kpi-best-wpm" className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1 shadow-sm">
           <div className="flex justify-between items-center">
-            <span className="text-xs text-slate-400 font-medium">Best WPM</span>
-            <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400"><Zap className="w-4 h-4" /></div>
+            <span className="text-xs text-slate-600 dark:text-slate-400 font-medium">Best WPM</span>
+            <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"><Zap className="w-4 h-4" /></div>
           </div>
           <div className="flex items-baseline gap-1.5 pt-1">
-            <span className="text-3xl font-mono font-extrabold text-emerald-400">{bestWpm}</span>
-            <span className="text-xs text-slate-400 font-mono">WPM</span>
+            <span className="text-3xl font-mono font-extrabold text-emerald-600 dark:text-emerald-400">{bestWpm}</span>
+            <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">WPM</span>
           </div>
-          <p className="text-[11px] text-slate-400">Peak net speed recorded</p>
+          <p className="text-[11px] text-slate-500 dark:text-slate-400">Peak net speed recorded</p>
         </div>
 
         {/* Average Accuracy */}
-        <div id="kpi-best-accuracy" className="p-5 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-1">
+        <div id="kpi-best-accuracy" className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1 shadow-sm">
           <div className="flex justify-between items-center">
-            <span className="text-xs text-slate-400 font-medium">Average Accuracy</span>
-            <div className="p-2 rounded-lg bg-cyan-500/10 text-cyan-400"><Target className="w-4 h-4" /></div>
+            <span className="text-xs text-slate-600 dark:text-slate-400 font-medium">Average Accuracy</span>
+            <div className="p-2 rounded-lg bg-blue-500/10 text-[#1e3a8a] dark:text-cyan-400"><Target className="w-4 h-4" /></div>
           </div>
           <div className="flex items-baseline gap-1.5 pt-1">
-            <span className="text-3xl font-mono font-extrabold text-cyan-400">{averageAccuracy}%</span>
+            <span className="text-3xl font-mono font-extrabold text-[#1e3a8a] dark:text-cyan-400">{averageAccuracy}%</span>
           </div>
-          <p className="text-[11px] text-slate-400">Precision consistency</p>
+          <p className="text-[11px] text-slate-500 dark:text-slate-400">Precision consistency</p>
         </div>
 
         {/* Total Tests Taken */}
-        <div id="kpi-practice-time" className="p-5 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-1">
+        <div id="kpi-practice-time" className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1 shadow-sm">
           <div className="flex justify-between items-center">
-            <span className="text-xs text-slate-400 font-medium">Total Tests Taken</span>
-            <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-400"><Clock className="w-4 h-4" /></div>
+            <span className="text-xs text-slate-600 dark:text-slate-400 font-medium">Total Tests Taken</span>
+            <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"><Clock className="w-4 h-4" /></div>
           </div>
           <div className="flex items-baseline gap-1.5 pt-1">
-            <span className="text-3xl font-mono font-extrabold text-indigo-400">{totalTestsTaken}</span>
-            <span className="text-xs text-slate-400 font-mono">Tests</span>
+            <span className="text-3xl font-mono font-extrabold text-indigo-600 dark:text-indigo-400">{totalTestsTaken}</span>
+            <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">Tests</span>
           </div>
-          <p className="text-[11px] text-slate-400">Time: {formatTotalTime(stats.totalPracticeTimeSeconds)}</p>
+          <p className="text-[11px] text-slate-500 dark:text-slate-400">Time: {formatTotalTime(stats.totalPracticeTimeSeconds)}</p>
         </div>
 
         {/* Current Streak */}
-        <div id="kpi-streak" className="p-5 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-1">
+        <div id="kpi-streak" className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1 shadow-sm">
           <div className="flex justify-between items-center">
-            <span className="text-xs text-slate-400 font-medium">Current Streak</span>
-            <div className="p-2 rounded-lg bg-amber-500/10 text-amber-400"><Flame className="w-4 h-4" /></div>
+            <span className="text-xs text-slate-600 dark:text-slate-400 font-medium">Current Streak</span>
+            <div className="p-2 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400"><Flame className="w-4 h-4" /></div>
           </div>
           <div className="flex items-baseline gap-1.5 pt-1">
-            <span className="text-3xl font-mono font-extrabold text-amber-400">{user.currentStreak || 0}</span>
-            <span className="text-xs text-slate-400 font-mono">Days</span>
+            <span className="text-3xl font-mono font-extrabold text-amber-600 dark:text-amber-400">{user.currentStreak || 0}</span>
+            <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">Days</span>
           </div>
-          <p className="text-[11px] text-slate-400">Longest: {user.longestStreak || 0} Days</p>
+          <p className="text-[11px] text-slate-500 dark:text-slate-400">Longest: {user.longestStreak || 0} Days</p>
         </div>
       </div>
 
       {/* Action / Quick Start & Daily Goal Row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Next Lesson Recommendation Card */}
-        <div className="lg:col-span-2 p-6 rounded-2xl bg-slate-900/80 border border-slate-800 flex flex-col justify-between space-y-4">
+        <div className="lg:col-span-2 p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col justify-between space-y-4 shadow-sm">
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-mono font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+              <span className="text-xs font-mono font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
                 <BookOpen className="w-3.5 h-3.5" /> Continue Curriculum
               </span>
-              <span className="text-xs text-slate-400 capitalize">{nextLesson.level} Tier</span>
+              <span className="text-xs text-slate-500 dark:text-slate-400 capitalize">{nextLesson.level} Tier</span>
             </div>
-            <h3 className="text-xl font-bold text-slate-100">{nextLesson.title}</h3>
-            <p className="text-xs text-slate-400 leading-relaxed">{nextLesson.description}</p>
-            <div className="flex items-center gap-4 text-xs font-mono text-slate-300 pt-1">
+            <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100">{nextLesson.title}</h3>
+            <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">{nextLesson.description}</p>
+            <div className="flex items-center gap-4 text-xs font-mono text-slate-700 dark:text-slate-300 pt-1">
               <span>Goal: <strong>{nextLesson.requiredWpm} WPM</strong></span>
               <span>•</span>
               <span>Min Accuracy: <strong>{nextLesson.requiredAccuracy}%</strong></span>
               <span>•</span>
-              <span className="text-emerald-400">+{nextLesson.xpReward} XP</span>
+              <span className="text-emerald-600 dark:text-emerald-400 font-bold">+{nextLesson.xpReward} XP</span>
             </div>
           </div>
 
@@ -246,20 +246,20 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
             <button
               id="dashboard-start-lesson-btn"
               onClick={() => onNavigate('lesson-view', nextLesson)}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs shadow-sm transition-all"
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs shadow-sm transition-all cursor-pointer"
             >
               <Play className="w-4 h-4 fill-slate-950" />
               <span>Start This Lesson</span>
             </button>
             <button
               onClick={() => onNavigate('learn')}
-              className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-200 font-medium text-xs border border-slate-700 transition-colors"
+              className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-750 text-slate-800 dark:text-slate-200 font-medium text-xs border border-slate-300 dark:border-slate-700 transition-colors cursor-pointer"
             >
               View All 18 Lessons
             </button>
             <button
               onClick={() => onNavigate('typing-test')}
-              className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-200 font-medium text-xs border border-slate-700 transition-colors"
+              className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-750 text-slate-800 dark:text-slate-200 font-medium text-xs border border-slate-300 dark:border-slate-700 transition-colors cursor-pointer"
             >
               Quick Timed Test
             </button>
@@ -267,13 +267,13 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
         </div>
 
         {/* Daily Goal & Achievements Teaser */}
-        <div className="p-6 rounded-2xl bg-slate-900/80 border border-slate-800 flex flex-col justify-between space-y-4">
+        <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col justify-between space-y-4 shadow-sm">
           <div>
             <div className="flex justify-between items-center mb-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Daily Target</span>
-              <span className="text-xs font-mono text-emerald-400 font-bold">{todayMinutes} / {dailyGoalMinutes} min</span>
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-400">Daily Target</span>
+              <span className="text-xs font-mono text-emerald-600 dark:text-emerald-400 font-bold">{todayMinutes} / {dailyGoalMinutes} min</span>
             </div>
-            <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+            <div className="w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
               <div 
                 className="h-full bg-emerald-500 rounded-full transition-all duration-300"
                 style={{ width: `${dailyGoalPercent}%` }}
@@ -281,19 +281,19 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
             </div>
           </div>
 
-          <div className="border-t border-slate-800 pt-4 space-y-2">
+          <div className="border-t border-slate-200 dark:border-slate-800 pt-4 space-y-2">
             <div className="flex justify-between items-center text-xs">
-              <span className="font-semibold text-slate-200 flex items-center gap-1.5">
-                <Award className="w-4 h-4 text-amber-400" /> Achievements
+              <span className="font-semibold text-slate-900 dark:text-slate-200 flex items-center gap-1.5">
+                <Award className="w-4 h-4 text-amber-500" /> Achievements
               </span>
-              <span className="text-slate-400 font-mono">{unlockedAchievementIds.length} unlocked</span>
+              <span className="text-slate-500 dark:text-slate-400 font-mono">{unlockedAchievementIds.length} unlocked</span>
             </div>
-            <p className="text-[11px] text-slate-400">
+            <p className="text-[11px] text-slate-600 dark:text-slate-400">
               Unlock badges for speed thresholds, streaks, and error-free execution.
             </p>
             <button
               onClick={() => onNavigate('achievements')}
-              className="w-full py-2 rounded-lg bg-slate-800 hover:bg-slate-750 text-slate-200 text-xs font-semibold border border-slate-700 transition-colors"
+              className="w-full py-2 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-750 text-slate-800 dark:text-slate-200 text-xs font-semibold border border-slate-300 dark:border-slate-700 transition-colors cursor-pointer"
             >
               View Badge Showcase
             </button>
@@ -305,21 +305,21 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
       <ProgressCharts stats={stats} />
 
       {/* Recent Tests Table (User History from Firestore & Local) */}
-      <div id="dashboard-recent-results" className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-lg space-y-4">
+      <div id="dashboard-recent-results" className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-md space-y-4">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-3">
             <div>
-              <h3 className="text-base font-bold text-slate-100">Recent Test History</h3>
-              <p className="text-xs text-slate-400">Your latest official keystroke records</p>
+              <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">Recent Test History</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Your latest official keystroke records</p>
             </div>
             {isLoadingHistory && (
-              <Loader2 className="w-4 h-4 text-emerald-400 animate-spin" />
+              <Loader2 className="w-4 h-4 text-emerald-500 animate-spin" />
             )}
           </div>
           <div className="flex items-center gap-3">
             <button
               onClick={loadUserCloudHistory}
-              className="text-xs text-slate-400 hover:text-slate-200 flex items-center gap-1 font-mono"
+              className="text-xs text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 flex items-center gap-1 font-mono cursor-pointer"
               title="Sync Cloud Scores"
             >
               <RotateCcw className="w-3 h-3" />
@@ -327,7 +327,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
             </button>
             <button
               onClick={() => onNavigate('progress')}
-              className="text-xs text-emerald-400 hover:underline flex items-center gap-1"
+              className="text-xs text-[#1e3a8a] dark:text-emerald-400 hover:underline flex items-center gap-1 font-semibold cursor-pointer"
             >
               <span>View Full Analytics</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -336,20 +336,20 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
         </div>
 
         {displayRecentTests.length === 0 ? (
-          <div className="text-center py-8 text-slate-400 text-xs space-y-3">
+          <div className="text-center py-8 text-slate-500 dark:text-slate-400 text-xs space-y-3">
             <p>No typing tests completed yet.</p>
             <button
               onClick={() => onNavigate('typing-test')}
-              className="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-lg text-xs transition-colors"
+              className="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-lg text-xs transition-colors cursor-pointer"
             >
               Take Your First Test
             </button>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-slate-300">
+            <table className="w-full text-left text-xs text-slate-700 dark:text-slate-300">
               <thead>
-                <tr className="border-b border-slate-800 text-slate-400 uppercase font-semibold">
+                <tr className="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 uppercase font-semibold">
                   <th className="pb-3">Session / Mode</th>
                   <th className="pb-3">Net WPM</th>
                   <th className="pb-3">Gross WPM</th>
@@ -358,17 +358,17 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
                   <th className="pb-3 text-right">Date</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/60 font-mono">
+              <tbody className="divide-y divide-slate-200 dark:divide-slate-800/60 font-mono">
                 {displayRecentTests.map((r) => (
-                  <tr key={r.id} className="hover:bg-slate-850 transition-colors">
-                    <td className="py-3 font-sans font-medium text-slate-200">
+                  <tr key={r.id} className="hover:bg-slate-50 dark:hover:bg-slate-850 transition-colors">
+                    <td className="py-3 font-sans font-medium text-slate-900 dark:text-slate-200">
                       {r.title}
                     </td>
-                    <td className="py-3 font-bold text-emerald-400">{r.netWpm}</td>
-                    <td className="py-3 text-slate-400">{r.grossWpm}</td>
-                    <td className="py-3 text-cyan-400">{r.accuracy}%</td>
-                    <td className="py-3 text-slate-400">{r.duration}</td>
-                    <td className="py-3 text-right text-slate-400 font-sans text-[11px]">
+                    <td className="py-3 font-bold text-emerald-600 dark:text-emerald-400">{r.netWpm}</td>
+                    <td className="py-3 text-slate-600 dark:text-slate-400">{r.grossWpm}</td>
+                    <td className="py-3 text-[#1e3a8a] dark:text-cyan-400 font-bold">{r.accuracy}%</td>
+                    <td className="py-3 text-slate-600 dark:text-slate-400">{r.duration}</td>
+                    <td className="py-3 text-right text-slate-500 dark:text-slate-400 font-sans text-[11px]">
                       {r.date}
                     </td>
                   </tr>

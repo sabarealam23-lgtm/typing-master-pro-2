@@ -1,4 +1,5 @@
 import React from 'react';
+import { useSettings } from '../../context/SettingsContext';
 
 export interface KeyDef {
   key: string;
@@ -160,6 +161,9 @@ export const VirtualKeyboard: React.FC<VirtualKeyboardProps> = ({
   hideFingerBadge = false,
   compact = false,
 }) => {
+  const { settings } = useSettings();
+  const isIvory = settings.theme === 'ivory-sapphire';
+
   const needsShift = React.useMemo(() => {
     if (!currentExpectedChar) return false;
     if (currentExpectedChar.length === 1 && /[A-Z]/.test(currentExpectedChar)) return true;
@@ -205,29 +209,37 @@ export const VirtualKeyboard: React.FC<VirtualKeyboardProps> = ({
       {!hideFingerBadge && (
         <div 
           id="dynamic-finger-guide-badge"
-          className="flex items-center justify-between px-3 sm:px-4 py-1.5 sm:py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xs"
+          className={`flex items-center justify-between px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl shadow-xs border ${
+            isIvory
+              ? 'bg-[#fffdf5] border-[#e2d9c8] text-[#1e293b]'
+              : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200'
+          }`}
         >
-          <div className="flex items-center gap-2 text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-200">
-            <span>Target:</span>
-            <span className="font-mono font-bold px-2 py-0.5 rounded bg-cyan-50 dark:bg-cyan-950/50 text-cyan-700 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-800">
+          <div className="flex items-center gap-2 text-xs sm:text-sm font-medium">
+            <span className={isIvory ? 'text-slate-600' : 'text-slate-500 dark:text-slate-400'}>Target:</span>
+            <span className={`font-mono font-bold px-2 py-0.5 rounded border ${
+              isIvory
+                ? 'bg-[#1e3a8a]/10 text-[#1e3a8a] border-[#1e3a8a]/30'
+                : 'bg-cyan-50 dark:bg-cyan-950/50 text-cyan-700 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-800'
+            }`}>
               {fingerGuide.targetDisplay}
             </span>
             <span className="text-slate-300 dark:text-slate-700">|</span>
-            <span className="text-slate-500 dark:text-slate-400">Use:</span>
-            <span className="font-semibold text-slate-900 dark:text-slate-100">
+            <span className={isIvory ? 'text-slate-600' : 'text-slate-500 dark:text-slate-400'}>Use:</span>
+            <span className={`font-semibold ${isIvory ? 'text-[#1e3a8a]' : 'text-slate-900 dark:text-slate-100'}`}>
               {fingerGuide.handName} • {fingerGuide.fingerName}
             </span>
           </div>
 
           {/* Home Row Reminder Hint */}
-          <div className="hidden sm:flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
-            <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 inline-block" />
+          <div className={`hidden sm:flex items-center gap-1.5 text-xs ${isIvory ? 'text-slate-500' : 'text-slate-500 dark:text-slate-400'}`}>
+            <span className={`w-1.5 h-1.5 rounded-full inline-block ${isIvory ? 'bg-[#d97706]' : 'bg-cyan-500'}`} />
             <span>Home Row: ASDF JKL;</span>
           </div>
         </div>
       )}
 
-      {/* Clean Minimal Virtual Keyboard Matrix (No outer frame/border/background panel) */}
+      {/* Clean Minimal Virtual Keyboard Matrix */}
       <div 
         id="virtual-keyboard-matrix"
         className={`w-full flex flex-col items-center overflow-x-auto select-none py-0.5 ${
@@ -265,15 +277,25 @@ export const VirtualKeyboard: React.FC<VirtualKeyboardProps> = ({
                     rounded-md sm:rounded-lg transition-all duration-100 relative cursor-pointer select-none border shadow-xs
                     ${
                       active
-                        ? 'bg-cyan-500 dark:bg-cyan-500 text-white shadow-md shadow-cyan-500/40 scale-105 font-bold z-10 ring-2 ring-cyan-300 dark:ring-cyan-400 border-cyan-400'
-                        : 'bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-750 text-slate-800 dark:text-slate-200 border-slate-200 dark:border-slate-700/80'
+                        ? isIvory
+                          ? 'bg-[#1d4ed8] text-white shadow-md shadow-[#1d4ed8]/40 scale-105 font-bold z-10 ring-2 ring-[#93c5fd] border-[#1e40af]'
+                          : 'bg-cyan-500 dark:bg-cyan-500 text-white shadow-md shadow-cyan-500/40 scale-105 font-bold z-10 ring-2 ring-cyan-300 dark:ring-cyan-400 border-cyan-400'
+                        : isIvory
+                          ? 'bg-[#fffdf5] hover:bg-[#f8f4e6] text-[#1e293b] border-[#e2d9c8]'
+                          : 'bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-750 text-slate-800 dark:text-slate-200 border-slate-200 dark:border-slate-700/80'
                     }
                   `}
                 >
                   {/* Shift Symbol */}
                   {k.shiftDisplay ? (
                     <div className="flex flex-col items-center leading-none">
-                      <span className={`text-[7px] sm:text-[9px] font-mono leading-none ${active ? 'text-cyan-100' : 'text-slate-400 dark:text-slate-500'}`}>
+                      <span className={`text-[7px] sm:text-[9px] font-mono leading-none ${
+                        active 
+                          ? 'text-blue-100' 
+                          : isIvory 
+                            ? 'text-slate-400' 
+                            : 'text-slate-400 dark:text-slate-500'
+                      }`}>
                         {k.shiftDisplay}
                       </span>
                       <span className="font-mono text-[9px] sm:text-xs font-semibold leading-tight mt-0.5">
@@ -288,7 +310,9 @@ export const VirtualKeyboard: React.FC<VirtualKeyboardProps> = ({
 
                   {/* Subtle tactile bump indicator on F and J */}
                   {isHomeAnchor && !active && (
-                    <span className="absolute bottom-1 w-2.5 h-0.5 bg-cyan-500/80 rounded-full" />
+                    <span className={`absolute bottom-1 w-2.5 h-0.5 rounded-full ${
+                      isIvory ? 'bg-[#d97706]' : 'bg-cyan-500/80'
+                    }`} />
                   )}
                 </div>
               );

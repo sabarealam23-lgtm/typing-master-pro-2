@@ -70,7 +70,7 @@ export const AboutPage: React.FC<InfoPageProps> = ({ onNavigate }) => {
           </div>
           <h3 className="text-base font-bold text-slate-100">Smart Customization</h3>
           <p className="text-xs text-slate-400 leading-relaxed">
-            Timed tests (30s, 60s, 120s, 5m, 10m), custom AI paragraph sandboxes, 3 theme presets (Dark, Light, Day/Night), keystroke sound volume controls, and responsive cursor styles.
+            Timed tests (30s, 60s, 120s, 5m, 10m), custom AI paragraph sandboxes, visual theme presets (Warm Ivory & Sapphire, Dark, Light, System), keystroke sound volume controls, and responsive cursor styles.
           </p>
         </div>
 
@@ -375,7 +375,7 @@ export const PrivacyPolicyPage: React.FC<InfoPageProps> = () => {
             2. Local Storage Usage
           </h2>
           <p>
-            Browser storage is used solely to save user theme preferences (Dark, Light, Day/Night), sound/cursor configurations, test history, earned achievements, and verified certificates for seamless progress continuation.
+            Browser storage is used solely to save user theme preferences (Warm Ivory & Sapphire, Dark, Light, System), sound/cursor configurations, test history, earned achievements, and verified certificates for seamless progress continuation.
           </p>
         </section>
 

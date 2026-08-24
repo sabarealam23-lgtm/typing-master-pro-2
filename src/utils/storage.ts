@@ -21,7 +21,7 @@ const STORAGE_KEYS = {
 };
 
 export const DEFAULT_SETTINGS: UserSettings = {
-  theme: 'dark',
+  theme: 'warm',
   soundEnabled: true,
   soundType: 'click',
   soundVolume: 0.5,
@@ -56,8 +56,8 @@ export function loadSettings(): UserSettings {
     const parsed = JSON.parse(raw);
     const validSoundTypes = ['click', 'typewriter', 'soft', 'beep', 'off'];
     const soundType = validSoundTypes.includes(parsed?.soundType) ? parsed.soundType : 'click';
-    const validThemes = ['dark', 'light', 'system', 'ivory-sapphire'];
-    const theme = validThemes.includes(parsed?.theme) ? parsed.theme : 'dark';
+    const validThemes = ['warm', 'ivory-sapphire', 'dark', 'light', 'system'];
+    const theme = validThemes.includes(parsed?.theme) ? parsed.theme : 'warm';
     const validFontSizes = ['sm', 'md', 'lg', 'xl'];
     const fontSize = validFontSizes.includes(parsed?.fontSize) ? parsed.fontSize : 'md';
     const validCursorStyles = ['line', 'block', 'underline'];

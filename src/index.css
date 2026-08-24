@@ -104,12 +104,12 @@
 }
 
 /* =========================================================
-   WARM IVORY & SAPPHIRE THEME PRESET
-   - App Canvas: #fbf8f1 (Warm Cream)
-   - Containers/Cards/Modals: #fffdf5 (Warm Ivory) with #e2d9c8 borders
-   - Headers/Navigation/Bars: Sapphire Navy (#1e3a8a) & Amber (#d97706) trims
-   - Typing Test Arena: Strictly exempted from overrides
+   MASTER THEME SYSTEM (WARM DEFAULT, DARK, LIGHT, SYSTEM)
    ========================================================= */
+
+/* Warm Ivory & Sapphire Theme (Default) */
+[data-theme="warm"],
+.theme-warm,
 [data-theme="ivory-sapphire"],
 .theme-ivory-sapphire {
   --bg-app: #fbf8f1;
@@ -121,49 +121,115 @@
   --accent-amber: #d97706;
 }
 
+[data-theme="warm"] body,
+.theme-warm body,
 [data-theme="ivory-sapphire"] body,
 .theme-ivory-sapphire body {
   background-color: #fbf8f1 !important;
   color: #1e293b !important;
 }
 
-/* General containers & cards in Ivory & Sapphire theme (Exempting Sonma Exam Arena) */
-[data-theme="ivory-sapphire"] div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).bg-slate-900,
-[data-theme="ivory-sapphire"] div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).bg-slate-900\/80,
-[data-theme="ivory-sapphire"] div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).bg-slate-900\/90,
-[data-theme="ivory-sapphire"] div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).bg-slate-950,
-[data-theme="ivory-sapphire"] div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).bg-slate-950\/80,
-[data-theme="ivory-sapphire"] div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).bg-slate-950\/90,
-[data-theme="ivory-sapphire"] div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).bg-slate-950\/40,
-.theme-ivory-sapphire div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).bg-slate-900,
-.theme-ivory-sapphire div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).bg-slate-900\/80,
-.theme-ivory-sapphire div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).bg-slate-900\/90,
-.theme-ivory-sapphire div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).bg-slate-950,
-.theme-ivory-sapphire div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).bg-slate-950\/80,
-.theme-ivory-sapphire div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).bg-slate-950\/90,
-.theme-ivory-sapphire div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).bg-slate-950\/40 {
+[data-theme="warm"] div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).bg-slate-900,
+[data-theme="warm"] div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).bg-slate-900\/80,
+[data-theme="warm"] div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).bg-slate-900\/90,
+[data-theme="warm"] div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).bg-slate-950,
+[data-theme="warm"] div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).bg-slate-950\/80,
+[data-theme="warm"] div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).bg-slate-950\/90,
+[data-theme="warm"] div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).bg-slate-950\/40,
+.theme-warm div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).bg-slate-900,
+.theme-warm div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).bg-slate-900\/80,
+.theme-warm div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).bg-slate-900\/90,
+.theme-warm div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).bg-slate-950,
+.theme-warm div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).bg-slate-950\/80,
+.theme-warm div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).bg-slate-950\/90,
+.theme-warm div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).bg-slate-950\/40 {
   background-color: #fffdf5;
   border-color: #e2d9c8;
 }
 
-[data-theme="ivory-sapphire"] div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).border-slate-800,
-[data-theme="ivory-sapphire"] div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).border-slate-850,
-.theme-ivory-sapphire div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).border-slate-800,
-.theme-ivory-sapphire div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).border-slate-850 {
+[data-theme="warm"] div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).border-slate-800,
+[data-theme="warm"] div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).border-slate-850,
+.theme-warm div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).border-slate-800,
+.theme-warm div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).border-slate-850 {
   border-color: #e2d9c8;
 }
 
-[data-theme="ivory-sapphire"] .text-slate-100,
-[data-theme="ivory-sapphire"] .text-slate-200,
-.theme-ivory-sapphire .text-slate-100,
-.theme-ivory-sapphire .text-slate-200 {
+[data-theme="warm"] .text-slate-100,
+[data-theme="warm"] .text-slate-200,
+.theme-warm .text-slate-100,
+.theme-warm .text-slate-200 {
   color: #1e293b;
 }
 
-[data-theme="ivory-sapphire"] .text-slate-300,
-[data-theme="ivory-sapphire"] .text-slate-400,
-.theme-ivory-sapphire .text-slate-300,
-.theme-ivory-sapphire .text-slate-400 {
+[data-theme="warm"] .text-slate-300,
+[data-theme="warm"] .text-slate-400,
+.theme-warm .text-slate-300,
+.theme-warm .text-slate-400 {
   color: #475569;
+}
+
+/* Light Theme (Clean Bright White) */
+[data-theme="light"]:not(.theme-warm),
+html.light:not(.theme-warm):not(.dark) {
+  --bg-app: #f8fafc;
+  --bg-card: #ffffff;
+  --border-card: #e2e8f0;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+}
+
+[data-theme="light"]:not(.theme-warm) body,
+html.light:not(.theme-warm):not(.dark) body {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+[data-theme="light"]:not(.theme-warm) div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).bg-slate-900,
+[data-theme="light"]:not(.theme-warm) div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).bg-slate-900\/80,
+[data-theme="light"]:not(.theme-warm) div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).bg-slate-900\/90,
+[data-theme="light"]:not(.theme-warm) div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).bg-slate-950,
+[data-theme="light"]:not(.theme-warm) div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).bg-slate-950\/80,
+[data-theme="light"]:not(.theme-warm) div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).bg-slate-950\/90,
+[data-theme="light"]:not(.theme-warm) div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).bg-slate-950\/40 {
+  background-color: #ffffff;
+  border-color: #e2e8f0;
+}
+
+[data-theme="light"]:not(.theme-warm) div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).bg-slate-800,
+[data-theme="light"]:not(.theme-warm) div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).bg-slate-850 {
+  background-color: #f1f5f9;
+  border-color: #e2e8f0;
+}
+
+[data-theme="light"]:not(.theme-warm) div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).border-slate-800,
+[data-theme="light"]:not(.theme-warm) div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).border-slate-850,
+[data-theme="light"]:not(.theme-warm) div:not(#sonma-exam-outer-arena *):not(#sonma-exam-outer-arena).border-slate-700 {
+  border-color: #e2e8f0;
+}
+
+[data-theme="light"]:not(.theme-warm) .text-slate-100,
+[data-theme="light"]:not(.theme-warm) .text-slate-200 {
+  color: #0f172a;
+}
+
+[data-theme="light"]:not(.theme-warm) .text-slate-300,
+[data-theme="light"]:not(.theme-warm) .text-slate-400 {
+  color: #64748b;
+}
+
+/* Dark Theme (Deep Charcoal Slate) */
+[data-theme="dark"],
+html.dark:not(.theme-warm) {
+  --bg-app: #090d16;
+  --bg-card: #0f172a;
+  --border-card: #1e293b;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+}
+
+[data-theme="dark"] body,
+html.dark:not(.theme-warm) body {
+  background-color: #090d16 !important;
+  color: #f8fafc !important;
 }
 

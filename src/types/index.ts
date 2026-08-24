@@ -4,7 +4,7 @@ export type TestMode = 'timed_15' | 'timed_30' | 'timed_60' | 'timed_120' | 'tim
 
 export type CursorStyle = 'line' | 'block' | 'underline';
 export type SoundType = 'click' | 'typewriter' | 'soft' | 'beep' | 'off';
-export type ThemeMode = 'dark' | 'light' | 'system' | 'ivory-sapphire';
+export type ThemeMode = 'warm' | 'ivory-sapphire' | 'dark' | 'light' | 'system';
 export type FontSize = 'sm' | 'md' | 'lg' | 'xl';
 
 export interface UserSettings {

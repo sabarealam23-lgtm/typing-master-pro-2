@@ -50,23 +50,23 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
     setProfileDropdownOpen(false);
   };
 
+  const isWarm = settings.theme === 'warm' || settings.theme === 'ivory-sapphire';
+
   const toggleTheme = () => {
     if (settings.theme === 'light') {
-      setTheme('ivory-sapphire');
-    } else if (settings.theme === 'ivory-sapphire') {
+      setTheme('warm');
+    } else if (isWarm) {
       setTheme('dark');
     } else {
       setTheme('light');
     }
   };
 
-  const isIvory = settings.theme === 'ivory-sapphire';
-
   return (
     <nav 
       id="main-navigation-bar"
       className={`sticky top-0 z-50 w-full backdrop-blur-md transition-colors shadow-xs ${
-        isIvory
+        isWarm
           ? 'bg-[#fffdf5]/95 border-b-2 border-[#e2d9c8] ring-1 ring-[#d97706]/20'
           : 'bg-white/95 dark:bg-slate-950/95 border-b border-slate-200 dark:border-slate-800/80'
       }`}
@@ -149,14 +149,14 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
             <button
               id="theme-toggle-btn"
               onClick={toggleTheme}
-              title={`Current Theme: ${settings.theme === 'ivory-sapphire' ? 'Warm Ivory & Sapphire' : settings.theme === 'light' ? 'Light Mode' : 'Dark Mode'}. Click to cycle.`}
+              title={`Current Theme: ${isWarm ? 'Warm Ivory & Sapphire' : settings.theme === 'light' ? 'Light Mode' : 'Dark Mode'}. Click to cycle.`}
               className={`p-2 rounded-lg border transition-colors shadow-xs ${
-                settings.theme === 'ivory-sapphire'
+                isWarm
                   ? 'bg-[#fffdf5] border-[#d97706]/40 text-[#1e3a8a] hover:bg-[#fef9eb]'
                   : 'bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
               }`}
             >
-              {settings.theme === 'ivory-sapphire' ? (
+              {isWarm ? (
                 <Palette className="w-4 h-4 text-[#d97706]" />
               ) : settings.theme === 'light' ? (
                 <Moon className="w-4 h-4 text-blue-600" />
@@ -242,7 +242,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
               onClick={toggleTheme}
               className="p-2 rounded-lg bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
             >
-              {settings.theme === 'ivory-sapphire' ? (
+              {isWarm ? (
                 <Palette className="w-4 h-4 text-[#d97706]" />
               ) : settings.theme === 'light' ? (
                 <Moon className="w-4 h-4 text-blue-600" />

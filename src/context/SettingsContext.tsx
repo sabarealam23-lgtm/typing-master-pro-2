@@ -22,25 +22,50 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [settings, setSettingsState] = useState<UserSettings>(() => loadSettings());
 
   useEffect(() => {
-    // Apply theme class to document html element
+    // Apply theme class and data-theme attribute to document html element
     const root = document.documentElement;
-    root.classList.remove('light', 'dark', 'theme-ivory-sapphire', 'ivory-sapphire', 'royal', 'nordic', 'espresso', 'theme-royal', 'theme-nordic', 'theme-espresso');
-    root.removeAttribute('data-theme');
+    
+    const applyTheme = () => {
+      root.classList.remove(
+        'light', 
+        'dark', 
+        'theme-warm', 
+        'theme-ivory-sapphire', 
+        'ivory-sapphire', 
+        'theme-dark', 
+        'theme-light'
+      );
+      root.removeAttribute('data-theme');
 
-    if (settings.theme === 'ivory-sapphire') {
-      root.classList.add('light', 'theme-ivory-sapphire');
-      root.setAttribute('data-theme', 'ivory-sapphire');
-    } else {
-      const isDark = settings.theme === 'dark' || 
-        (settings.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-      
-      if (isDark) {
+      const isWarm = settings.theme === 'warm' || settings.theme === 'ivory-sapphire';
+
+      if (isWarm) {
+        root.classList.add('light', 'theme-warm', 'theme-ivory-sapphire');
+        root.setAttribute('data-theme', 'warm');
+      } else if (settings.theme === 'dark') {
         root.classList.add('dark');
-        root.classList.remove('light');
-      } else {
-        root.classList.remove('dark');
+        root.setAttribute('data-theme', 'dark');
+      } else if (settings.theme === 'light') {
         root.classList.add('light');
+        root.setAttribute('data-theme', 'light');
+      } else if (settings.theme === 'system') {
+        const isSystemDark = typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        root.setAttribute('data-theme', isSystemDark ? 'dark' : 'light');
+        if (isSystemDark) {
+          root.classList.add('dark');
+        } else {
+          root.classList.add('light');
+        }
       }
+    };
+
+    applyTheme();
+
+    if (settings.theme === 'system' && typeof window !== 'undefined') {
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+      const handleMediaChange = () => applyTheme();
+      mediaQuery.addEventListener('change', handleMediaChange);
+      return () => mediaQuery.removeEventListener('change', handleMediaChange);
     }
   }, [settings.theme]);
 

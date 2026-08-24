@@ -219,7 +219,7 @@ const AboutModalContent: React.FC<{ onNavigate?: (page: any) => void; onClose: (
               <span>Smart Customization</span>
             </div>
             <p className="text-slate-400 text-xs leading-relaxed">
-              Flexible timed tests (30s, 60s, 120s, 5m, 10m), custom paragraph sandboxes, 3 theme presets (Dark, Light, Day/Night), keystroke mechanical sound synthesis, volume controls, and responsive cursor styles.
+              Flexible timed tests (30s, 60s, 120s, 5m, 10m), custom paragraph sandboxes, visual theme presets (Warm Ivory & Sapphire, Dark, Light, System), keystroke mechanical sound synthesis, volume controls, and responsive cursor styles.
             </p>
           </div>
 
@@ -565,7 +565,7 @@ const PrivacyModalContent: React.FC = () => {
           <span>2. Browser Local Storage Utilization</span>
         </div>
         <p className="text-xs text-slate-300 leading-relaxed">
-          Browser local storage is used solely to store your chosen UI theme preferences (Dark/Light/Day-Night), sound synthesis volume settings, cursor configurations, test session history, earned achievements, and verified certificate credentials so you can resume practice seamlessly across visits.
+          Browser local storage is used solely to store your chosen UI theme preferences (Warm Ivory & Sapphire, Dark, Light, System), sound synthesis volume settings, cursor configurations, test session history, earned achievements, and verified certificate credentials so you can resume practice seamlessly across visits.
         </p>
       </div>
 

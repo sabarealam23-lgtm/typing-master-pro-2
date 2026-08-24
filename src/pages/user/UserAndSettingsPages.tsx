@@ -575,9 +575,9 @@ export const SettingsPage: React.FC<UserPageProps> = ({ onNavigate }) => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {[
               {
-                id: 'ivory-sapphire' as ThemeMode,
+                id: 'warm' as ThemeMode,
                 name: '📜 Warm Ivory & Sapphire',
-                description: 'Cream canvas, sapphire navy bars & gold amber trims',
+                description: 'Cream canvas (#fbf8f1), sapphire navy & gold amber trims (Default)',
                 icon: <Palette className="w-4 h-4 text-amber-500" />
               },
               {
@@ -599,7 +599,7 @@ export const SettingsPage: React.FC<UserPageProps> = ({ onNavigate }) => {
                 icon: <Sparkles className="w-4 h-4" />
               },
             ].map((thm) => {
-              const isSelected = settings.theme === thm.id;
+              const isSelected = settings.theme === thm.id || (thm.id === 'warm' && settings.theme === 'ivory-sapphire');
               return (
                 <button
                   key={thm.id}
@@ -607,25 +607,25 @@ export const SettingsPage: React.FC<UserPageProps> = ({ onNavigate }) => {
                   onClick={() => setTheme(thm.id)}
                   className={`p-4 rounded-xl border flex items-center justify-between text-xs font-semibold capitalize transition-all ${
                     isSelected
-                      ? 'bg-[#1e3a8a]/10 border-[#1e3a8a] text-[#1e3a8a] dark:bg-slate-800 dark:border-emerald-500 dark:text-emerald-400 shadow-sm ring-1 ring-[#1e3a8a]/40 dark:ring-emerald-500/40'
-                      : 'bg-slate-950/40 border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-900/70'
+                      ? 'bg-blue-50 border-[#1e3a8a] text-[#1e3a8a] dark:bg-slate-800 dark:border-emerald-500 dark:text-emerald-400 shadow-sm ring-2 ring-[#1e3a8a]/20 dark:ring-emerald-500/30'
+                      : 'bg-slate-50/60 border-slate-200 text-slate-600 dark:bg-slate-950/40 dark:border-slate-800 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100/80 dark:hover:bg-slate-900/70'
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-lg border ${
+                    <div className={`p-2.5 rounded-lg border ${
                       isSelected
                         ? 'bg-white border-[#1e3a8a]/40 text-[#1e3a8a] dark:bg-slate-900 dark:border-emerald-500/40 dark:text-emerald-400'
-                        : 'bg-slate-900 border-slate-800 text-slate-400'
+                        : 'bg-white border-slate-200 text-slate-500 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400'
                     }`}>
                       {thm.icon}
                     </div>
                     <div className="text-left">
-                      <div className="text-xs font-bold text-slate-100">{thm.name}</div>
-                      <div className="text-[10px] text-slate-400 font-normal">{thm.description}</div>
+                      <div className="text-xs font-bold text-slate-900 dark:text-slate-100">{thm.name}</div>
+                      <div className="text-[10px] text-slate-500 dark:text-slate-400 font-normal">{thm.description}</div>
                     </div>
                   </div>
                   {isSelected && (
-                    <div className="w-5 h-5 rounded-full bg-[#1e3a8a] text-white dark:bg-emerald-500 dark:text-slate-950 flex items-center justify-center">
+                    <div className="w-5 h-5 rounded-full bg-[#1e3a8a] text-white dark:bg-emerald-500 dark:text-slate-950 flex items-center justify-center shadow-xs">
                       <Check className="w-3 h-3 stroke-[3]" />
                     </div>
                   )}

@@ -120,12 +120,12 @@ const AppContent: React.FC = () => {
   };
 
   // Theme container classes
-  const isIvorySapphire = settings.theme === 'ivory-sapphire';
-  const isDark = !isIvorySapphire && (settings.theme === 'dark' || (settings.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches));
+  const isWarm = settings.theme === 'warm' || settings.theme === 'ivory-sapphire';
+  const isDark = !isWarm && (settings.theme === 'dark' || (settings.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches));
 
   return (
     <div className={`min-h-screen flex flex-col font-sans transition-colors duration-200 ${
-      isIvorySapphire
+      isWarm
         ? 'bg-[#fbf8f1] text-[#1e293b] selection:bg-[#1e3a8a]/20 selection:text-[#1e3a8a]'
         : isDark 
         ? 'bg-slate-950 text-slate-100 selection:bg-cyan-500/30 selection:text-cyan-200' 

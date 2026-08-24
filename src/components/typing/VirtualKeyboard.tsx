@@ -162,7 +162,7 @@ export const VirtualKeyboard: React.FC<VirtualKeyboardProps> = ({
   compact = false,
 }) => {
   const { settings } = useSettings();
-  const isIvory = settings.theme === 'ivory-sapphire';
+  const isIvory = settings.theme === 'warm' || settings.theme === 'ivory-sapphire';
 
   const needsShift = React.useMemo(() => {
     if (!currentExpectedChar) return false;

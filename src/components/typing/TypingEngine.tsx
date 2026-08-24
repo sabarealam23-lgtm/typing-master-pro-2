@@ -33,7 +33,14 @@ import {
   Moon,
   Check,
   LayoutGrid,
-  AlignLeft
+  AlignLeft,
+  Pause,
+  Play,
+  X,
+  User,
+  ArrowDown,
+  Clock,
+  Sparkles
 } from 'lucide-react';
 
 interface TypingEngineProps {
@@ -41,8 +48,11 @@ interface TypingEngineProps {
   mode: TestMode;
   targetDurationSeconds?: number; // for timed tests (15, 30, 60, 120, 300, 600)
   lesson?: Lesson;
+  candidateName?: string;
+  layout?: 'standard' | 'sonma';
   onComplete: (result: TypingResult) => void;
   onRestart?: () => void;
+  onExit?: () => void;
 }
 
 interface CharDetail {
@@ -56,12 +66,16 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
   mode,
   targetDurationSeconds,
   lesson,
+  candidateName,
+  layout = 'standard',
   onComplete,
   onRestart,
+  onExit,
 }) => {
   const { settings, setTheme, setSoundEnabled, setShowVirtualKeyboard } = useSettings();
   const { user } = useAuth();
 
+  const isSonmaLayout = layout === 'sonma';
   const isTimedMode = Boolean(targetDurationSeconds && targetDurationSeconds > 0);
   const initialTimeLeft = targetDurationSeconds || 0;
 
@@ -73,7 +87,9 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
   const startTimeRef = useRef<number | null>(null);
   const endTimeRef = useRef<number | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const referenceContainerRef = useRef<HTMLDivElement>(null);
   const activeCharRef = useRef<HTMLDivElement & HTMLSpanElement>(null);
+  const activeRefCharRef = useRef<HTMLSpanElement>(null);
 
   // State
   const [charDetails, setCharDetails] = useState<CharDetail[]>(() => 
@@ -82,6 +98,9 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
   const [cursorIndex, setCursorIndex] = useState<number>(0);
   const [isStarted, setIsStarted] = useState<boolean>(false);
   const [isFinished, setIsFinished] = useState<boolean>(false);
+  const [isPaused, setIsPaused] = useState<boolean>(false);
+  const pausedAtRef = useRef<number | null>(null);
+  const totalPausedTimeRef = useRef<number>(0);
   const [timeLeft, setTimeLeft] = useState<number>(initialTimeLeft);
   const [elapsedSeconds, setElapsedSeconds] = useState<number>(0);
   const [pasteBlockedWarning, setPasteBlockedWarning] = useState<boolean>(false);
@@ -107,13 +126,15 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
   isStartedRef.current = isStarted;
   const isFinishedRef = useRef(isFinished);
   isFinishedRef.current = isFinished;
+  const isPausedRef = useRef(isPaused);
+  isPausedRef.current = isPaused;
 
   // Live calculation states for smooth UI feedback
   const [liveGrossWpm, setLiveGrossWpm] = useState<number>(0);
   const [liveNetWpm, setLiveNetWpm] = useState<number>(0);
   const [liveAccuracy, setLiveAccuracy] = useState<number>(100);
 
-  // Viewport Auto-Center & Auto-Focus on mount or mode change (isolated to lesson mode)
+  // Viewport Auto-Center & Auto-Focus on mount or mode change
   useEffect(() => {
     containerRef.current?.focus();
     if (mode === 'lesson') {
@@ -129,6 +150,37 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
       return () => clearTimeout(timer);
     }
   }, [practiceText, mode]);
+
+  // Smooth auto-scroll for reference text container in Sonma layout
+  useEffect(() => {
+    if (!isSonmaLayout || !referenceContainerRef.current) return;
+
+    if (!isStarted || cursorIndex === 0) {
+      referenceContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    if (activeRefCharRef.current) {
+      const refContainer = referenceContainerRef.current;
+      const charElem = activeRefCharRef.current;
+
+      const containerRect = refContainer.getBoundingClientRect();
+      const charRect = charElem.getBoundingClientRect();
+
+      const relativeTop = charRect.top - containerRect.top + refContainer.scrollTop;
+      const charHeight = charRect.height || 28;
+      const containerHeight = refContainer.clientHeight;
+
+      const targetScrollTop = Math.max(0, relativeTop - (containerHeight / 2) + (charHeight / 2));
+
+      if (Math.abs(refContainer.scrollTop - targetScrollTop) > 12) {
+        refContainer.scrollTo({
+          top: targetScrollTop,
+          behavior: 'smooth'
+        });
+      }
+    }
+  }, [cursorIndex, isStarted, isSonmaLayout]);
 
   // Smooth auto-scroll for active typing position / line centering inside the typing box
   useEffect(() => {
@@ -164,6 +216,24 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
     }
   }, [cursorIndex, isStarted]);
 
+  // Pause / Resume toggle
+  const togglePause = useCallback(() => {
+    if (!isStartedRef.current || isFinishedRef.current) return;
+    if (isPausedRef.current) {
+      if (pausedAtRef.current) {
+        totalPausedTimeRef.current += (performance.now() - pausedAtRef.current);
+        pausedAtRef.current = null;
+      }
+      setIsPaused(false);
+      isPausedRef.current = false;
+      setTimeout(() => containerRef.current?.focus(), 50);
+    } else {
+      pausedAtRef.current = performance.now();
+      setIsPaused(true);
+      isPausedRef.current = true;
+    }
+  }, []);
+
   // Finish test callback
   const finishTest = useCallback(() => {
     if (isFinishedRef.current) return;
@@ -174,7 +244,7 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
     endTimeRef.current = endTimestamp;
 
     const startTimestamp = startTimeRef.current || endTimestamp - 1000;
-    const finalElapsedMs = Math.max(500, endTimestamp - startTimestamp);
+    const finalElapsedMs = Math.max(500, endTimestamp - startTimestamp - totalPausedTimeRef.current);
     const finalElapsedSeconds = isTimedMode && targetDurationSeconds
       ? targetDurationSeconds
       : Number((finalElapsedMs / 1000).toFixed(1));
@@ -228,7 +298,7 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
     const paceTimeSaved = Math.max(0, Number((allottedSeconds - actualSeconds).toFixed(1)));
 
     // Certificate qualification & tier evaluation
-    const isTypingTestMode = mode.startsWith('timed_') || mode === 'paragraph';
+    const isTypingTestMode = mode.startsWith('timed_') || mode === 'paragraph' || isSonmaLayout;
     const isCertificateQualified = isTypingTestMode && netWPM >= 30 && accuracy >= 95;
     let certificateTier: 'silver' | 'gold' | 'platinum' | null = null;
     if (isCertificateQualified) {
@@ -244,6 +314,8 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
 
     const isLessonPassed = lesson ? (netWPM >= lesson.requiredWpm && accuracy >= lesson.requiredAccuracy) : true;
     const xpEarned = calculateXpEarned(netWPM, accuracy, finalElapsedSeconds, Boolean(lesson), isLessonPassed);
+
+    const resolvedCandidateName = candidateName || (user?.displayName && user.displayName !== 'Guest' ? user.displayName : 'Typing Candidate');
 
     const result: TypingResult = {
       id: `res-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`,
@@ -278,13 +350,14 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
       certificateCode,
       isCertificateQualified,
       certificateTier,
+      candidateName: resolvedCandidateName,
     };
 
     // Save score to Firestore if user is authenticated
     if (user && user.uid && !user.isGuest) {
       saveTypingScoreToFirestore({
         userId: user.uid,
-        userName: user.displayName || user.email?.split('@')[0] || 'Typist',
+        userName: resolvedCandidateName,
         userEmail: user.email || '',
         wpm: result.netWpm,
         rawWpm: result.grossWpm,
@@ -295,12 +368,14 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
     }
 
     onComplete(result);
-  }, [isTimedMode, targetDurationSeconds, lesson, mode, user, onComplete]);
+  }, [isTimedMode, targetDurationSeconds, lesson, mode, isSonmaLayout, candidateName, user, onComplete]);
 
   // Restart / Reset
   const handleManualRestart = useCallback(() => {
     startTimeRef.current = null;
     endTimeRef.current = null;
+    pausedAtRef.current = null;
+    totalPausedTimeRef.current = 0;
     totalKeystrokesRef.current = 0;
     correctKeystrokesRef.current = 0;
     incorrectKeystrokesRef.current = 0;
@@ -315,8 +390,10 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
     setCursorIndex(0);
     setIsStarted(false);
     setIsFinished(false);
+    setIsPaused(false);
     isStartedRef.current = false;
     isFinishedRef.current = false;
+    isPausedRef.current = false;
     setTimeLeft(targetDurationSeconds || 0);
     setElapsedSeconds(0);
     setLiveGrossWpm(0);
@@ -336,12 +413,16 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
     setCursorIndex(0);
     setIsStarted(false);
     setIsFinished(false);
+    setIsPaused(false);
     isStartedRef.current = false;
     isFinishedRef.current = false;
+    isPausedRef.current = false;
     setTimeLeft(targetDurationSeconds || 0);
     setElapsedSeconds(0);
     startTimeRef.current = null;
     endTimeRef.current = null;
+    pausedAtRef.current = null;
+    totalPausedTimeRef.current = 0;
     totalKeystrokesRef.current = 0;
     correctKeystrokesRef.current = 0;
     incorrectKeystrokesRef.current = 0;
@@ -361,9 +442,9 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
     if (!isStarted || isFinished) return;
 
     const intervalId = setInterval(() => {
-      if (!startTimeRef.current) return;
+      if (!startTimeRef.current || isPausedRef.current) return;
       const now = performance.now();
-      const elapsedMs = now - startTimeRef.current;
+      const elapsedMs = Math.max(0, now - startTimeRef.current - totalPausedTimeRef.current);
       const elapsedSec = Math.floor(elapsedMs / 1000);
       setElapsedSeconds(elapsedSec);
 
@@ -407,10 +488,19 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
       return;
     }
 
+    // Ignore if paused
+    if (isPausedRef.current) {
+      if (key === ' ' || key === 'Enter') {
+        if (e) e.preventDefault();
+        togglePause();
+      }
+      return;
+    }
+
     // Ignore modifier keys
     if ([
       'Shift', 'Control', 'Alt', 'Meta', 'CapsLock', 'ArrowUp', 'ArrowDown',
-      'ArrowLeft', 'ArrowRight', 'Home', 'End', 'PageUp', 'PageDown', 'Insert',
+      'ArrowLeft', 'ArrowRight', 'Home', 'End', 'PageDown', 'PageUp', 'Insert',
       'F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12'
     ].includes(key)) {
       return;
@@ -544,10 +634,11 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
     settings.soundType,
     settings.soundVolume,
     handleManualRestart,
+    togglePause,
     finishTest
   ]);
 
-  // Global Window Keydown Listener: Ensures reliable input across all modes
+  // Global Window Keydown Listener
   useEffect(() => {
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
       const activeEl = document.activeElement;
@@ -692,6 +783,380 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
 
   const isLessonMode = mode === 'lesson';
 
+  // ==================== AUTHENTIC SONMA 2-BOX EXAM ARENA LAYOUT ====================
+  if (isSonmaLayout) {
+    const formattedCandidateName = candidateName || (user?.displayName && user.displayName !== 'Guest' ? user.displayName : 'Typing Candidate');
+
+    // Compute word-by-word structure for authentic Sonma top reference box
+    const sonmaWords = React.useMemo(() => {
+      const words: Array<{
+        wordIndex: number;
+        startIndex: number;
+        endIndex: number;
+        chars: typeof charDetails;
+        hasNewlineAfter: boolean;
+        hasError: boolean;
+      }> = [];
+
+      let currentWordChars: typeof charDetails = [];
+      let currentStartIndex = 0;
+
+      for (let i = 0; i < charDetails.length; i++) {
+        const detail = charDetails[i];
+        if (detail.expected === ' ' || detail.expected === '\n') {
+          if (currentWordChars.length > 0) {
+            const hasErr = currentWordChars.some(c => c.state === 'incorrect');
+            words.push({
+              wordIndex: words.length,
+              startIndex: currentStartIndex,
+              endIndex: i - 1,
+              chars: currentWordChars,
+              hasNewlineAfter: detail.expected === '\n',
+              hasError: hasErr,
+            });
+            currentWordChars = [];
+          }
+          currentStartIndex = i + 1;
+        } else {
+          if (currentWordChars.length === 0) {
+            currentStartIndex = i;
+          }
+          currentWordChars.push(detail);
+        }
+      }
+
+      if (currentWordChars.length > 0) {
+        const hasErr = currentWordChars.some(c => c.state === 'incorrect');
+        words.push({
+          wordIndex: words.length,
+          startIndex: currentStartIndex,
+          endIndex: charDetails.length - 1,
+          chars: currentWordChars,
+          hasNewlineAfter: false,
+          hasError: hasErr,
+        });
+      }
+
+      return words;
+    }, [charDetails]);
+
+    // Find which word is currently active
+    const activeWordIndex = React.useMemo(() => {
+      if (sonmaWords.length === 0) return 0;
+      const idx = sonmaWords.findIndex(w => cursorIndex <= w.endIndex + 1);
+      return idx !== -1 ? idx : sonmaWords.length - 1;
+    }, [sonmaWords, cursorIndex]);
+
+    return (
+      <div 
+        id="sonma-exam-arena-wrapper" 
+        onClick={() => containerRef.current?.focus()}
+        className="w-full border-4 border-[#1e40af] bg-[#eff6ff] rounded-lg shadow-xl overflow-hidden select-none"
+      >
+        {/* Top Window Title Bar */}
+        <div className="bg-[#1e40af] text-white px-4 py-2.5 flex items-center justify-between text-xs font-bold shadow-sm">
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse" />
+            <span className="tracking-wide text-sm font-extrabold font-sans">Sonma Typing Expert - Official Speed Assessment</span>
+          </div>
+          <div className="font-mono text-xs text-blue-100 flex items-center gap-2">
+            <span>Candidate:</span>
+            <span className="text-white font-bold bg-blue-900/60 px-2 py-0.5 rounded border border-blue-400/40">
+              {formattedCandidateName}
+            </span>
+          </div>
+        </div>
+
+        {/* Main Split Body: Left 2-Box Typing Arena + Right Pastel Green Control Sidebar */}
+        <div className="flex flex-col lg:flex-row min-h-[460px]">
+          {/* Left Typing Arena (Top & Bottom Boxes) */}
+          <div className="flex-1 p-3.5 sm:p-4 space-y-3 flex flex-col justify-between">
+            {/* Paste Blocked Warning */}
+            {pasteBlockedWarning && (
+              <div 
+                id="sonma-paste-warning"
+                className="flex items-center gap-2 px-3.5 py-1.5 rounded-md bg-[#fee2e2] border border-[#f87171] text-[#991b1b] text-xs font-medium animate-bounce shadow-xs"
+              >
+                <AlertTriangle className="w-4 h-4 text-[#dc2626] shrink-0" />
+                <span>Clipboard pasting is locked during official exam mode to maintain authentic candidate scoring.</span>
+              </div>
+            )}
+
+            {/* ==================== BOX 1: TOP REFERENCE BOX ==================== */}
+            <div className="relative rounded-md bg-[#fefced] border border-[#cbd5e1] shadow-xs flex-1 flex flex-col overflow-hidden">
+              {/* Top Box Header */}
+              <div className="flex items-center justify-between px-3.5 py-1.5 bg-[#fef9c3]/60 border-b border-[#e2e8f0] text-xs font-serif text-[#1e3a8a]">
+                <span className="font-bold uppercase tracking-wider text-[11px]">Reference Text Passage</span>
+                <span className="text-[11px] font-mono text-[#64748b]">
+                  {charDetails.length} chars • {sonmaWords.length} words
+                </span>
+              </div>
+
+              {/* Top Box Content (Classic Serif, ~19px, line-height 1.8, Word-by-Word styling) */}
+              <div
+                id="sonma-reference-box"
+                ref={referenceContainerRef}
+                className="p-4 h-[160px] sm:h-[185px] overflow-y-auto font-serif text-[19px] leading-[1.8] text-[#111827] text-left select-none scrollbar-clean scroll-smooth"
+                style={{ wordBreak: 'normal', overflowWrap: 'break-word', fontFamily: 'Georgia, "Times New Roman", Times, serif' }}
+              >
+                {sonmaWords.map((word) => {
+                  const isPast = word.wordIndex < activeWordIndex;
+                  const isCurrent = word.wordIndex === activeWordIndex;
+
+                  let wordStyle = 'text-[#1f2937]'; // Upcoming words: Crisp dark charcoal text
+                  if (isPast) {
+                    wordStyle = word.hasError ? 'text-[#9a3412] font-normal' : 'text-[#78716c] font-normal'; // Wrong: Soft muted brownish-tan | Correct: Muted olive-grey
+                  } else if (isCurrent) {
+                    wordStyle = 'text-[#1d4ed8] border-b-2 border-[#2563eb] font-semibold pb-0.5'; // Current Active Word: Deep royal blue with clean blue underline
+                  }
+
+                  return (
+                    <React.Fragment key={word.wordIndex}>
+                      <span
+                        ref={isCurrent ? activeRefCharRef : null}
+                        className={`inline-block mr-2 transition-colors duration-75 ${wordStyle}`}
+                      >
+                        {word.chars.map((c) => c.expected).join('')}
+                      </span>
+                      {word.hasNewlineAfter && (
+                        <span className="block my-1.5 border-t border-dashed border-[#cbd5e1] pt-1" />
+                      )}
+                    </React.Fragment>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* ==================== CENTER RED DIVIDER ==================== */}
+            <div className="relative my-2 flex items-center justify-center select-none">
+              <div className="w-full border-t-2 border-[#dc2626]" />
+              <span className="absolute px-3.5 py-1 bg-[#eff6ff] text-[#dc2626] border-2 border-[#dc2626] rounded-full text-xs font-bold uppercase tracking-wider shadow-xs flex items-center gap-1.5">
+                <ArrowDown className="w-3.5 h-3.5 text-[#dc2626] animate-bounce" />
+                <span>Type the above texts below</span>
+              </span>
+            </div>
+
+            {/* ==================== BOX 2: BOTTOM LIVE INPUT BOX ==================== */}
+            <div 
+              id="sonma-input-container-card"
+              className="relative rounded-md bg-[#fefced] border-2 border-[#94a3b8] focus-within:border-[#1e40af] shadow-sm flex-1 flex flex-col overflow-hidden transition-all"
+            >
+              {/* Bottom Box Header */}
+              <div className="flex items-center justify-between px-3.5 py-1.5 bg-[#fef9c3]/60 border-b border-[#e2e8f0] text-xs font-serif text-[#1e3a8a]">
+                <div className="flex items-center gap-1.5 font-bold">
+                  <span className={`w-2 h-2 rounded-full ${isStarted && !isPaused ? 'bg-[#10b981] animate-pulse' : 'bg-[#f59e0b]'}`} />
+                  <span className="uppercase tracking-wider text-[11px]">Live Typing Input Box</span>
+                </div>
+                <div className="text-[11px] font-mono text-[#64748b]">
+                  {cursorIndex} / {charDetails.length} ({progressPercent}%)
+                </div>
+              </div>
+
+              {/* Dedicated Typing Area (Classic Serif, ~19px, line-height 1.8) */}
+              <div
+                id="sonma-typing-input-area"
+                ref={containerRef}
+                onPaste={handlePaste}
+                tabIndex={0}
+                className="p-4 h-[160px] sm:h-[185px] overflow-y-auto font-serif text-[19px] leading-[1.8] text-[#111827] text-left select-none outline-none cursor-text scrollbar-clean scroll-smooth"
+                style={{ wordBreak: 'normal', overflowWrap: 'break-word', fontFamily: 'Georgia, "Times New Roman", Times, serif' }}
+              >
+                {cursorIndex === 0 && !isStarted ? (
+                  <div className="flex flex-col items-center justify-center h-full text-[#64748b] text-base italic pointer-events-none">
+                    <Keyboard className="w-8 h-8 text-[#94a3b8] mb-2" />
+                    <span>Click here or press any key to start the official speed test...</span>
+                  </div>
+                ) : (
+                  <div className="whitespace-pre-wrap">
+                    {charDetails.slice(0, Math.max(cursorIndex + 1, 1)).map((detail, index) => {
+                      const isCurrent = index === cursorIndex;
+                      const isPassed = index < cursorIndex;
+
+                      let charStyle = 'text-[#111827]';
+                      if (isPassed) {
+                        if (detail.state === 'correct' || detail.state === 'corrected') {
+                          charStyle = 'text-[#111827]';
+                        } else if (detail.state === 'incorrect') {
+                          charStyle = 'text-[#dc2626] bg-[#fee2e2] underline font-medium';
+                        }
+                      }
+
+                      if (detail.expected === '\n') {
+                        return (
+                          <span
+                            key={index}
+                            ref={isCurrent ? activeCharRef : null}
+                            className="block my-1.5 border-t border-dashed border-[#cbd5e1] pt-1"
+                          >
+                            <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-sans ${
+                              isCurrent ? 'bg-[#1e40af] text-white font-bold' : 'bg-[#e2e8f0] text-[#64748b]'
+                            }`}>
+                              ↵ Paragraph Break
+                            </span>
+                          </span>
+                        );
+                      }
+
+                      return (
+                        <span
+                          key={index}
+                          ref={isCurrent ? activeCharRef : null}
+                          className={`relative inline-block ${charStyle}`}
+                        >
+                          {isCurrent && (
+                            <span 
+                              id="sonma-typing-caret"
+                              className="inline-block w-[2px] h-[1.15em] bg-[#1e40af] animate-pulse align-middle mx-0.5" 
+                            />
+                          )}
+                          {detail.typed !== undefined 
+                            ? (detail.typed === ' ' ? '\u00A0' : detail.typed) 
+                            : (detail.expected === ' ' ? '\u00A0' : detail.expected)}
+                        </span>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* Paused Overlay */}
+              {isPaused && (
+                <div className="absolute inset-0 bg-[#fefced]/90 backdrop-blur-xs flex flex-col items-center justify-center p-4 space-y-3 z-20">
+                  <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-600">
+                    <Pause className="w-5 h-5" />
+                  </div>
+                  <div className="text-center space-y-1">
+                    <h4 className="text-base font-bold text-[#1e293b]">Test Paused</h4>
+                    <p className="text-xs text-[#64748b]">Timer is frozen. Keystrokes are temporarily locked.</p>
+                  </div>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); togglePause(); }}
+                    className="flex items-center gap-2 px-5 py-2 rounded-lg bg-[#10b981] hover:bg-[#059669] text-white font-bold text-xs shadow-md transition-all cursor-pointer"
+                  >
+                    <Play className="w-4 h-4 fill-current" />
+                    <span>Resume Test (Space)</span>
+                  </button>
+                </div>
+              )}
+
+              {/* Progress Bar */}
+              <div className="h-1 w-full bg-[#e2e8f0] overflow-hidden">
+                <div 
+                  className="h-full bg-[#1e40af] transition-all duration-150"
+                  style={{ width: `${progressPercent}%` }}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* ==================== RIGHT EXAM CONTROL PANEL SIDEBAR ==================== */}
+          <div 
+            id="sonma-sidebar-control-panel"
+            className="w-full lg:w-64 bg-[#dcfce7] border-t-2 lg:border-t-0 lg:border-l-2 border-[#86efac] text-[#065f46] p-4 flex flex-col justify-between gap-4 select-none shrink-0"
+          >
+            {/* Top: Candidate Info & Exit Button */}
+            <div>
+              <div className="flex items-center justify-between pb-3 border-b border-[#bbf7d0]">
+                <div className="flex items-center gap-2 min-w-0">
+                  <div className="w-7 h-7 rounded-lg bg-[#065f46] text-white flex items-center justify-center shrink-0">
+                    <User className="w-3.5 h-3.5" />
+                  </div>
+                  <div className="min-w-0">
+                    <span className="text-[10px] uppercase font-bold text-[#047857] block">Candidate</span>
+                    <p className="text-xs font-bold text-[#065f46] truncate">{formattedCandidateName}</p>
+                  </div>
+                </div>
+                {onExit && (
+                  <button
+                    id="sonma-close-btn"
+                    onClick={(e) => { e.stopPropagation(); onExit(); }}
+                    title="Exit Exam Arena"
+                    className="p-1.5 rounded-lg bg-white/70 hover:bg-rose-100 text-[#065f46] hover:text-rose-600 border border-[#86efac] transition-colors cursor-pointer"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Middle: Prominent Digital Countdown Clock & Live KPIs */}
+            <div className="space-y-3 my-auto">
+              <div 
+                id="sonma-digital-countdown"
+                className="bg-white/90 border-2 border-[#86efac] rounded-xl p-3.5 text-center shadow-xs"
+              >
+                <span className="text-[11px] uppercase font-bold text-[#047857] tracking-wider block mb-1">
+                  Remaining Time
+                </span>
+                <div className={`text-3xl sm:text-4xl font-extrabold font-mono tracking-wider ${
+                  isTimedMode && timeLeft <= 10 && isStarted && !isFinished
+                    ? 'text-[#dc2626] animate-pulse'
+                    : 'text-[#065f46]'
+                }`}>
+                  {isTimedMode ? formatDuration(timeLeft) : formatDuration(elapsedSeconds)}
+                </div>
+
+                <div className="mt-3 grid grid-cols-2 gap-2 pt-2 border-t border-[#bbf7d0] text-center font-mono">
+                  <div className="bg-[#f0fdf4] rounded-lg py-1 border border-[#bbf7d0]">
+                    <span className="text-[9px] uppercase font-bold text-[#047857] block">Net WPM</span>
+                    <span className="text-sm font-extrabold text-[#065f46]">{Math.round(liveNetWpm)}</span>
+                  </div>
+                  <div className="bg-[#f0fdf4] rounded-lg py-1 border border-[#bbf7d0]">
+                    <span className="text-[9px] uppercase font-bold text-[#047857] block">Accuracy</span>
+                    <span className="text-sm font-extrabold text-[#065f46]">{liveAccuracy}%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom: Pause, Restart, Sound Controls */}
+            <div className="space-y-2 pt-2 border-t border-[#bbf7d0]">
+              <div className="grid grid-cols-2 gap-2">
+                {/* Pause / Resume */}
+                <button
+                  id="sonma-pause-btn"
+                  onClick={(e) => { e.stopPropagation(); togglePause(); }}
+                  disabled={!isStarted || isFinished}
+                  title={isPaused ? 'Resume Test (Space)' : 'Pause Test'}
+                  className={`py-2 px-3 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-xs disabled:opacity-40 disabled:cursor-not-allowed ${
+                    isPaused
+                      ? 'bg-[#10b981] hover:bg-[#059669] text-white'
+                      : 'bg-white hover:bg-[#f0fdf4] text-[#065f46] border border-[#86efac]'
+                  }`}
+                >
+                  {isPaused ? <Play className="w-3.5 h-3.5 fill-current" /> : <Pause className="w-3.5 h-3.5" />}
+                  <span>{isPaused ? 'Resume' : 'Pause'}</span>
+                </button>
+
+                {/* New / Restart */}
+                <button
+                  id="sonma-restart-btn"
+                  onClick={(e) => { e.stopPropagation(); handleManualRestart(); }}
+                  title="Restart Assessment (Esc / Tab)"
+                  className="py-2 px-3 rounded-lg bg-white hover:bg-[#f0fdf4] text-[#065f46] border border-[#86efac] text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span>Restart</span>
+                </button>
+              </div>
+
+              {/* Sound Keystrokes Toggle */}
+              <button
+                id="sonma-sound-toggle-btn"
+                onClick={(e) => { e.stopPropagation(); setSoundEnabled(!settings.soundEnabled); }}
+                className="w-full py-1.5 rounded-lg bg-white/70 hover:bg-white text-[#065f46] border border-[#86efac] text-[11px] font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+              >
+                {settings.soundEnabled ? <Volume2 className="w-3.5 h-3.5 text-[#059669]" /> : <VolumeX className="w-3.5 h-3.5 text-slate-400" />}
+                <span>{settings.soundEnabled ? 'Typing Sound: ON' : 'Typing Sound: OFF'}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ==================== STANDARD / LESSON LAYOUT ====================
   return (
     <div 
       id="typing-engine-wrapper" 
@@ -858,7 +1323,7 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
         </div>
       )}
 
-      {/* Target Key Prompt / Finger Guideline (Positioned cleanly ABOVE the main typing text display card) */}
+      {/* Target Key Prompt / Finger Guideline */}
       {(settings.showVirtualKeyboard || mode === 'lesson') && (
         <div 
           id="typing-target-key-guide"
@@ -997,7 +1462,7 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
             })}
           </div>
         ) : (
-          /* 2. CONTINUOUS STREAMING MONOSPACE TEXT (Practice & Test view) */
+          /* 2. CONTINUOUS STREAMING MONOSPACE TEXT (Practice & Drill view) */
           <div 
             id="typing-continuous-text-display"
             className={`font-mono text-left tracking-normal whitespace-pre-wrap select-none outline-none py-1.5 ${continuousFontSizeClass}`}
@@ -1005,15 +1470,12 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
           >
             {charDetails.map((detail, index) => {
               const isCurrent = index === cursorIndex;
-              // Untyped / Upcoming text: solid, clearly visible dark slate / light slate
               let charStyle = 'text-slate-700 dark:text-slate-300';
 
               if (!blindModeActive) {
                 if (detail.state === 'correct' || detail.state === 'corrected') {
-                  // Correctly Typed: vibrant green
                   charStyle = 'text-emerald-600 dark:text-emerald-400 font-semibold';
                 } else if (detail.state === 'incorrect') {
-                  // Incorrect / Error: bright red (keeping existing error handling untouched)
                   charStyle = 'text-red-500 dark:text-red-400 bg-red-500/10 underline decoration-red-500 font-semibold';
                 }
               }
@@ -1047,7 +1509,6 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
                   ref={isCurrent ? activeCharRef : null}
                   className={`relative inline-block transition-colors duration-75 ${charStyle}`}
                 >
-                  {/* Dynamic Active Caret Cursor */}
                   {renderContinuousCaret(isCurrent)}
                   {detail.expected === ' ' ? (detail.state === 'incorrect' ? '␣' : '\u00A0') : detail.expected}
                 </span>
@@ -1065,8 +1526,8 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
         </div>
       </div>
 
-      {/* Clean Modular Virtual Keyboard */}
-      {settings.showVirtualKeyboard && (
+      {/* Virtual Keyboard (Only in standard/learn/practice mode) */}
+      {!isSonmaLayout && settings.showVirtualKeyboard && (
         <VirtualKeyboard 
           currentExpectedChar={currentExpectedChar} 
           onKeyPress={(k) => processKeyInput(k)}
@@ -1077,3 +1538,4 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
     </div>
   );
 };
+

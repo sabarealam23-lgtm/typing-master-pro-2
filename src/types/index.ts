@@ -83,6 +83,7 @@ export interface TypingResult {
   certificateCode?: string;
   isCertificateQualified?: boolean;
   certificateTier?: CertificateTier | null;
+  candidateName?: string;
 }
 
 export interface Lesson {

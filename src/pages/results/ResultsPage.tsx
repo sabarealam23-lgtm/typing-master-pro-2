@@ -38,18 +38,20 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ result, onNavigate }) 
 
   const activeResult = result || lastResult;
 
-  const defaultCandidateName = user?.displayName && user.displayName !== 'Guest'
+  const defaultCandidateName = activeResult?.candidateName || (user?.displayName && user.displayName !== 'Guest'
     ? user.displayName 
-    : (user?.email ? user.email.split('@')[0] : 'Typing Candidate');
+    : (user?.email ? user.email.split('@')[0] : 'Typing Candidate'));
 
   const [candidateName, setCandidateName] = useState<string>(defaultCandidateName);
 
   // Sync candidate name if user logs in or updates
   useEffect(() => {
-    if (user?.displayName && user.displayName !== 'Guest') {
+    if (activeResult?.candidateName) {
+      setCandidateName(activeResult.candidateName);
+    } else if (user?.displayName && user.displayName !== 'Guest') {
       setCandidateName(user.displayName);
     }
-  }, [user?.displayName]);
+  }, [activeResult?.candidateName, user?.displayName]);
 
   // Qualification Check: Typing Test mode with Net WPM >= 30 and Accuracy >= 95%
   const isTypingTestMode = activeResult ? (activeResult.mode.startsWith('timed_') || activeResult.mode === 'paragraph' || activeResult.mode === 'custom') : false;

@@ -50,6 +50,7 @@ export const LeaderboardPage: React.FC<UserPageProps> = ({ onNavigate }) => {
   const [firestoreScores, setFirestoreScores] = useState<FirestoreTypingScore[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
+  const [timeframe, setTimeframe] = useState<'all_time' | 'daily' | 'weekly' | 'monthly'>('all_time');
 
   const loadLeaderboardData = useCallback(async () => {
     setIsRefreshing(true);
@@ -69,9 +70,9 @@ export const LeaderboardPage: React.FC<UserPageProps> = ({ onNavigate }) => {
   }, [loadLeaderboardData]);
 
   // If no Firestore scores yet (e.g. fresh database), fallback to local leaderboard demo entries
-  const localEntries = getLeaderboard('all_time', 'netWpm');
+  const localEntries = getLeaderboard(timeframe, 'netWpm');
 
-  const displayRows = firestoreScores.length > 0
+  const displayRows = firestoreScores.length > 0 && timeframe === 'all_time'
     ? firestoreScores.map((score, index) => ({
         id: score.id || `fs_${index}`,
         rank: index + 1,
@@ -112,25 +113,25 @@ export const LeaderboardPage: React.FC<UserPageProps> = ({ onNavigate }) => {
   return (
     <div id="leaderboard-page" className="w-full max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-8">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-6">
         <div>
-          <div className="inline-flex items-center gap-1.5 text-xs font-mono text-amber-400 font-bold uppercase mb-1">
+          <div className="inline-flex items-center gap-1.5 text-xs font-mono text-amber-500 font-bold uppercase mb-1">
             <Trophy className="w-3.5 h-3.5" /> Competitive Rankings
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-100">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-100">
             Global Typist Leaderboard
           </h1>
-          <p className="text-xs sm:text-sm text-slate-400 mt-1">
+          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-1">
             Top scores synced in real time to the cloud from all certified typing sessions.
           </p>
         </div>
 
         {/* Refresh button & Live indicator */}
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-300">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="font-mono text-[11px] text-slate-400">
-              {firestoreScores.length > 0 ? 'Live Cloud Sync' : 'Local / Ready'}
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs text-slate-700 dark:text-slate-300 shadow-xs">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="font-mono text-[11px] text-slate-600 dark:text-slate-400">
+              {firestoreScores.length > 0 && timeframe === 'all_time' ? 'Live Cloud Sync' : 'Verified Ranking'}
             </span>
           </div>
 
@@ -138,37 +139,63 @@ export const LeaderboardPage: React.FC<UserPageProps> = ({ onNavigate }) => {
             id="leaderboard-refresh-btn"
             onClick={loadLeaderboardData}
             disabled={isRefreshing}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-200 border border-slate-700 text-xs font-medium transition-colors disabled:opacity-60"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-white hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-750 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 text-xs font-semibold transition-colors disabled:opacity-60 cursor-pointer shadow-xs"
             title="Refresh Leaderboard"
           >
-            <RotateCcw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-emerald-400' : ''}`} />
+            <RotateCcw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-emerald-600 dark:text-emerald-400' : ''}`} />
             <span>Refresh</span>
           </button>
         </div>
       </div>
 
+      {/* Time Filter Tabs */}
+      <div className="flex flex-wrap gap-2 items-center">
+        {(['all_time', 'daily', 'weekly', 'monthly'] as const).map((t) => {
+          const labels: Record<string, string> = {
+            all_time: 'All-Time Champions',
+            daily: 'Today',
+            weekly: 'This Week',
+            monthly: 'This Month',
+          };
+          const isActive = timeframe === t;
+          return (
+            <button
+              key={t}
+              onClick={() => setTimeframe(t)}
+              className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                isActive
+                  ? 'bg-[#1e3a8a] text-white border border-[#1e3a8a] shadow-xs font-bold'
+                  : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-300 dark:border-slate-700 shadow-xs'
+              }`}
+            >
+              {labels[t]}
+            </button>
+          );
+        })}
+      </div>
+
       {/* Leaderboard Table Container */}
-      <div className="bg-slate-900/80 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-md">
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-16 space-y-3">
-            <Loader2 className="w-7 h-7 text-emerald-400 animate-spin" />
-            <p className="text-xs text-slate-400 font-mono">Fetching global scores from Firestore...</p>
+            <Loader2 className="w-7 h-7 text-[#1e3a8a] dark:text-emerald-400 animate-spin" />
+            <p className="text-xs text-slate-600 dark:text-slate-400 font-mono">Fetching global scores from Firestore...</p>
           </div>
         ) : displayRows.length === 0 ? (
-          <div className="text-center py-16 text-slate-400 text-xs space-y-3">
+          <div className="text-center py-16 text-slate-500 dark:text-slate-400 text-xs space-y-3">
             <p>No leaderboard scores recorded yet. Be the first to claim #1!</p>
             <button
               onClick={() => onNavigate('typing-test')}
-              className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs shadow-sm transition-all"
+              className="px-4 py-2 rounded-xl bg-[#1e3a8a] hover:bg-[#172554] text-white font-bold text-xs shadow-sm transition-all cursor-pointer"
             >
               Take a Typing Test
             </button>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-slate-300">
+            <table className="w-full text-left text-xs">
               <thead>
-                <tr className="border-b border-slate-800 bg-slate-950/60 text-slate-400 uppercase font-semibold text-[11px]">
+                <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/60 text-slate-700 dark:text-slate-400 uppercase font-semibold text-[11px]">
                   <th className="py-3.5 px-4 w-16 text-center">Rank</th>
                   <th className="py-3.5 px-4">User Name</th>
                   <th className="py-3.5 px-4">WPM</th>
@@ -177,7 +204,7 @@ export const LeaderboardPage: React.FC<UserPageProps> = ({ onNavigate }) => {
                   <th className="py-3.5 px-4 text-right">Date</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/60 font-mono">
+              <tbody className="divide-y divide-slate-200 dark:divide-slate-800/60 font-mono">
                 {displayRows.map((entry) => {
                   const isTop1 = entry.rank === 1;
                   const isTop2 = entry.rank === 2;
@@ -186,43 +213,43 @@ export const LeaderboardPage: React.FC<UserPageProps> = ({ onNavigate }) => {
                   return (
                     <tr
                       key={entry.id}
-                      className={`transition-colors ${
+                      className={`bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800/60 text-slate-800 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-850 transition-colors ${
                         entry.isCurrentUser
-                          ? 'bg-emerald-500/10 border-l-4 border-l-emerald-500 font-semibold'
-                          : 'hover:bg-slate-850'
+                          ? 'bg-blue-50/80 dark:bg-emerald-500/10 border-l-4 border-l-[#1e3a8a] dark:border-l-emerald-500 font-semibold'
+                          : ''
                       }`}
                     >
                       {/* Rank */}
                       <td className="py-3.5 px-4 text-center">
                         {isTop1 ? (
                           <div className="flex items-center justify-center">
-                            <Crown className="w-5 h-5 text-amber-400" />
+                            <Crown className="w-5 h-5 text-amber-500" />
                           </div>
                         ) : isTop2 ? (
                           <div className="flex items-center justify-center">
-                            <Crown className="w-5 h-5 text-slate-300" />
+                            <Crown className="w-5 h-5 text-slate-400" />
                           </div>
                         ) : isTop3 ? (
                           <div className="flex items-center justify-center">
-                            <Crown className="w-5 h-5 text-amber-600" />
+                            <Crown className="w-5 h-5 text-amber-700" />
                           </div>
                         ) : (
-                          <span className="text-slate-400 font-bold text-xs">#{entry.rank}</span>
+                          <span className="text-slate-600 dark:text-slate-400 font-bold text-xs">#{entry.rank}</span>
                         )}
                       </td>
 
                       {/* User Name */}
-                      <td className="py-3.5 px-4 font-sans font-medium text-slate-100">
+                      <td className="py-3.5 px-4 font-sans font-bold text-slate-900 dark:text-slate-100">
                         <div className="flex items-center gap-2.5">
-                          <div className="w-7 h-7 rounded-full bg-slate-800 text-slate-300 flex items-center justify-center font-bold text-xs shrink-0">
+                          <div className="w-7 h-7 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-300 flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
                             {entry.userName.charAt(0).toUpperCase()}
                           </div>
                           <div className="flex items-center gap-1.5">
-                            <span className={entry.isCurrentUser ? 'text-emerald-400 font-bold' : ''}>
+                            <span className={entry.isCurrentUser ? 'text-[#1e3a8a] dark:text-emerald-400 font-bold' : 'text-slate-900 dark:text-slate-100 font-bold'}>
                               {entry.userName}
                             </span>
                             {entry.isCurrentUser && (
-                              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-semibold border border-emerald-500/30">
+                              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#1e3a8a]/10 dark:bg-emerald-500/20 text-[#1e3a8a] dark:text-emerald-300 font-bold border border-[#1e3a8a]/20 dark:border-emerald-500/30">
                                 You
                               </span>
                             )}
@@ -231,22 +258,22 @@ export const LeaderboardPage: React.FC<UserPageProps> = ({ onNavigate }) => {
                       </td>
 
                       {/* WPM */}
-                      <td className="py-3.5 px-4 font-bold text-emerald-400 text-sm">
-                        {entry.wpm} <span className="text-xs text-slate-400 font-normal">WPM</span>
+                      <td className="py-3.5 px-4 font-bold text-[#1e3a8a] dark:text-emerald-400 text-sm">
+                        {entry.wpm} <span className="text-xs text-slate-500 dark:text-slate-400 font-normal">WPM</span>
                       </td>
 
                       {/* Accuracy */}
-                      <td className="py-3.5 px-4 font-bold text-cyan-400">
+                      <td className="py-3.5 px-4 font-bold text-blue-700 dark:text-cyan-400">
                         {entry.accuracy}%
                       </td>
 
                       {/* Duration / Time Taken */}
-                      <td className="py-3.5 px-4 text-slate-400">
+                      <td className="py-3.5 px-4 text-slate-600 dark:text-slate-400">
                         {entry.timeTaken}s
                       </td>
 
                       {/* Date */}
-                      <td className="py-3.5 px-4 text-right text-slate-400 font-sans text-xs">
+                      <td className="py-3.5 px-4 text-right text-slate-500 dark:text-slate-400 font-sans text-xs">
                         {entry.date}
                       </td>
                     </tr>
@@ -295,80 +322,84 @@ export const ProfilePage: React.FC<UserPageProps> = ({ onNavigate }) => {
   return (
     <div id="user-profile-page" className="w-full max-w-4xl mx-auto py-8 px-4 sm:px-6 space-y-8">
       {/* Profile Header Card */}
-      <div className="p-6 sm:p-8 rounded-3xl bg-slate-900/90 border border-slate-800 shadow-xl flex flex-col sm:flex-row items-center gap-6">
-        <div className="w-20 h-20 rounded-3xl bg-gradient-to-tr from-emerald-600 to-cyan-500 text-slate-950 flex items-center justify-center text-3xl font-extrabold shadow-lg shadow-emerald-500/20">
+      <div className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-md flex flex-col sm:flex-row items-center gap-6">
+        <div className="w-20 h-20 rounded-3xl bg-gradient-to-tr from-[#1e3a8a] to-blue-600 text-white flex items-center justify-center text-3xl font-extrabold shadow-md">
           {user.displayName.charAt(0).toUpperCase()}
         </div>
 
         <div className="flex-1 text-center sm:text-left space-y-1">
           <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
-            <h1 className="text-2xl font-bold text-slate-100">{user.displayName}</h1>
-            <span className="px-2.5 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-mono font-bold">
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{user.displayName}</h1>
+            <span className="px-2.5 py-0.5 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-xs font-mono font-bold">
               Level {levelInfo.level}
             </span>
           </div>
-          <p className="text-xs text-slate-400">{user.email}</p>
-          <p className="text-xs text-slate-300 italic pt-1 max-w-lg">{user.bio || 'Touch typing enthusiast.'}</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">{user.email}</p>
+          <p className="text-xs text-slate-700 dark:text-slate-300 italic pt-1 max-w-lg">{user.bio || 'Touch typing enthusiast.'}</p>
         </div>
 
-        <div className="flex flex-col items-center p-3 rounded-2xl bg-slate-950 border border-slate-800 min-w-[140px]">
-          <span className="text-[10px] uppercase font-semibold text-slate-400">Streak</span>
-          <div className="flex items-center gap-1.5 text-amber-400 font-mono font-bold text-xl">
-            <Flame className="w-5 h-5 fill-amber-400/30 text-amber-400" />
+        <div className="flex flex-col items-center p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 min-w-[140px] shadow-xs">
+          <span className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400">Streak</span>
+          <div className="flex items-center gap-1.5 text-amber-500 font-mono font-bold text-xl">
+            <Flame className="w-5 h-5 fill-amber-500/30 text-amber-500" />
             <span>{user.currentStreak || 0} Days</span>
           </div>
         </div>
       </div>
 
-      {/* Lifetime Performance Grid */}
+      {/* Lifetime Performance Grid (User Stat Overview Cards: Clean white/cream surfaces with bold navy titles) */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 text-center">
-          <span className="text-[10px] uppercase font-bold text-slate-400">Best Net Speed</span>
-          <p className="text-2xl font-mono font-bold text-emerald-400 pt-1">{stats.bestNetWpm} WPM</p>
+        <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-center shadow-sm">
+          <span className="text-[11px] uppercase font-bold text-[#1e3a8a] dark:text-blue-400 tracking-wider">Top Speed</span>
+          <p className="text-2xl font-mono font-bold text-slate-900 dark:text-slate-100 pt-1">{stats.bestNetWpm} <span className="text-xs font-normal text-slate-500">WPM</span></p>
+          <span className="text-[10px] text-slate-500 dark:text-slate-400">Peak net speed</span>
         </div>
 
-        <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 text-center">
-          <span className="text-[10px] uppercase font-bold text-slate-400">Best Accuracy</span>
-          <p className="text-2xl font-mono font-bold text-cyan-400 pt-1">{stats.bestAccuracy}%</p>
+        <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-center shadow-sm">
+          <span className="text-[11px] uppercase font-bold text-[#1e3a8a] dark:text-blue-400 tracking-wider">Average Speed</span>
+          <p className="text-2xl font-mono font-bold text-slate-900 dark:text-slate-100 pt-1">{stats.averageNetWpm} <span className="text-xs font-normal text-slate-500">WPM</span></p>
+          <span className="text-[10px] text-slate-500 dark:text-slate-400">Lifetime average</span>
         </div>
 
-        <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 text-center">
-          <span className="text-[10px] uppercase font-bold text-slate-400">Total Practice</span>
-          <p className="text-2xl font-mono font-bold text-slate-200 pt-1">{formatTotalTime(stats.totalPracticeTimeSeconds)}</p>
+        <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-center shadow-sm">
+          <span className="text-[11px] uppercase font-bold text-[#1e3a8a] dark:text-blue-400 tracking-wider">Total Tests</span>
+          <p className="text-2xl font-mono font-bold text-slate-900 dark:text-slate-100 pt-1">{stats.totalTestsCompleted}</p>
+          <span className="text-[10px] text-slate-500 dark:text-slate-400">Completed tests</span>
         </div>
 
-        <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 text-center">
-          <span className="text-[10px] uppercase font-bold text-slate-400">Badges Claimed</span>
-          <p className="text-2xl font-mono font-bold text-amber-400 pt-1">{unlockedAchievementIds.length}</p>
+        <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-center shadow-sm">
+          <span className="text-[11px] uppercase font-bold text-[#1e3a8a] dark:text-blue-400 tracking-wider">Accuracy & Badges</span>
+          <p className="text-2xl font-mono font-bold text-slate-900 dark:text-slate-100 pt-1">{stats.averageAccuracy}%</p>
+          <span className="text-[10px] text-slate-500 dark:text-slate-400">{unlockedAchievementIds.length} Badges Unlocked</span>
         </div>
       </div>
 
       {/* Official Verified Certification Status */}
-      <div className="p-6 rounded-2xl bg-gradient-to-br from-slate-900 via-slate-900/90 to-slate-950 border border-slate-800 space-y-4">
+      <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 border ${
               stats.bestNetWpm >= 70 && stats.bestAccuracy >= 98
-                ? 'bg-cyan-500/15 border-cyan-400 text-cyan-300'
+                ? 'bg-blue-50 dark:bg-cyan-500/15 border-blue-300 dark:border-cyan-400 text-[#1e3a8a] dark:text-cyan-300'
                 : stats.bestNetWpm >= 50 && stats.bestAccuracy >= 97
-                ? 'bg-amber-500/15 border-amber-400 text-amber-300'
+                ? 'bg-amber-50 dark:bg-amber-500/15 border-amber-300 dark:border-amber-400 text-amber-600 dark:text-amber-300'
                 : stats.bestNetWpm >= 30 && stats.bestAccuracy >= 95
-                ? 'bg-slate-700/50 border-slate-400 text-slate-200'
-                : 'bg-slate-800/40 border-slate-700 text-slate-500'
+                ? 'bg-slate-100 dark:bg-slate-700/50 border-slate-300 dark:border-slate-400 text-slate-800 dark:text-slate-200'
+                : 'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700 text-slate-400'
             }`}>
               <ShieldCheck className="w-6 h-6" />
             </div>
             <div className="space-y-0.5">
               <div className="flex items-center gap-2">
-                <h3 className="text-sm font-bold text-slate-100">SmartTyping Pro Official Certification</h3>
+                <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">SmartTyping Pro Official Certification</h3>
                 <span className={`text-[10px] font-mono px-2 py-0.5 rounded font-bold uppercase ${
                   stats.bestNetWpm >= 70 && stats.bestAccuracy >= 98
-                    ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
+                    ? 'bg-blue-500/20 text-[#1e3a8a] dark:text-cyan-300 border border-blue-500/30'
                     : stats.bestNetWpm >= 50 && stats.bestAccuracy >= 97
-                    ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                    ? 'bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/30'
                     : stats.bestNetWpm >= 30 && stats.bestAccuracy >= 95
-                    ? 'bg-slate-700 text-slate-200 border border-slate-600'
-                    : 'bg-slate-800 text-slate-400 border border-slate-700'
+                    ? 'bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-600'
+                    : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700'
                 }`}>
                   {stats.bestNetWpm >= 70 && stats.bestAccuracy >= 98
                     ? 'Platinum Tier Master'
@@ -379,7 +410,7 @@ export const ProfilePage: React.FC<UserPageProps> = ({ onNavigate }) => {
                     : 'Benchmark Pending'}
                 </span>
               </div>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-slate-600 dark:text-slate-400">
                 Official verified certificates with holographic seal, time matrix, and security hash are awarded on speed tests with ≥30 Net WPM & ≥95% Accuracy.
               </p>
             </div>
@@ -387,7 +418,7 @@ export const ProfilePage: React.FC<UserPageProps> = ({ onNavigate }) => {
 
           <button
             onClick={() => onNavigate('typing-test')}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs shadow-md transition-all self-start sm:self-auto shrink-0"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#1e3a8a] hover:bg-[#172554] text-white font-bold text-xs shadow-md transition-all self-start sm:self-auto shrink-0 cursor-pointer"
           >
             <Zap className="w-3.5 h-3.5" />
             <span>Take Speed Test</span>
@@ -395,34 +426,73 @@ export const ProfilePage: React.FC<UserPageProps> = ({ onNavigate }) => {
         </div>
       </div>
 
+      {/* Recent Activity List with clear borders and high-contrast text */}
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-4">
+        <div className="flex justify-between items-center">
+          <div>
+            <h2 className="text-base font-bold text-slate-900 dark:text-slate-100">Recent User Activity</h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400">Latest completed typing and drill sessions</p>
+          </div>
+          <button
+            onClick={() => onNavigate('progress')}
+            className="text-xs text-[#1e3a8a] dark:text-emerald-400 font-semibold hover:underline cursor-pointer"
+          >
+            Full Analytics &rarr;
+          </button>
+        </div>
+
+        {stats.recentResults.length === 0 ? (
+          <p className="text-xs text-slate-500 py-4 text-center">No recent sessions recorded yet.</p>
+        ) : (
+          <div className="divide-y divide-slate-200 dark:divide-slate-800/80">
+            {stats.recentResults.slice(0, 5).map((session) => (
+              <div key={session.id} className="py-3 flex items-center justify-between text-xs">
+                <div className="space-y-0.5">
+                  <span className="font-bold text-slate-900 dark:text-slate-100">
+                    {session.lessonTitle || session.mode.replace('_', ' ').toUpperCase()}
+                  </span>
+                  <div className="text-[11px] text-slate-500 dark:text-slate-400">
+                    {new Date(session.completedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 font-mono">
+                  <span className="font-bold text-[#1e3a8a] dark:text-emerald-400">{session.netWpm} WPM</span>
+                  <span className="text-slate-600 dark:text-slate-400">{session.accuracy}% Acc</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
       {/* Profile Edit Form */}
-      <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-lg space-y-4">
-        <h2 className="text-base font-bold text-slate-100">Edit Profile Details</h2>
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-4">
+        <h2 className="text-base font-bold text-slate-900 dark:text-slate-100">Edit Profile Details</h2>
         <form onSubmit={handleSaveProfile} className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5">Display Name</label>
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Display Name</label>
             <input
               type="text"
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
-              className="w-full px-4 py-2 rounded-xl bg-slate-950 border border-slate-800 focus:border-emerald-500 text-sm text-slate-100 focus:outline-none"
+              className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 focus:border-[#1e3a8a] focus:ring-1 focus:ring-[#1e3a8a] text-sm text-slate-900 dark:text-slate-100 focus:outline-none"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5">Bio</label>
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Bio</label>
             <textarea
               rows={3}
               value={bio}
               onChange={(e) => setBio(e.target.value)}
-              className="w-full p-3 rounded-xl bg-slate-950 border border-slate-800 focus:border-emerald-500 text-xs text-slate-100 focus:outline-none resize-none"
+              className="w-full p-3 rounded-xl bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 focus:border-[#1e3a8a] focus:ring-1 focus:ring-[#1e3a8a] text-xs text-slate-900 dark:text-slate-100 focus:outline-none resize-none"
             />
           </div>
 
           <div className="flex items-center justify-between pt-2">
             <button
               type="submit"
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs shadow-md transition-colors"
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#1e3a8a] hover:bg-[#172554] text-white font-bold text-xs shadow-md transition-colors cursor-pointer"
             >
               <Save className="w-3.5 h-3.5" />
               <span>{savedMessage ? 'Profile Updated!' : 'Save Changes'}</span>
@@ -431,7 +501,7 @@ export const ProfilePage: React.FC<UserPageProps> = ({ onNavigate }) => {
             <button
               type="button"
               onClick={handleExportData}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-300 text-xs font-medium border border-slate-700 transition-colors"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-750 text-slate-800 dark:text-slate-300 text-xs font-medium border border-slate-300 dark:border-slate-700 transition-colors cursor-pointer"
             >
               <Download className="w-3.5 h-3.5" />
               <span>Export Typing Data (JSON)</span>

@@ -1033,30 +1033,31 @@ export const LessonViewPage: React.FC<LessonViewPageProps> = ({ lesson, onNaviga
               <>
                 <button
                   onClick={handleAdvanceNextStep}
-                  className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs shadow-md transition-transform hover:scale-105 cursor-pointer"
+                  className="flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#1e3a8a] hover:bg-[#172554] text-white font-semibold text-xs shadow-md transition-all cursor-pointer"
                 >
                   <span>Advance to Step {stepVerdict.stepIndex + 2}</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
                 <button
                   onClick={handleRetryCurrentStep}
-                  className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-300 text-xs font-medium border border-slate-700 cursor-pointer"
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-white hover:bg-slate-100 text-slate-800 border-2 border-slate-300 font-semibold text-xs shadow-sm transition-all cursor-pointer"
                 >
-                  Retry Step {stepVerdict.stepIndex + 1}
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span>Retry Step {stepVerdict.stepIndex + 1}</span>
                 </button>
               </>
             ) : (
               <>
                 <button
                   onClick={handleRetryCurrentStep}
-                  className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs shadow-md transition-transform hover:scale-105 cursor-pointer"
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-white hover:bg-slate-100 text-slate-800 border-2 border-slate-300 font-semibold text-xs shadow-sm transition-all cursor-pointer"
                 >
                   <RotateCcw className="w-3.5 h-3.5" />
                   <span>Retry Step {stepVerdict.stepIndex + 1}</span>
                 </button>
                 <button
                   onClick={() => onNavigate('learn')}
-                  className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-300 text-xs font-medium border border-slate-700 cursor-pointer"
+                  className="px-5 py-2.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 font-semibold text-xs shadow-sm transition-all cursor-pointer"
                 >
                   Back to Catalog
                 </button>
@@ -1135,7 +1136,7 @@ export const LessonViewPage: React.FC<LessonViewPageProps> = ({ lesson, onNaviga
           <div className="flex flex-wrap justify-center items-center gap-3 pt-2">
             <button
               onClick={handleRetryLesson}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-200 text-xs font-semibold border border-slate-700 cursor-pointer"
+              className="bg-white hover:bg-slate-100 text-slate-800 border-2 border-slate-300 font-semibold px-5 py-2.5 rounded-lg shadow-sm flex items-center gap-2 transition-all cursor-pointer text-xs"
             >
               <RotateCcw className="w-3.5 h-3.5" />
               <span>Retry Lesson (Step 1)</span>
@@ -1144,7 +1145,7 @@ export const LessonViewPage: React.FC<LessonViewPageProps> = ({ lesson, onNaviga
             {isOverallPassed && nextLesson && (
               <button
                 onClick={handleNextLesson}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs shadow-md cursor-pointer"
+                className="bg-[#1e3a8a] hover:bg-[#172554] text-white font-semibold px-6 py-2.5 rounded-lg shadow-md transition-all flex items-center gap-2 cursor-pointer text-xs"
               >
                 <span>Next Lesson ({nextLesson.order})</span>
                 <ArrowRight className="w-4 h-4" />
@@ -1153,7 +1154,7 @@ export const LessonViewPage: React.FC<LessonViewPageProps> = ({ lesson, onNaviga
 
             <button
               onClick={() => onNavigate('learn')}
-              className="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-850 text-slate-300 text-xs font-medium border border-slate-800 cursor-pointer"
+              className="bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 font-semibold px-5 py-2.5 rounded-lg shadow-sm transition-all cursor-pointer text-xs"
             >
               Back to Catalog
             </button>

@@ -784,69 +784,70 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
 
   const isLessonMode = mode === 'lesson';
 
+  // Compute word-by-word structure for text legibility, Practice Mode, and Sonma layouts
+  const parsedWords = React.useMemo(() => {
+    const words: Array<{
+      wordIndex: number;
+      startIndex: number;
+      endIndex: number;
+      chars: typeof charDetails;
+      hasNewlineAfter: boolean;
+      hasError: boolean;
+    }> = [];
+
+    let currentWordChars: typeof charDetails = [];
+    let currentStartIndex = 0;
+
+    for (let i = 0; i < charDetails.length; i++) {
+      const detail = charDetails[i];
+      if (detail.expected === ' ' || detail.expected === '\n') {
+        if (currentWordChars.length > 0) {
+          const hasErr = currentWordChars.some(c => c.state === 'incorrect');
+          words.push({
+            wordIndex: words.length,
+            startIndex: currentStartIndex,
+            endIndex: i - 1,
+            chars: currentWordChars,
+            hasNewlineAfter: detail.expected === '\n',
+            hasError: hasErr,
+          });
+          currentWordChars = [];
+        }
+        currentStartIndex = i + 1;
+      } else {
+        if (currentWordChars.length === 0) {
+          currentStartIndex = i;
+        }
+        currentWordChars.push(detail);
+      }
+    }
+
+    if (currentWordChars.length > 0) {
+      const hasErr = currentWordChars.some(c => c.state === 'incorrect');
+      words.push({
+        wordIndex: words.length,
+        startIndex: currentStartIndex,
+        endIndex: charDetails.length - 1,
+        chars: currentWordChars,
+        hasNewlineAfter: false,
+        hasError: hasErr,
+      });
+    }
+
+    return words;
+  }, [charDetails]);
+
+  // Find which word is currently active
+  const activeWordIndex = React.useMemo(() => {
+    if (parsedWords.length === 0) return 0;
+    const idx = parsedWords.findIndex(w => cursorIndex <= w.endIndex + 1);
+    return idx !== -1 ? idx : parsedWords.length - 1;
+  }, [parsedWords, cursorIndex]);
+
   // ==================== AUTHENTIC SONMA 2-BOX EXAM ARENA LAYOUT ====================
   if (isSonmaLayout) {
     const formattedCandidateName = candidateName || (user?.displayName && user.displayName !== 'Guest' ? user.displayName : 'Typing Candidate');
-
-    // Compute word-by-word structure for authentic Sonma top reference box
-    const sonmaWords = React.useMemo(() => {
-      const words: Array<{
-        wordIndex: number;
-        startIndex: number;
-        endIndex: number;
-        chars: typeof charDetails;
-        hasNewlineAfter: boolean;
-        hasError: boolean;
-      }> = [];
-
-      let currentWordChars: typeof charDetails = [];
-      let currentStartIndex = 0;
-
-      for (let i = 0; i < charDetails.length; i++) {
-        const detail = charDetails[i];
-        if (detail.expected === ' ' || detail.expected === '\n') {
-          if (currentWordChars.length > 0) {
-            const hasErr = currentWordChars.some(c => c.state === 'incorrect');
-            words.push({
-              wordIndex: words.length,
-              startIndex: currentStartIndex,
-              endIndex: i - 1,
-              chars: currentWordChars,
-              hasNewlineAfter: detail.expected === '\n',
-              hasError: hasErr,
-            });
-            currentWordChars = [];
-          }
-          currentStartIndex = i + 1;
-        } else {
-          if (currentWordChars.length === 0) {
-            currentStartIndex = i;
-          }
-          currentWordChars.push(detail);
-        }
-      }
-
-      if (currentWordChars.length > 0) {
-        const hasErr = currentWordChars.some(c => c.state === 'incorrect');
-        words.push({
-          wordIndex: words.length,
-          startIndex: currentStartIndex,
-          endIndex: charDetails.length - 1,
-          chars: currentWordChars,
-          hasNewlineAfter: false,
-          hasError: hasErr,
-        });
-      }
-
-      return words;
-    }, [charDetails]);
-
-    // Find which word is currently active
-    const activeWordIndex = React.useMemo(() => {
-      if (sonmaWords.length === 0) return 0;
-      const idx = sonmaWords.findIndex(w => cursorIndex <= w.endIndex + 1);
-      return idx !== -1 ? idx : sonmaWords.length - 1;
-    }, [sonmaWords, cursorIndex]);
+    const sonmaWords = parsedWords;
 
     return (
       <div 
@@ -1177,6 +1178,406 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
             )}
           </div>
         </div>
+      </div>
+    );
+  }
+
+  // ==================== PRACTICE MODE LAYOUT (WARM IVORY & SAPPHIRE NAVY) ====================
+  if (!isLessonMode) {
+    return (
+      <div 
+        id="practice-arena-outer-frame" 
+        onClick={() => containerRef.current?.focus()}
+        className="w-full border-4 border-[#1e3a8a] bg-[#f8fafc] rounded-2xl shadow-xl ring-1 ring-[#d97706]/30 overflow-hidden select-none p-4 sm:p-5 space-y-4"
+      >
+        {/* Top Controls & KPI Dashboard Bar (Warm Ivory & Sapphire) */}
+        <div 
+          id="practice-stats-dashboard"
+          className="w-full bg-[#fffdf5] dark:bg-[#fffdf5] border-2 border-[#e2d9c8] rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-xs flex flex-wrap items-center justify-between gap-2.5 sm:gap-3 transition-colors text-[#1e293b]"
+        >
+          {/* Left: Mode / Drill Info */}
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 sm:p-2 rounded-xl bg-[#1e3a8a]/10 border border-[#1e3a8a]/20 text-[#1e3a8a]">
+              <Flame className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#1e3a8a]" />
+            </div>
+            <div>
+              <h2 className="text-xs sm:text-sm font-bold text-[#1e3a8a]">
+                PRACTICE ARENA & DRILLS
+              </h2>
+              <p className="text-[10px] sm:text-[11px] text-[#64748b] font-medium">
+                {isStarted ? 'Live Practice Session' : 'Press any key to begin practice'}
+              </p>
+            </div>
+          </div>
+
+          {/* Center: Live Stats Badges */}
+          <div className="flex items-center gap-2.5 sm:gap-4">
+            {/* Timer */}
+            <div className="flex items-center gap-1">
+              <TimerIcon className="w-3.5 h-3.5 text-[#1e3a8a]" />
+              <div className="text-right">
+                <span className="text-[8px] sm:text-[9px] uppercase font-bold text-[#64748b] block leading-none">Time</span>
+                <span className="text-sm sm:text-base font-mono font-bold text-[#1e293b]">
+                  {isTimedMode ? formatDuration(timeLeft) : formatDuration(elapsedSeconds)}
+                </span>
+              </div>
+            </div>
+
+            <div className="h-6 w-px bg-[#e2d9c8]" />
+
+            {/* Net WPM */}
+            <div className="flex items-center gap-1">
+              <div className="text-right">
+                <span className="text-[8px] sm:text-[9px] uppercase font-bold text-[#64748b] block leading-none">Net WPM</span>
+                <span className="text-sm sm:text-lg font-mono font-bold text-[#059669]">{Math.round(liveNetWpm)}</span>
+              </div>
+            </div>
+
+            <div className="h-6 w-px bg-[#e2d9c8]" />
+
+            {/* Accuracy */}
+            <div className="flex items-center gap-1">
+              <Target className="w-3 h-3 text-[#0284c7]" />
+              <div className="text-right">
+                <span className="text-[8px] sm:text-[9px] uppercase font-bold text-[#64748b] block leading-none">Accuracy</span>
+                <span className="text-sm sm:text-base font-mono font-bold text-[#0284c7]">{liveAccuracy}%</span>
+              </div>
+            </div>
+
+            <div className="h-6 w-px bg-[#e2d9c8]" />
+
+            {/* Progress */}
+            <div className="hidden sm:flex flex-col items-end">
+              <span className="text-[8px] sm:text-[9px] uppercase font-bold text-[#64748b] block leading-none">Progress</span>
+              <span className="text-[11px] sm:text-xs font-mono font-semibold text-[#1e293b]">{progressPercent}%</span>
+            </div>
+          </div>
+
+          {/* Right: Controls & Toggles */}
+          <div className="flex items-center gap-1">
+            {/* Display Mode Toggle (Boxes / Flow) */}
+            <button
+              id="practice-toggle-display-style-btn"
+              onClick={(e) => { e.stopPropagation(); setDisplayStyle(prev => prev === 'cards' ? 'continuous' : 'cards'); }}
+              title={displayStyle === 'cards' ? 'Switch to Continuous Text Flow' : 'Switch to Character Boxes'}
+              className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-white border border-[#e2d9c8] text-xs font-semibold text-[#1e293b] hover:bg-[#fffdf5] transition-colors shadow-2xs cursor-pointer"
+            >
+              {displayStyle === 'cards' ? <LayoutGrid className="w-3 h-3 text-[#1e3a8a]" /> : <AlignLeft className="w-3 h-3 text-[#1e3a8a]" />}
+              <span className="hidden sm:inline">{displayStyle === 'cards' ? 'Boxes' : 'Flow'}</span>
+            </button>
+
+            {/* Sound Toggle */}
+            <button
+              id="practice-toggle-sound-btn"
+              onClick={(e) => { e.stopPropagation(); setSoundEnabled(!settings.soundEnabled); }}
+              title={settings.soundEnabled ? 'Mute Key Sound' : 'Enable Key Sound'}
+              className={`p-1.5 rounded-lg border transition-colors shadow-2xs cursor-pointer ${
+                settings.soundEnabled 
+                  ? 'bg-[#1e3a8a]/10 border-[#1e3a8a]/30 text-[#1e3a8a]' 
+                  : 'bg-white border-[#e2d9c8] text-[#94a3b8] hover:text-[#1e293b]'
+              }`}
+            >
+              {settings.soundEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
+            </button>
+
+            {/* Keyboard Toggle */}
+            <button
+              id="practice-toggle-keyboard-btn"
+              onClick={(e) => { e.stopPropagation(); setShowVirtualKeyboard(!settings.showVirtualKeyboard); }}
+              title={settings.showVirtualKeyboard ? 'Hide On-Screen Keyboard' : 'Show On-Screen Keyboard'}
+              className={`p-1.5 rounded-lg border transition-colors shadow-2xs cursor-pointer ${
+                settings.showVirtualKeyboard 
+                  ? 'bg-[#1e3a8a]/10 border-[#1e3a8a]/30 text-[#1e3a8a]' 
+                  : 'bg-white border-[#e2d9c8] text-[#94a3b8] hover:text-[#1e293b]'
+              }`}
+            >
+              <Keyboard className="w-3.5 h-3.5" />
+            </button>
+
+            {/* Blind Mode Toggle */}
+            <button
+              id="practice-toggle-blind-mode-btn"
+              onClick={(e) => { e.stopPropagation(); setBlindModeActive(!blindModeActive); }}
+              title={blindModeActive ? 'Disable Blind Mode' : 'Enable Blind Mode'}
+              className={`p-1.5 rounded-lg border transition-colors shadow-2xs cursor-pointer ${
+                blindModeActive 
+                  ? 'bg-amber-100 border-amber-300 text-amber-800' 
+                  : 'bg-white border-[#e2d9c8] text-[#94a3b8] hover:text-[#1e293b]'
+              }`}
+            >
+              {blindModeActive ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+            </button>
+
+            {/* Manual Restart */}
+            <button
+              id="practice-restart-test-btn"
+              onClick={(e) => { e.stopPropagation(); handleManualRestart(); }}
+              title="Restart Practice (or press Tab / Esc)"
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-white hover:bg-[#fffdf5] text-[#1e293b] border border-[#e2d9c8] text-xs font-semibold transition-colors shadow-2xs cursor-pointer"
+            >
+              <RotateCcw className="w-3 h-3 text-[#1e3a8a]" />
+              <span className="hidden sm:inline">Restart</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Paste Blocked Toast */}
+        {pasteBlockedWarning && (
+          <div 
+            id="practice-paste-warning-banner"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-600 text-xs font-medium animate-bounce shadow-md"
+          >
+            <AlertTriangle className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+            <span>Clipboard paste is disabled to ensure authentic keystroke tracking & accuracy metrics.</span>
+          </div>
+        )}
+
+        {/* Target Key Prompt / Finger Guidance Bar (Warm Ivory & Sapphire) */}
+        {settings.showVirtualKeyboard && (
+          <div 
+            id="typing-target-key-guide"
+            className="flex flex-wrap items-center justify-between gap-2 px-3.5 sm:px-4 py-2 bg-[#fffdf5] dark:bg-[#fffdf5] border-2 border-[#e2d9c8] rounded-xl shadow-xs text-xs text-[#1e293b]"
+          >
+            <div className="flex items-center gap-2 font-medium text-[#1e293b]">
+              <span className="text-[#64748b] font-semibold">Type:</span>
+              <span className="font-mono font-extrabold px-2 py-0.5 rounded-md bg-[#1e3a8a]/10 text-[#1e3a8a] border border-[#1e3a8a]/30 text-xs sm:text-sm shadow-2xs">
+                {fingerGuide.targetDisplay}
+              </span>
+              <span className="text-[#cbd5e1]">|</span>
+              <span className="text-[#64748b]">Finger:</span>
+              <span className="font-semibold text-[#1e3a8a]">
+                {fingerGuide.handName} - {fingerGuide.fingerName}
+              </span>
+            </div>
+
+            <div className="hidden sm:flex items-center gap-1.5 text-xs text-[#64748b] font-mono">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#d97706] inline-block" />
+              <span className="hidden md:inline font-semibold">Home Row:</span>
+              <span>ASDF JKL;</span>
+            </div>
+          </div>
+        )}
+
+        {/* Main Interactive Typing Container (Warm Ivory & Serif Typography) */}
+        <div
+          id="typing-focus-container"
+          ref={containerRef}
+          onPaste={handlePaste}
+          className={`
+            relative w-full min-h-[170px] max-h-[290px] p-4 sm:p-6
+            overflow-y-auto scrollbar-clean scroll-smooth
+            bg-[#fffdf5] dark:bg-[#fffdf5] text-[#1e293b]
+            border-2 border-[#e2d9c8] rounded-xl sm:rounded-2xl
+            shadow-md transition-all duration-150
+            select-none outline-none cursor-text
+            ${isStarted && !isFinished ? 'ring-2 ring-[#2563eb]/20' : ''}
+          `}
+          tabIndex={0}
+        >
+          {!isStarted && (
+            <div className="absolute top-2.5 right-3 text-[11px] font-sans text-[#64748b] bg-[#f1f5f9] px-2.5 py-0.5 rounded-md border border-[#e2d9c8] pointer-events-none font-semibold">
+              Press any key to start practice
+            </div>
+          )}
+
+          {/* 1. COMPACT CHARACTER BOXES (If toggled) */}
+          {displayStyle === 'cards' ? (
+            <div 
+              id="practice-character-boxes-grid"
+              className="flex flex-wrap items-center gap-1.5 sm:gap-2 py-1"
+            >
+              {charDetails.map((detail, index) => {
+                const isCurrent = index === cursorIndex;
+                const isSpace = detail.expected === ' ';
+                const isNewline = detail.expected === '\n';
+
+                if (isNewline) {
+                  return (
+                    <div key={index} className="w-full my-1.5 border-t border-dashed border-[#e2d9c8] flex items-center pt-1">
+                      <span className="text-[9px] font-mono font-bold text-[#1e3a8a] bg-[#1e3a8a]/10 border border-[#1e3a8a]/20 px-2 py-0.5 rounded">
+                        ↵ New Paragraph
+                      </span>
+                    </div>
+                  );
+                }
+
+                if (isSpace) {
+                  return (
+                    <div
+                      key={index}
+                      ref={isCurrent ? activeCharRef : null}
+                      id={`practice-letter-space-card-${index}`}
+                      className={`
+                        relative flex items-center justify-center
+                        ${cardSizes.spaceBox} rounded-lg ${cardSizes.spaceText} uppercase font-mono font-bold
+                        transition-all duration-75 select-none
+                        ${
+                          detail.state === 'correct' || detail.state === 'corrected'
+                            ? 'bg-emerald-50 border border-emerald-400 text-emerald-700'
+                            : detail.state === 'incorrect'
+                            ? 'bg-rose-50 border border-rose-400 text-rose-700'
+                            : isCurrent
+                            ? 'bg-blue-50 border-2 border-[#2563eb] text-[#1d4ed8] ring-2 ring-[#2563eb]/30 scale-105 shadow-2xs'
+                            : 'bg-slate-100 border border-dashed border-[#e2d9c8] text-[#64748b]'
+                        }
+                      `}
+                    >
+                      <span>SPACE</span>
+                      {(detail.state === 'correct' || detail.state === 'corrected') && !blindModeActive && (
+                        <Check className="w-2.5 h-2.5 text-emerald-600 stroke-[3] absolute top-0.5 right-0.5" />
+                      )}
+                      {detail.state === 'incorrect' && !blindModeActive && (
+                        <span className="text-[8px] font-extrabold text-rose-600 absolute top-0.5 right-0.5">✕</span>
+                      )}
+                      {renderCardCaret(isCurrent)}
+                    </div>
+                  );
+                }
+
+                return (
+                  <div
+                    key={index}
+                    ref={isCurrent ? activeCharRef : null}
+                    id={`practice-letter-card-${index}`}
+                    className={`
+                      relative flex items-center justify-center
+                      ${cardSizes.charBox} rounded-lg ${cardSizes.charText} font-mono font-bold
+                      transition-all duration-75 select-none shadow-2xs
+                      ${
+                        detail.state === 'correct' || detail.state === 'corrected'
+                          ? 'bg-emerald-50 border border-emerald-400 text-emerald-700'
+                          : detail.state === 'incorrect'
+                          ? 'bg-rose-50 border border-rose-400 text-rose-700'
+                          : isCurrent
+                          ? 'bg-blue-50 border-2 border-[#2563eb] text-[#1d4ed8] ring-2 ring-[#2563eb]/30 scale-105 shadow-2xs'
+                          : 'bg-white border border-[#e2d9c8] text-[#1e293b]'
+                      }
+                    `}
+                  >
+                    <span className="leading-none">{detail.expected}</span>
+                    {(detail.state === 'correct' || detail.state === 'corrected') && !blindModeActive && (
+                      <Check className="w-2.5 h-2.5 text-emerald-600 stroke-[3] absolute top-0.5 right-0.5" />
+                    )}
+                    {detail.state === 'incorrect' && !blindModeActive && (
+                      <span className="text-[8px] font-extrabold text-rose-600 absolute top-0.5 right-0.5">✕</span>
+                    )}
+                    {renderCardCaret(isCurrent)}
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            /* 2. CONTINUOUS FLOW (Warm Ivory & Serif 19px Typography) */
+            <div 
+              id="practice-continuous-text-display"
+              className="font-serif text-[19px] leading-[1.85] text-left tracking-normal whitespace-pre-wrap select-none outline-none py-1.5 text-[#1e293b]"
+              style={{ wordBreak: 'normal', overflowWrap: 'break-word', fontFamily: 'Georgia, "Times New Roman", Times, serif' }}
+            >
+              {parsedWords.length > 0 ? (
+                parsedWords.map((word) => {
+                  const isPast = word.wordIndex < activeWordIndex;
+                  const isCurrent = word.wordIndex === activeWordIndex;
+                  const isUpcoming = word.wordIndex > activeWordIndex;
+
+                  let wordColorClass = 'text-[#1e293b]'; // Upcoming
+                  if (isPast) {
+                    wordColorClass = word.hasError && !blindModeActive ? 'text-[#b45309]' : 'text-[#64748b]';
+                  } else if (isCurrent) {
+                    wordColorClass = 'text-[#1d4ed8] border-b-2 border-[#2563eb] font-medium pb-0.5';
+                  }
+
+                  return (
+                    <React.Fragment key={word.wordIndex}>
+                      <span className={`inline-block transition-colors duration-75 ${wordColorClass} mr-2`}>
+                        {word.chars.map((charDetail, charIdxInWord) => {
+                          const absoluteCharIndex = word.startIndex + charIdxInWord;
+                          const isCharCurrent = absoluteCharIndex === cursorIndex;
+
+                          let charErrorStyle = '';
+                          if (!blindModeActive && charDetail.state === 'incorrect') {
+                            charErrorStyle = 'text-rose-600 bg-rose-500/10 underline decoration-rose-500 font-semibold';
+                          }
+
+                          return (
+                            <span
+                              key={absoluteCharIndex}
+                              ref={isCharCurrent ? activeCharRef : null}
+                              className={`relative inline-block ${charErrorStyle}`}
+                            >
+                              {renderContinuousCaret(isCharCurrent)}
+                              {charDetail.expected}
+                            </span>
+                          );
+                        })}
+                      </span>
+
+                      {/* Inter-word space caret if cursor is on the trailing space */}
+                      {(() => {
+                        const spaceIndex = word.endIndex + 1;
+                        if (spaceIndex < charDetails.length && charDetails[spaceIndex]?.expected === ' ') {
+                          const isSpaceCurrent = spaceIndex === cursorIndex;
+                          return (
+                            <span
+                              key={`space-${word.wordIndex}`}
+                              ref={isSpaceCurrent ? activeCharRef : null}
+                              className="relative inline-block"
+                            >
+                              {renderContinuousCaret(isSpaceCurrent)}
+                            </span>
+                          );
+                        }
+                        return null;
+                      })()}
+
+                      {/* Paragraph line break */}
+                      {word.hasNewlineAfter && (
+                        <span className="block my-2.5 border-t border-dashed border-[#e2d9c8] pt-1">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-xs font-serif bg-[#e2d9c8]/60 text-[#1e3a8a]">
+                            ↵ Next Paragraph
+                          </span>
+                        </span>
+                      )}
+                    </React.Fragment>
+                  );
+                })
+              ) : (
+                charDetails.map((detail, index) => {
+                  const isCurrent = index === cursorIndex;
+                  return (
+                    <span
+                      key={index}
+                      ref={isCurrent ? activeCharRef : null}
+                      className="relative inline-block text-[#1e293b]"
+                    >
+                      {renderContinuousCaret(isCurrent)}
+                      {detail.expected === ' ' ? '\u00A0' : detail.expected}
+                    </span>
+                  );
+                })
+              )}
+            </div>
+          )}
+
+          {/* Progress indicator */}
+          <div className="absolute bottom-0 left-0 right-0 h-1 bg-[#e2d9c8] rounded-b-2xl overflow-hidden">
+            <div 
+              className="h-full bg-gradient-to-r from-[#1e3a8a] to-[#2563eb] transition-all duration-150"
+              style={{ width: `${progressPercent}%` }}
+            />
+          </div>
+        </div>
+
+        {/* Visual On-Screen Keyboard (Harmonized with Warm Ivory & Sapphire Theme) */}
+        {settings.showVirtualKeyboard && (
+          <div className="p-3 sm:p-4 bg-[#fffdf5] dark:bg-[#fffdf5] border-2 border-[#e2d9c8] rounded-xl sm:rounded-2xl shadow-xs">
+            <VirtualKeyboard 
+              currentExpectedChar={currentExpectedChar} 
+              onKeyPress={(k) => processKeyInput(k)}
+              hideFingerBadge={true}
+              compact={false}
+            />
+          </div>
+        )}
       </div>
     );
   }

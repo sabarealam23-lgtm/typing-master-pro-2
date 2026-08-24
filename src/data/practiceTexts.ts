@@ -1,6 +1,6 @@
 export interface PracticeTextItem {
   id: string;
-  category: 'quote' | 'literature' | 'code' | 'business' | 'pangram' | 'general';
+  category: 'quote' | 'literature' | 'code' | 'business' | 'simple' | 'pangram' | 'general';
   title: string;
   author?: string;
   text: string;
@@ -10,50 +10,16 @@ export interface PracticeTextItem {
 export interface ParagraphItem {
   id: string;
   title: string;
-  category: string;
+  category: 'Quote' | 'Literature' | 'Code' | 'Business' | 'Simple' | 'Pangram' | 'General';
   text: string;
   difficulty: 'easy' | 'medium' | 'hard';
   wordCount: number;
 }
 
 export const PRACTICE_TEXTS: PracticeTextItem[] = [
-  // ==================== PANGRAMS ====================
-  {
-    id: 'pt-1',
-    category: 'pangram',
-    title: 'The Classic Fox Pangram',
-    author: 'Traditional',
-    text: 'The quick brown fox jumps over the lazy dog. Pack my box with five dozen liquor jugs. How vexingly quick daft zebras jump! Sphinx of black quartz, judge my vow.',
-    difficulty: 'easy',
-  },
-  {
-    id: 'pt-pangram-2',
-    category: 'pangram',
-    title: 'Sphinx & Black Quartz',
-    author: 'Typing Drill',
-    text: 'Sphinx of black quartz, judge my vow! The five boxing wizards jump quickly. How razorback-jumping frogs can level six piqued gymnasts! Cozy sphinx waves back from jigsaw cliff.',
-    difficulty: 'easy',
-  },
-  {
-    id: 'pt-pangram-3',
-    category: 'pangram',
-    title: 'Jackdaws & Quartz Jewels',
-    author: 'Alphabet Master',
-    text: 'Jackdaws love my big sphinx of quartz. Six crazy kings vowed to quiz the lazy dwarf about prized jumping fox gems. Blowzy red night-frumps vexing quick pyx quaffers.',
-    difficulty: 'medium',
-  },
-  {
-    id: 'pt-pangram-4',
-    category: 'pangram',
-    title: 'Wizards & Quizzical Prizefights',
-    author: 'Keyboard Gymnast',
-    text: 'A quick movement of the enemy will jeopardize six gunboats. Crazy Frederick bought many very exquisite opal jewels. The job requires extra pluck and zeal from every young wage earner.',
-    difficulty: 'medium',
-  },
-
   // ==================== QUOTES ====================
   {
-    id: 'pt-2',
+    id: 'pt-quote-1',
     category: 'quote',
     title: 'Simplicity and Clarity',
     author: 'Steve Jobs',
@@ -61,9 +27,9 @@ export const PRACTICE_TEXTS: PracticeTextItem[] = [
     difficulty: 'medium',
   },
   {
-    id: 'pt-8',
+    id: 'pt-quote-2',
     category: 'quote',
-    title: 'Mastery and Discipline',
+    title: 'Mastery and Deliberate Practice',
     author: 'Bruce Lee',
     text: 'I fear not the man who has practiced ten thousand kicks once, but I fear the man who has practiced one kick ten thousand times. Consistency and deliberate focus surpass sporadic bursts of effort.',
     difficulty: 'easy',
@@ -87,7 +53,7 @@ export const PRACTICE_TEXTS: PracticeTextItem[] = [
   {
     id: 'pt-quote-5',
     category: 'quote',
-    title: 'Inner Sovereignty & Equilibrium',
+    title: 'Inner Sovereignty and Equilibrium',
     author: 'Marcus Aurelius',
     text: 'You have power over your mind, not outside events. Realize this, and you will find strength. The happiness of your life depends upon the quality of your thoughts.',
     difficulty: 'medium',
@@ -95,7 +61,7 @@ export const PRACTICE_TEXTS: PracticeTextItem[] = [
 
   // ==================== LITERATURE ====================
   {
-    id: 'pt-3',
+    id: 'pt-lit-1',
     category: 'literature',
     title: 'A Tale of Two Cities',
     author: 'Charles Dickens',
@@ -103,7 +69,7 @@ export const PRACTICE_TEXTS: PracticeTextItem[] = [
     difficulty: 'medium',
   },
   {
-    id: 'pt-7',
+    id: 'pt-lit-2',
     category: 'literature',
     title: 'The Great Gatsby',
     author: 'F. Scott Fitzgerald',
@@ -137,7 +103,7 @@ export const PRACTICE_TEXTS: PracticeTextItem[] = [
 
   // ==================== CODE ====================
   {
-    id: 'pt-6',
+    id: 'pt-code-1',
     category: 'code',
     title: 'TypeScript CacheStore Interface',
     author: 'Software Engineering',
@@ -145,7 +111,7 @@ export const PRACTICE_TEXTS: PracticeTextItem[] = [
     difficulty: 'hard',
   },
   {
-    id: 'pt-10',
+    id: 'pt-code-2',
     category: 'code',
     title: 'Async Fetch with Retries',
     author: 'Web Development',
@@ -179,7 +145,7 @@ export const PRACTICE_TEXTS: PracticeTextItem[] = [
 
   // ==================== BUSINESS ====================
   {
-    id: 'pt-5',
+    id: 'pt-biz-1',
     category: 'business',
     title: 'Executive Communication',
     author: 'Professional Management',
@@ -211,9 +177,77 @@ export const PRACTICE_TEXTS: PracticeTextItem[] = [
     difficulty: 'hard',
   },
 
+  // ==================== SIMPLE ====================
+  {
+    id: 'pt-sim-1',
+    category: 'simple',
+    title: 'Morning Sun over Green Hills',
+    author: 'Easy Phrasing',
+    text: 'The warm morning sun came up over the green hills. Birds began to sing softly in the tall oak trees. It was a fresh, peaceful day to walk down the quiet garden path and enjoy the cool breeze.',
+    difficulty: 'easy',
+  },
+  {
+    id: 'pt-sim-2',
+    category: 'simple',
+    title: 'Fresh Bread in the Kitchen',
+    author: 'Easy Phrasing',
+    text: 'Fresh bread was baking in the warm oven. The sweet aroma filled the room with comfort. A bowl of ripe red apples sat upon the wooden table next to a cup of warm tea.',
+    difficulty: 'easy',
+  },
+  {
+    id: 'pt-sim-3',
+    category: 'simple',
+    title: 'Afternoon at the Library',
+    author: 'Easy Phrasing',
+    text: 'Rows of neat books lined the quiet wooden shelves. Sunlight streamed through the tall glass window onto the study desk. It was easy to sit, read, and learn in such a calm place.',
+    difficulty: 'easy',
+  },
+  {
+    id: 'pt-sim-4',
+    category: 'simple',
+    title: 'Gentle Rain on the Rooftop',
+    author: 'Easy Phrasing',
+    text: 'Soft rain fell steadily against the windowpane. Small drops slid down the clear glass into the garden below. Inside the warm house, everything was calm, still, and pleasant.',
+    difficulty: 'easy',
+  },
+
+  // ==================== PANGRAMS ====================
+  {
+    id: 'pt-pan-1',
+    category: 'pangram',
+    title: 'The Classic Fox Pangram',
+    author: 'Traditional',
+    text: 'The quick brown fox jumps over the lazy dog. Pack my box with five dozen liquor jugs. How vexingly quick daft zebras jump! Sphinx of black quartz, judge my vow.',
+    difficulty: 'easy',
+  },
+  {
+    id: 'pt-pan-2',
+    category: 'pangram',
+    title: 'Sphinx & Black Quartz',
+    author: 'Typing Drill',
+    text: 'Sphinx of black quartz, judge my vow! The five boxing wizards jump quickly. How razorback-jumping frogs can level six piqued gymnasts! Cozy sphinx waves back from jigsaw cliff.',
+    difficulty: 'easy',
+  },
+  {
+    id: 'pt-pan-3',
+    category: 'pangram',
+    title: 'Jackdaws & Quartz Jewels',
+    author: 'Alphabet Master',
+    text: 'Jackdaws love my big sphinx of quartz. Six crazy kings vowed to quiz the lazy dwarf about prized jumping fox gems. Blowzy red night-frumps vexing quick pyx quaffers.',
+    difficulty: 'medium',
+  },
+  {
+    id: 'pt-pan-4',
+    category: 'pangram',
+    title: 'Wizards & Quizzical Prizefights',
+    author: 'Keyboard Gymnast',
+    text: 'A quick movement of the enemy will jeopardize six gunboats. Crazy Frederick bought many very exquisite opal jewels. The job requires extra pluck and zeal from every young wage earner.',
+    difficulty: 'medium',
+  },
+
   // ==================== GENERAL ====================
   {
-    id: 'pt-4',
+    id: 'pt-gen-1',
     category: 'general',
     title: 'The Art of Touch Typing',
     author: 'SmartTypingPro',
@@ -221,7 +255,7 @@ export const PRACTICE_TEXTS: PracticeTextItem[] = [
     difficulty: 'easy',
   },
   {
-    id: 'pt-9',
+    id: 'pt-gen-2',
     category: 'general',
     title: 'Digital Ergonomics & Focus',
     author: 'Ergonomic Society',
@@ -229,7 +263,7 @@ export const PRACTICE_TEXTS: PracticeTextItem[] = [
     difficulty: 'medium',
   },
   {
-    id: 'pt-14',
+    id: 'pt-gen-3',
     category: 'general',
     title: 'Left & Right Hand Finger Coordination',
     author: 'Hand Drill Series',
@@ -280,6 +314,64 @@ export const PARAGRAPHS_LIST: ParagraphItem[] = [
     text: 'You have power over your mind, not outside events. Realize this, and you will find strength. The happiness of your life depends upon the quality of your thoughts; therefore, guard accordingly.',
     wordCount: 31
   },
+  {
+    id: 'p-quote-6',
+    title: 'Perseverance & Victory (Nelson Mandela)',
+    category: 'Quote',
+    difficulty: 'easy',
+    text: 'It always seems impossible until it is done. The greatest glory in living lies not in never falling, but in rising every time we fall. Dedication and persistent effort always carve a way forward.',
+    wordCount: 35
+  },
+
+  // ==================== LITERATURE CATEGORY ====================
+  {
+    id: 'p-lit-1',
+    title: 'A Tale of Two Cities (Charles Dickens)',
+    category: 'Literature',
+    difficulty: 'medium',
+    text: 'It was the best of times, it was the worst of times, it was the age of wisdom, it was the age of foolishness, it was the epoch of belief, it was the epoch of incredulity, it was the season of light, it was the season of darkness.',
+    wordCount: 48
+  },
+  {
+    id: 'p-lit-2',
+    title: 'The Great Gatsby (F. Scott Fitzgerald)',
+    category: 'Literature',
+    difficulty: 'medium',
+    text: 'In my younger and more vulnerable years my father gave me some advice that I have been turning over in my mind ever since. Whenever you feel like criticizing anyone, just remember that all the people in this world have not had the advantages that you have had.',
+    wordCount: 49
+  },
+  {
+    id: 'p-lit-3',
+    title: 'Pride & Prejudice (Jane Austen)',
+    category: 'Literature',
+    difficulty: 'medium',
+    text: 'It is a truth universally acknowledged, that a single man in possession of a good fortune, must be in want of a wife. However little known the feelings or views of such a man may be on his first entering a neighbourhood, this truth is well fixed.',
+    wordCount: 47
+  },
+  {
+    id: 'p-lit-4',
+    title: 'Moby Dick (Herman Melville)',
+    category: 'Literature',
+    difficulty: 'medium',
+    text: 'Call me Ishmael. Some years ago, never mind how long precisely, having little or no money in my purse, and nothing particular to interest me on shore, I thought I would sail about a little and see the watery part of the world. It is a way I have of driving off the spleen.',
+    wordCount: 54
+  },
+  {
+    id: 'p-lit-5',
+    title: 'Tom Sawyer (Mark Twain)',
+    category: 'Literature',
+    difficulty: 'easy',
+    text: 'Saturday morning was come, and all the summer world was bright and fresh, and brimming with life. There was a song in every heart; and if the heart was young the music came at the lips. There was cheer in every face and a spring in every step.',
+    wordCount: 48
+  },
+  {
+    id: 'p-lit-6',
+    title: 'A Study in Scarlet (Arthur Conan Doyle)',
+    category: 'Literature',
+    difficulty: 'medium',
+    text: 'There is a mystery about this which stimulates the imagination; where there is no imagination there is no horror. We must look for consistency in human motives and deduce the hidden truth from minor observations.',
+    wordCount: 36
+  },
 
   // ==================== CODE CATEGORY ====================
   {
@@ -321,6 +413,14 @@ export const PARAGRAPHS_LIST: ParagraphItem[] = [
     difficulty: 'hard',
     text: 'export function useShortcut(key: string, callback: () => void) { useEffect(() => { const handleKeyDown = (e: KeyboardEvent) => { if (e.key === key && !e.repeat) callback(); }; window.addEventListener("keydown", handleKeyDown); return () => window.removeEventListener("keydown", handleKeyDown); }, [key, callback]); }',
     wordCount: 40
+  },
+  {
+    id: 'p-code-6',
+    title: 'Go Concurrency Worker Pool Channel',
+    category: 'Code',
+    difficulty: 'hard',
+    text: 'func worker(id int, jobs <-chan Job, results chan<- Result) { for job := range jobs { res := process(job); results <- res } }',
+    wordCount: 24
   },
 
   // ==================== BUSINESS CATEGORY ====================
@@ -364,47 +464,55 @@ export const PARAGRAPHS_LIST: ParagraphItem[] = [
     text: 'During our sprint retrospective, the product team identified opportunities to reduce code review cycle times and improve automated test coverage. Fostering continuous feedback loops empowers distributed engineering teams to ship reliable software on schedule.',
     wordCount: 34
   },
+  {
+    id: 'p-biz-6',
+    title: 'Financial Liquidity & Risk Management',
+    category: 'Business',
+    difficulty: 'hard',
+    text: 'Prudent fiscal treasury policy requires maintaining substantial liquid reserves, evaluating foreign currency exposure, and hedging against commodity volatility to safeguard enterprise operations through unpredictable market cycles.',
+    wordCount: 28
+  },
 
-  // ==================== LITERATURE CATEGORY ====================
+  // ==================== SIMPLE CATEGORY ====================
   {
-    id: 'p-lit-1',
-    title: 'A Tale of Two Cities (Charles Dickens)',
-    category: 'Literature',
-    difficulty: 'medium',
-    text: 'It was the best of times, it was the worst of times, it was the age of wisdom, it was the age of foolishness, it was the epoch of belief, it was the epoch of incredulity, it was the season of light, it was the season of darkness.',
-    wordCount: 48
-  },
-  {
-    id: 'p-lit-2',
-    title: 'The Great Gatsby (F. Scott Fitzgerald)',
-    category: 'Literature',
-    difficulty: 'medium',
-    text: 'In my younger and more vulnerable years my father gave me some advice that I have been turning over in my mind ever since. Whenever you feel like criticizing anyone, just remember that all the people in this world have not had the advantages that you have had.',
-    wordCount: 49
-  },
-  {
-    id: 'p-lit-3',
-    title: 'Pride & Prejudice (Jane Austen)',
-    category: 'Literature',
-    difficulty: 'medium',
-    text: 'It is a truth universally acknowledged, that a single man in possession of a good fortune, must be in want of a wife. However little known the feelings or views of such a man may be on his first entering a neighbourhood, this truth is well fixed.',
-    wordCount: 47
-  },
-  {
-    id: 'p-lit-4',
-    title: 'Moby Dick (Herman Melville)',
-    category: 'Literature',
-    difficulty: 'medium',
-    text: 'Call me Ishmael. Some years ago, never mind how long precisely, having little or no money in my purse, and nothing particular to interest me on shore, I thought I would sail about a little and see the watery part of the world. It is a way I have of driving off the spleen.',
-    wordCount: 54
-  },
-  {
-    id: 'p-lit-5',
-    title: 'Tom Sawyer (Mark Twain)',
-    category: 'Literature',
+    id: 'p-sim-1',
+    title: 'The Morning Sun & Green Hills',
+    category: 'Simple',
     difficulty: 'easy',
-    text: 'Saturday morning was come, and all the summer world was bright and fresh, and brimming with life. There was a song in every heart; and if the heart was young the music came at the lips. There was cheer in every face and a spring in every step.',
-    wordCount: 48
+    text: 'The warm morning sun came up over the quiet green hills. Birds began to sing softly in the tall oak trees. It was a fresh and pleasant day to take a walk along the clean stone path and enjoy the light cool breeze.',
+    wordCount: 46
+  },
+  {
+    id: 'p-sim-2',
+    title: 'Fresh Warm Bread in the Bakery',
+    category: 'Simple',
+    difficulty: 'easy',
+    text: 'Fresh bread was baking inside the warm kitchen oven. The sweet smell of butter and wheat filled the cozy room. A bowl of ripe red apples sat upon the wooden table next to a cup of hot green tea.',
+    wordCount: 41
+  },
+  {
+    id: 'p-sim-3',
+    title: 'A Calm Afternoon in the Library',
+    category: 'Simple',
+    difficulty: 'easy',
+    text: 'Rows of neat books stood on the clean wooden shelves. Warm sunlight streamed through the tall window onto the reading desk. It was quiet and relaxing to sit, open a favorite book, and read peacefully.',
+    wordCount: 36
+  },
+  {
+    id: 'p-sim-4',
+    title: 'Gentle Rain on the Cozy Rooftop',
+    category: 'Simple',
+    difficulty: 'easy',
+    text: 'Soft rain fell steadily against the bedroom window. Small drops of water slid down the clear glass into the garden below. Inside the comfortable room, everything was still, peaceful, and warm.',
+    wordCount: 32
+  },
+  {
+    id: 'p-sim-5',
+    title: 'A Little Blue Bird in the Garden',
+    category: 'Simple',
+    difficulty: 'easy',
+    text: 'A little blue bird flew down to rest on the wooden fence. It looked around the blooming flower garden with bright curious eyes before hopping onto the soft green grass in search of seeds.',
+    wordCount: 35
   },
 
   // ==================== PANGRAM CATEGORY ====================

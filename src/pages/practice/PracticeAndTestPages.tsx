@@ -3,7 +3,6 @@ import { PageRoute, TestMode, TypingResult } from '../../types';
 import { 
   PRACTICE_TEXTS, 
   PARAGRAPHS_LIST, 
-  generateDurationPassage, 
   PracticeTextItem,
   ParagraphItem 
 } from '../../data/practiceTexts';
@@ -11,25 +10,17 @@ import { TypingEngine } from '../../components/typing/TypingEngine';
 import { useTypingStats } from '../../context/TypingStatsContext';
 import { useAuth } from '../../context/AuthContext';
 import { 
-  Keyboard, 
   Clock, 
-  FileText, 
-  Code, 
-  Quote, 
   Edit3, 
   Play, 
-  RotateCcw, 
   Sliders,
-  Sparkles,
-  Flame,
-  ChevronDown,
   BookOpen,
-  Shuffle,
   ShieldCheck,
   Award,
   User,
   CheckCircle2,
-  X
+  X,
+  FileText
 } from 'lucide-react';
 
 interface PracticePageProps {
@@ -42,6 +33,18 @@ const DURATION_OPTIONS = [
   { value: 120, label: '120s', mode: 'timed_120' as TestMode },
   { value: 300, label: '5m', mode: 'timed_300' as TestMode },
   { value: 600, label: '10m', mode: 'timed_600' as TestMode },
+  { value: 0, label: 'Untimed', mode: 'paragraph' as TestMode },
+];
+
+const CATEGORY_TABS = [
+  { id: 'all', label: 'All' },
+  { id: 'quote', label: 'Quote' },
+  { id: 'literature', label: 'Literature' },
+  { id: 'code', label: 'Code' },
+  { id: 'business', label: 'Business' },
+  { id: 'simple', label: 'Simple' },
+  { id: 'general', label: 'General' },
+  { id: 'pangram', label: 'Pangram' },
 ];
 
 // ==================== OFFICIAL TYPING TEST PAGE (SONMA 2-BOX EXAM MODE) ====================
@@ -56,18 +59,16 @@ export const TypingTestPage: React.FC<PracticePageProps> = ({ onNavigate }) => {
   const [candidateName, setCandidateName] = useState<string>(initialName);
   const [tempCandidateName, setTempCandidateName] = useState<string>(initialName);
   const [showCandidateModal, setShowCandidateModal] = useState<boolean>(() => {
-    // Show modal if no candidate name stored or on initial entry
     return !localStorage.getItem('smarttyping_candidate_name_set');
   });
 
-  // Test Mode & Text Selection
+  // Test Mode & Text Selection (Completely Decoupled)
   const [selectedDuration, setSelectedDuration] = useState<number>(60);
-  const [isParagraphMode, setIsParagraphMode] = useState<boolean>(false);
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [selectedParagraph, setSelectedParagraph] = useState<ParagraphItem>(PARAGRAPHS_LIST[0]);
   const [customInputText, setCustomInputText] = useState<string>('');
   const [isCustomMode, setIsCustomMode] = useState<boolean>(false);
-  const [testText, setTestText] = useState<string>(() => generateDurationPassage(60).text);
+  const [testText, setTestText] = useState<string>(PARAGRAPHS_LIST[0].text);
 
   // Sync candidate name if user logs in
   useEffect(() => {
@@ -86,31 +87,23 @@ export const TypingTestPage: React.FC<PracticePageProps> = ({ onNavigate }) => {
     setShowCandidateModal(false);
   };
 
+  // Duration changes independently without modifying or resetting chosen passage
   const handleDurationChange = (duration: number) => {
     setSelectedDuration(duration);
-    setIsParagraphMode(false);
-    setIsCustomMode(false);
-    setTestText(generateDurationPassage(duration).text);
   };
 
-  const handleParagraphMode = () => {
-    setIsParagraphMode(true);
-    setIsCustomMode(false);
-    setTestText(selectedParagraph.text);
-  };
-
+  // Passage selection independently sets test text without overriding selected duration
   const handleSelectParagraph = (paragraph: ParagraphItem) => {
     setSelectedParagraph(paragraph);
-    setIsParagraphMode(true);
     setIsCustomMode(false);
     setTestText(paragraph.text);
   };
 
+  // Custom text independently sets text without resetting selected duration
   const handleApplyCustomText = () => {
     if (!customInputText.trim()) return;
     setTestText(customInputText.trim());
     setIsCustomMode(true);
-    setIsParagraphMode(false);
   };
 
   const handleTestComplete = (result: TypingResult) => {
@@ -118,15 +111,13 @@ export const TypingTestPage: React.FC<PracticePageProps> = ({ onNavigate }) => {
     onNavigate('results', result);
   };
 
-  const currentMode: TestMode = isParagraphMode 
-    ? 'paragraph' 
-    : isCustomMode
-    ? 'custom'
+  const currentMode: TestMode = selectedDuration === 0
+    ? 'paragraph'
     : (DURATION_OPTIONS.find(d => d.value === selectedDuration)?.mode || 'timed_60');
 
   const filteredParagraphs = activeCategory === 'all'
     ? PARAGRAPHS_LIST
-    : PARAGRAPHS_LIST.filter(p => p.category.toLowerCase().includes(activeCategory.toLowerCase()));
+    : PARAGRAPHS_LIST.filter(p => p.category.toLowerCase() === activeCategory.toLowerCase());
 
   return (
     <div id="official-typing-test-page" className="w-full max-w-7xl mx-auto py-6 sm:py-8 px-4 sm:px-6 lg:px-8 space-y-6">
@@ -155,7 +146,7 @@ export const TypingTestPage: React.FC<PracticePageProps> = ({ onNavigate }) => {
               </div>
               <div>
                 <h3 className="text-lg font-bold text-slate-100">Candidate Exam Entry</h3>
-                <p className="text-xs text-slate-400">Smart Typing Pro & Verified Certification</p>
+                <p className="text-xs text-slate-400">Smart Typing Pro - Official Speed Assessment</p>
               </div>
             </div>
 
@@ -179,7 +170,7 @@ export const TypingTestPage: React.FC<PracticePageProps> = ({ onNavigate }) => {
                   />
                 </div>
                 <p className="text-[11px] text-slate-400 mt-1">
-                  This name will appear on your official PDF & PNG typing certificate upon qualification.
+                  This name will be displayed on your verified certification upon qualification.
                 </p>
               </div>
 
@@ -217,9 +208,9 @@ export const TypingTestPage: React.FC<PracticePageProps> = ({ onNavigate }) => {
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-100">Official Typing Test</h1>
           <p className="text-xs text-slate-400 mt-1">
-            Candidate: <strong className="text-slate-200">{candidateName}</strong> • {isParagraphMode 
-              ? 'Standalone Paragraph Assessment' 
-              : `Timed ${selectedDuration >= 60 ? `${selectedDuration / 60} min` : `${selectedDuration}s`} Test`}
+            Candidate: <strong className="text-slate-200">{candidateName}</strong> • {selectedDuration === 0
+              ? 'Untimed Full Passage' 
+              : `Timed ${selectedDuration >= 60 ? `${selectedDuration / 60} min` : `${selectedDuration}s`} Test`} • {isCustomMode ? 'Custom Text' : selectedParagraph.title}
           </p>
         </div>
 
@@ -227,10 +218,10 @@ export const TypingTestPage: React.FC<PracticePageProps> = ({ onNavigate }) => {
         <div className="flex items-center gap-2">
           <button
             onClick={() => { setTempCandidateName(candidateName); setShowCandidateModal(true); }}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-semibold text-slate-300 transition-colors"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-semibold text-slate-300 transition-colors cursor-pointer"
           >
             <User className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Edit Candidate</span>
+            <span>Edit Candidate ({candidateName})</span>
           </button>
         </div>
       </div>
@@ -243,7 +234,7 @@ export const TypingTestPage: React.FC<PracticePageProps> = ({ onNavigate }) => {
           </div>
           <div>
             <span className="font-bold text-slate-200">Official Certification Criteria:</span>{' '}
-            <span className="text-slate-400">Score <strong className="text-emerald-400">≥30 Net WPM</strong> and <strong className="text-cyan-400">≥95% Accuracy</strong> to earn your Verified SmartTyping Pro Certificate.</span>
+            <span className="text-slate-400">Score <strong className="text-emerald-400">≥30 Net WPM</strong> and <strong className="text-cyan-400">≥95% Accuracy</strong> to earn your Verified Smart Typing Pro Certificate.</span>
           </div>
         </div>
 
@@ -258,7 +249,7 @@ export const TypingTestPage: React.FC<PracticePageProps> = ({ onNavigate }) => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left: Test Configuration Sidebar (1 Col) */}
         <div className="space-y-5">
-          {/* Test Durations */}
+          {/* Test Durations (Independent) */}
           <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-3">
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
               <Clock className="w-3.5 h-3.5 text-emerald-400" /> Exam Duration Presets
@@ -269,66 +260,57 @@ export const TypingTestPage: React.FC<PracticePageProps> = ({ onNavigate }) => {
                   key={dur.value}
                   id={`test-duration-${dur.label}`}
                   onClick={() => handleDurationChange(dur.value)}
-                  className={`py-2 rounded-xl text-xs font-mono font-bold transition-all text-center ${
-                    !isParagraphMode && !isCustomMode && selectedDuration === dur.value
-                      ? 'bg-emerald-500 text-slate-950 shadow-sm shadow-emerald-500/20'
+                  className={`py-2 rounded-xl text-xs font-mono font-bold transition-all text-center cursor-pointer ${
+                    selectedDuration === dur.value
+                      ? 'bg-emerald-500 text-slate-950 shadow-sm shadow-emerald-500/20 font-bold'
                       : 'bg-slate-950 text-slate-400 hover:text-slate-200 border border-slate-800'
                   }`}
                 >
                   {dur.label}
                 </button>
               ))}
-              <button
-                id="test-mode-paragraph"
-                onClick={handleParagraphMode}
-                className={`py-2 rounded-xl text-xs font-sans font-bold transition-all text-center ${
-                  isParagraphMode
-                    ? 'bg-cyan-500 text-slate-950 shadow-sm shadow-cyan-500/20'
-                    : 'bg-slate-950 text-slate-400 hover:text-slate-200 border border-slate-800'
-                }`}
-              >
-                Passage
-              </button>
             </div>
           </div>
 
-          {/* Drill & Category Filter */}
+          {/* Categories Filter (Distinct & Unique Content) */}
           <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-3">
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
               <Sliders className="w-3.5 h-3.5 text-cyan-400" /> Categories
             </h3>
             <div className="flex flex-wrap gap-1.5">
-              {['all', 'quote', 'code', 'business', 'literature', 'pangram', 'general'].map((cat) => (
+              {CATEGORY_TABS.map((cat) => (
                 <button
-                  key={cat}
-                  onClick={() => { setActiveCategory(cat); }}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition-colors cursor-pointer ${
-                    activeCategory === cat
+                  key={cat.id}
+                  onClick={() => setActiveCategory(cat.id)}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
+                    activeCategory === cat.id
                       ? 'bg-cyan-500 text-slate-950 font-bold'
                       : 'bg-slate-950 text-slate-400 hover:text-slate-200 border border-slate-800'
                   }`}
                 >
-                  {cat}
+                  {cat.label}
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Passage List */}
+          {/* Preset Passages (Independent) */}
           <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-2 max-h-[260px] overflow-y-auto">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300 mb-2 flex items-center gap-1.5">
-              <BookOpen className="w-3.5 h-3.5 text-amber-400" /> Preset Passages
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300 mb-2 flex items-center justify-between">
+              <span className="flex items-center gap-1.5">
+                <BookOpen className="w-3.5 h-3.5 text-amber-400" /> Passages ({filteredParagraphs.length})
+              </span>
             </h3>
             <div className="space-y-1.5">
               {filteredParagraphs.map((item) => {
-                const isCurrent = isParagraphMode && selectedParagraph.id === item.id;
+                const isCurrent = !isCustomMode && selectedParagraph.id === item.id;
                 return (
                   <button
                     key={item.id}
                     onClick={() => handleSelectParagraph(item)}
                     className={`w-full text-left p-2.5 rounded-xl text-xs transition-colors flex flex-col gap-0.5 cursor-pointer ${
                       isCurrent
-                        ? 'bg-slate-800 border border-emerald-500/40 text-emerald-300'
+                        ? 'bg-slate-800 border border-emerald-500/40 text-emerald-300 font-medium'
                         : 'bg-slate-950/60 hover:bg-slate-850 text-slate-300 border border-slate-900'
                     }`}
                   >
@@ -365,17 +347,17 @@ export const TypingTestPage: React.FC<PracticePageProps> = ({ onNavigate }) => {
         {/* Right: Sonma 2-Box Exam Arena (2 Cols) */}
         <div className="lg:col-span-2 space-y-4">
           <TypingEngine
-            key={`${selectedDuration}-${isParagraphMode}-${selectedParagraph.id}-${testText.slice(0, 25)}-${candidateName}`}
+            key={`${selectedDuration}-${isCustomMode ? 'custom' : selectedParagraph.id}-${testText.slice(0, 25)}-${candidateName}`}
             practiceText={testText}
             mode={currentMode}
-            targetDurationSeconds={isParagraphMode || isCustomMode ? undefined : selectedDuration}
+            targetDurationSeconds={selectedDuration > 0 ? selectedDuration : undefined}
             candidateName={candidateName}
             layout="sonma"
             onComplete={handleTestComplete}
             onRestart={() => {
-              if (!isParagraphMode && !isCustomMode) {
-                setTestText(generateDurationPassage(selectedDuration).text);
-              } else if (isParagraphMode) {
+              if (isCustomMode && customInputText.trim()) {
+                setTestText(customInputText.trim());
+              } else {
                 setTestText(selectedParagraph.text);
               }
             }}
@@ -447,7 +429,7 @@ export const PracticePage: React.FC<PracticePageProps> = ({ onNavigate }) => {
           <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-3">
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300">Drill Categories</h3>
             <div className="flex flex-wrap gap-1.5">
-              {['all', 'quote', 'code', 'business', 'literature', 'pangram', 'general'].map((cat) => (
+              {['all', 'quote', 'literature', 'code', 'business', 'simple', 'general', 'pangram'].map((cat) => (
                 <button
                   key={cat}
                   onClick={() => { setActiveCategory(cat); setIsCustomMode(false); }}

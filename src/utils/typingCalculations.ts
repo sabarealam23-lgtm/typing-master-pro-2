@@ -1,9 +1,11 @@
 /**
  * SmartTypingPro - Centralized Typing Calculation Utilities
  * 
- * Standard convention:
+ * Industry Standard Convention (Monkeytype / Typing.com standard):
  * 1 Word = 5 keystrokes/characters (including spaces, numbers, punctuation)
  * Time elapsed is measured using high-resolution timestamps (performance.now())
+ * Elapsed minutes is bounded with Math.max(elapsedMs / 60000, 0.0167) (~1 second minimum)
+ * to prevent zero division and erratic initial jumps.
  */
 
 export interface WpmCalculationInput {
@@ -13,36 +15,36 @@ export interface WpmCalculationInput {
   elapsedMs: number;
 }
 
-export const CALCULATION_VERSION = "1.0.0";
+export const CALCULATION_VERSION = "1.1.0";
 
 /**
- * Calculates Gross Words Per Minute.
- * Formula: (Total Typed Characters / 5) / Elapsed Minutes
+ * Calculates Gross / Raw Words Per Minute.
+ * Formula: ((Total Typed Characters) / 5) / max(Elapsed Minutes, 0.0167)
  */
 export function calculateGrossWPM(totalCharacters: number, elapsedMs: number): number {
   if (elapsedMs <= 0 || totalCharacters <= 0) return 0;
-  const elapsedMinutes = elapsedMs / 60000;
-  if (elapsedMinutes <= 0) return 0;
+  const elapsedMinutes = Math.max(elapsedMs / 60000, 0.0167);
   const grossWpm = (totalCharacters / 5) / elapsedMinutes;
   return Number(Math.max(0, grossWpm).toFixed(2));
 }
 
 /**
- * Calculates Net Words Per Minute.
- * Formula: Gross WPM - (Uncorrected Errors / Elapsed Minutes)
- * OR: Math.max(0, ((Correct Characters / 5) - Uncorrected Errors) / Elapsed Minutes)
+ * Calculates Net / Real-Time Words Per Minute (Industry Standard: Monkeytype & Typing.com).
+ * Formula: ((Total Correct Characters Typed) / 5) / max(Time Elapsed in Minutes, 0.0167)
+ * 
+ * Typos reduce Accuracy % and increment Error Count, but do NOT artificially
+ * crash the active running WPM to zero or single digits.
  */
 export function calculateNetWPM(
   correctCharacters: number,
   uncorrectedErrors: number,
   elapsedMs: number
 ): number {
-  if (elapsedMs <= 0 || (correctCharacters <= 0 && uncorrectedErrors <= 0)) return 0;
-  const elapsedMinutes = elapsedMs / 60000;
-  if (elapsedMinutes <= 0) return 0;
+  if (elapsedMs <= 0 || correctCharacters <= 0) return 0;
+  const elapsedMinutes = Math.max(elapsedMs / 60000, 0.0167);
   
-  const wordsTyped = correctCharacters / 5;
-  const netWpm = (wordsTyped - uncorrectedErrors) / elapsedMinutes;
+  // Real-time speed based strictly on standard correct keypress throughput
+  const netWpm = (correctCharacters / 5) / elapsedMinutes;
   return Number(Math.max(0, netWpm).toFixed(2));
 }
 

@@ -259,7 +259,7 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
     const correctChars = charDetailsRef.current.filter(c => c.state === 'correct' || c.state === 'corrected').length;
     const grossWPM = calculateGrossWPM(totalChars, finalElapsedMs);
     const netWPM = calculateNetWPM(correctChars, uncorrected, finalElapsedMs);
-    const accuracy = calculateAccuracy(correctKeystrokesRef.current, totalKeystrokesRef.current);
+    const accuracy = calculateAccuracy(correctChars, totalChars);
 
     // Compute Word Breakdown
     const typedSlice = charDetailsRef.current.slice(0, cursorIndexRef.current);
@@ -458,7 +458,7 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
 
       const gWpm = calculateGrossWPM(totalChars, elapsedMs);
       const nWpm = calculateNetWPM(correctChars, uncorrected, elapsedMs);
-      const acc = calculateAccuracy(correctKeystrokesRef.current, totalKeystrokesRef.current);
+      const acc = calculateAccuracy(correctChars, totalChars);
 
       setLiveGrossWpm(gWpm);
       setLiveNetWpm(nWpm);

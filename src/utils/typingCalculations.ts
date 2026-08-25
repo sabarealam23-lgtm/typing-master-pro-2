@@ -50,16 +50,16 @@ export function calculateNetWPM(
 
 /**
  * Calculates Keystroke Accuracy Percentage.
- * Formula: (Correct Keystrokes / Total Keystrokes) * 100
+ * Formula: (correctChars / totalChars) * 100
  * Returned as a 2-decimal number (e.g. 98.45).
  */
 export function calculateAccuracy(
-  correctKeystrokes: number,
-  totalKeystrokes: number
+  correctChars: number,
+  totalChars: number
 ): number {
-  if (totalKeystrokes <= 0) return 100;
-  if (correctKeystrokes <= 0) return 0;
-  const accuracy = (correctKeystrokes / totalKeystrokes) * 100;
+  if (totalChars <= 0) return 100;
+  if (correctChars <= 0) return 0;
+  const accuracy = (correctChars / totalChars) * 100;
   // Guard against any floating point anomalies
   const clamped = Math.min(100, Math.max(0, accuracy));
   return Number(clamped.toFixed(2));

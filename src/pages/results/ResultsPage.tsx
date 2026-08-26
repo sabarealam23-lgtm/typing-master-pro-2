@@ -53,8 +53,9 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ result, onNavigate }) 
     }
   }, [activeResult?.candidateName, user?.displayName]);
 
-  // Qualification Check: Typing Test mode with Net WPM >= 30 and Accuracy >= 95%
-  const isTypingTestMode = activeResult ? (activeResult.mode.startsWith('timed_') || activeResult.mode === 'paragraph' || activeResult.mode === 'custom') : false;
+  // Qualification Check: Typing Test mode ONLY with Net WPM >= 30 and Accuracy >= 95%
+  // Strictly excludes 'custom' (Practice mode) and 'lesson' (Learn mode)
+  const isTypingTestMode = activeResult ? (activeResult.mode.startsWith('timed_') || activeResult.mode === 'paragraph') : false;
   const meetsSpeed = activeResult ? activeResult.netWpm >= 30 : false;
   const meetsAccuracy = activeResult ? activeResult.accuracy >= 95 : false;
   const isQualifiedForCertificate = isTypingTestMode && meetsSpeed && meetsAccuracy;
@@ -115,11 +116,25 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ result, onNavigate }) 
     ? LESSONS_DATA.find(l => l.order === associatedLesson.order + 1)
     : undefined;
 
+  const handleRetry = () => {
+    if (activeResult?.mode === 'lesson' && associatedLesson) {
+      onNavigate('lesson-view', associatedLesson);
+    } else if (activeResult?.mode === 'lesson') {
+      onNavigate('learn');
+    } else if (activeResult?.mode === 'custom') {
+      onNavigate('practice');
+    } else {
+      onNavigate('typing-test');
+    }
+  };
+
   const handleNext = () => {
     if (nextLesson) {
       onNavigate('lesson-view', nextLesson);
     } else if (activeResult?.mode === 'lesson' && associatedLesson) {
       onNavigate('lesson-view', associatedLesson);
+    } else if (activeResult?.mode === 'custom') {
+      onNavigate('practice');
     } else {
       onNavigate('typing-test');
     }
@@ -342,7 +357,7 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ result, onNavigate }) 
         <div className="flex flex-wrap items-center gap-3">
           <button
             id="results-retry-btn"
-            onClick={() => onNavigate(activeResult.mode === 'lesson' && associatedLesson ? 'lesson-view' : 'typing-test', associatedLesson)}
+            onClick={handleRetry}
             className="flex items-center gap-2 px-5 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs shadow-md transition-all cursor-pointer"
           >
             <RotateCcw className="w-4 h-4" />
@@ -363,20 +378,20 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ result, onNavigate }) 
           <button
             id="results-dashboard-btn"
             onClick={() => onNavigate('dashboard')}
-            className="flex items-center gap-2 px-4 py-3 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-200 font-semibold text-xs border border-slate-700 transition-colors cursor-pointer"
+            className="flex items-center gap-2 px-5 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs border border-slate-700 shadow-md transition-colors cursor-pointer"
           >
-            <Home className="w-4 h-4" />
-            <span>Dashboard</span>
+            <Home className="w-4 h-4 text-white" />
+            <span className="text-white font-bold">Dashboard</span>
           </button>
         </div>
 
         <button
           id="results-share-btn"
           onClick={handleCopySummary}
-          className="flex items-center gap-2 px-4 py-3 rounded-xl bg-slate-900 hover:bg-slate-850 text-slate-300 text-xs font-semibold border border-slate-800 transition-colors cursor-pointer"
+          className="flex items-center gap-2 px-5 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold border border-slate-700 shadow-md transition-colors cursor-pointer"
         >
-          {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Share2 className="w-4 h-4" />}
-          <span>{copied ? 'Summary Copied!' : 'Copy Score'}</span>
+          {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Share2 className="w-4 h-4 text-white" />}
+          <span className="text-white font-bold">{copied ? 'Summary Copied!' : 'Copy Score'}</span>
         </button>
       </div>
     </div>

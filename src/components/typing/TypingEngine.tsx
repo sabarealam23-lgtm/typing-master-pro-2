@@ -79,6 +79,7 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
   const isSonmaLayout = layout === 'sonma';
   const isTimedMode = Boolean(targetDurationSeconds && targetDurationSeconds > 0);
   const initialTimeLeft = targetDurationSeconds || 0;
+  const isTypingTestMode = isSonmaLayout || mode.startsWith('timed_') || mode === 'paragraph';
 
   // View style: Learn mode defaults to compact character boxes; Practice and Test default to continuous text flow
   const isDefaultCards = mode === 'lesson';
@@ -299,7 +300,6 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
     const paceTimeSaved = Math.max(0, Number((allottedSeconds - actualSeconds).toFixed(1)));
 
     // Certificate qualification & tier evaluation
-    const isTypingTestMode = mode.startsWith('timed_') || mode === 'paragraph' || isSonmaLayout;
     const isCertificateQualified = isTypingTestMode && netWPM >= 30 && accuracy >= 95;
     let certificateTier: 'silver' | 'gold' | 'platinum' | null = null;
     if (isCertificateQualified) {
@@ -970,21 +970,14 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
                 </div>
               ) : (
                 <div className="whitespace-pre-wrap">
-                  {charDetails.slice(0, Math.max(cursorIndex + 1, 1)).map((detail, index) => {
-                    const isCurrent = index === cursorIndex;
-                    // Clean standard neutral body text color as typed, exactly like authentic Sonma Typing Expert (no live red highlights)
-                    const charStyle = 'text-[#111827]';
-
+                  {charDetails.slice(0, cursorIndex).map((detail, index) => {
                     if (detail.expected === '\n') {
                       return (
                         <span
                           key={index}
-                          ref={isCurrent ? activeCharRef : null}
                           className="block my-1.5 border-t border-dashed border-[#cbd5e1] pt-1"
                         >
-                          <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-sans ${
-                            isCurrent ? 'bg-[#1e40af] text-white font-bold' : 'bg-[#e2e8f0] text-[#64748b]'
-                          }`}>
+                          <span className="inline-block px-2 py-0.5 rounded text-[10px] font-sans bg-[#e2e8f0] text-[#64748b]">
                             ↵ Paragraph Break
                           </span>
                         </span>
@@ -994,21 +987,19 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
                     return (
                       <span
                         key={index}
-                        ref={isCurrent ? activeCharRef : null}
-                        className={`relative inline-block ${charStyle}`}
+                        className="relative inline-block text-[#111827]"
                       >
-                        {isCurrent && (
-                          <span 
-                            id="sonma-typing-caret"
-                            className="inline-block w-[2px] h-[1.15em] bg-[#1e40af] animate-pulse align-middle mx-0.5" 
-                          />
-                        )}
                         {detail.typed !== undefined 
                           ? (detail.typed === ' ' ? '\u00A0' : detail.typed) 
-                          : (detail.expected === ' ' ? '\u00A0' : detail.expected)}
+                          : ''}
                       </span>
                     );
                   })}
+                  <span 
+                    ref={activeCharRef}
+                    id="sonma-typing-caret"
+                    className="inline-block w-[2px] h-[1.15em] bg-[#1e40af] animate-pulse align-middle mx-0.5" 
+                  />
                 </div>
               )}
             </div>
@@ -1750,7 +1741,7 @@ export const TypingEngine: React.FC<TypingEngineProps> = ({
       )}
 
       {/* Target Key Prompt / Finger Guideline */}
-      {(settings.showVirtualKeyboard || mode === 'lesson') && (
+      {(settings.showVirtualKeyboard || mode === 'lesson') && !isTypingTestMode && (
         <div 
           id="typing-target-key-guide"
           className="flex flex-wrap items-center justify-between gap-2 px-3 sm:px-4 py-1.5 bg-slate-100/90 dark:bg-slate-900/90 border border-slate-300 dark:border-slate-800 rounded-xl shadow-xs text-xs"

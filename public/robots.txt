@@ -1,0 +1,9 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+
+# Host
+Host: https://smarttypingpro.vercel.app
+
+# Sitemaps
+Sitemap: https://smarttypingpro.vercel.app/sitemap.xml

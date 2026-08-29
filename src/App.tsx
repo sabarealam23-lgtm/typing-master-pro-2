@@ -17,6 +17,7 @@ import { LeaderboardPage, ProfilePage, SettingsPage } from './pages/user/UserAnd
 import { LoginPage, RegisterPage, ForgotPasswordPage, EmailVerificationPage } from './pages/auth/AuthPages';
 import { AboutPage, ContactPage, PrivacyPolicyPage, TermsPage } from './pages/info/InfoPages';
 import { LESSONS_DATA } from './data/lessons';
+import { SEOHead } from './components/seo/SEOHead';
 
 const AppContent: React.FC = () => {
   const { settings } = useSettings();
@@ -131,6 +132,9 @@ const AppContent: React.FC = () => {
         ? 'bg-slate-950 text-slate-100 selection:bg-cyan-500/30 selection:text-cyan-200' 
         : 'bg-slate-50 text-slate-900 selection:bg-cyan-500/30 selection:text-cyan-900'
     }`}>
+      {/* Dynamic SEO Meta & Canonical Sync */}
+      <SEOHead currentPage={currentPage} />
+
       {/* Top Sticky Navigation Bar */}
       <Navbar currentPage={currentPage} onNavigate={handleNavigate} />
 

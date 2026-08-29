@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="accent-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#06b6d4"/>
+      <stop offset="50%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#6366f1"/>
+    </linearGradient>
+    <linearGradient id="key-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#334155"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background rounded card -->
+  <rect width="512" height="512" rx="112" fill="url(#bg-gradient)"/>
+  
+  <!-- Outer Glow Border -->
+  <rect x="16" y="16" width="480" height="480" rx="96" fill="none" stroke="url(#accent-gradient)" stroke-width="6" opacity="0.6"/>
+
+  <!-- Stylized Keyboard Body -->
+  <rect x="76" y="128" width="360" height="256" rx="28" fill="#090d16" stroke="#334155" stroke-width="4"/>
+
+  <!-- Top Row Keys -->
+  <rect x="96" y="148" width="44" height="40" rx="8" fill="url(#key-gradient)" stroke="#475569" stroke-width="2"/>
+  <rect x="150" y="148" width="44" height="40" rx="8" fill="url(#key-gradient)" stroke="#475569" stroke-width="2"/>
+  <rect x="204" y="148" width="44" height="40" rx="8" fill="url(#key-gradient)" stroke="#475569" stroke-width="2"/>
+  <rect x="258" y="148" width="44" height="40" rx="8" fill="url(#key-gradient)" stroke="#475569" stroke-width="2"/>
+  <rect x="312" y="148" width="44" height="40" rx="8" fill="url(#key-gradient)" stroke="#475569" stroke-width="2"/>
+  <rect x="366" y="148" width="50" height="40" rx="8" fill="url(#accent-gradient)"/>
+
+  <!-- Home Row Keys -->
+  <rect x="96" y="198" width="48" height="40" rx="8" fill="url(#key-gradient)" stroke="#475569" stroke-width="2"/>
+  <rect x="154" y="198" width="44" height="40" rx="8" fill="url(#key-gradient)" stroke="#475569" stroke-width="2"/>
+  
+  <!-- Highlighted Glowing 'F' key -->
+  <rect x="208" y="198" width="44" height="40" rx="8" fill="url(#accent-gradient)"/>
+  <circle cx="230" cy="228" r="2" fill="#ffffff"/>
+
+  <!-- Highlighted Glowing 'J' key -->
+  <rect x="262" y="198" width="44" height="40" rx="8" fill="url(#accent-gradient)"/>
+  <circle cx="284" cy="228" r="2" fill="#ffffff"/>
+
+  <rect x="316" y="198" width="44" height="40" rx="8" fill="url(#key-gradient)" stroke="#475569" stroke-width="2"/>
+  <rect x="370" y="198" width="46" height="40" rx="8" fill="url(#key-gradient)" stroke="#475569" stroke-width="2"/>
+
+  <!-- Bottom Row & Spacebar -->
+  <rect x="96" y="248" width="56" height="40" rx="8" fill="url(#key-gradient)" stroke="#475569" stroke-width="2"/>
+  <rect x="162" y="248" width="44" height="40" rx="8" fill="url(#key-gradient)" stroke="#475569" stroke-width="2"/>
+  <rect x="216" y="248" width="44" height="40" rx="8" fill="url(#key-gradient)" stroke="#475569" stroke-width="2"/>
+  <rect x="270" y="248" width="44" height="40" rx="8" fill="url(#key-gradient)" stroke="#475569" stroke-width="2"/>
+  <rect x="324" y="248" width="88" height="40" rx="8" fill="url(#key-gradient)" stroke="#475569" stroke-width="2"/>
+
+  <!-- Space Bar Row -->
+  <rect x="96" y="298" width="60" height="40" rx="8" fill="url(#key-gradient)" stroke="#475569" stroke-width="2"/>
+  <rect x="166" y="298" width="180" height="40" rx="8" fill="url(#accent-gradient)"/>
+  <rect x="356" y="298" width="60" height="40" rx="8" fill="url(#key-gradient)" stroke="#475569" stroke-width="2"/>
+
+  <!-- Speed Lightning Indicator -->
+  <path d="M 248 56 L 272 56 L 246 100 L 268 100 L 236 142 L 246 96 L 226 96 Z" fill="#06b6d4" opacity="0.95"/>
+
+  <!-- Pro Badge Text -->
+  <text x="256" y="440" text-anchor="middle" fill="#f8fafc" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="800" font-size="34" letter-spacing="4">SMART TYPING</text>
+</svg>

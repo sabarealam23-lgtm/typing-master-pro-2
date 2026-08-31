@@ -132,8 +132,8 @@ export const SITE_ROUTES: SitemapRouteConfig[] = [
 ];
 
 export const siteConfig = {
-  name: 'SmartTypingPro',
-  shortName: 'SmartTypingPro',
+  name: 'Smart Typing Pro',
+  shortName: 'SmartTyping',
   description: 'Professional browser-based typing learning and practice web platform with structured courses, accurate WPM/Accuracy typing engine, visual keyboard, detailed analytics, achievements, and leaderboards.',
   url: getBaseUrl(),
   ogImage: `${getBaseUrl()}/og-image.png`,
